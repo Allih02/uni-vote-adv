@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal - University Voting System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #7c3aed;
+            --accent-color: #06b6d4;
+            --text-color: #1e293b;
+            --light-text: #64748b;
+            --light-bg: #f8fafc;
+            --card-bg: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo i {
+            -webkit-text-fill-color: var(--primary-color);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color);
+        }
+
+        .btn-login {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.2);
+        }
+
+        .hero {
+            padding: 8rem 2rem 4rem;
+            background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, var(--primary-color) 0%, transparent 70%);
+            opacity: 0.1;
+            border-radius: 50%;
+            transform: translate(25%, -25%);
+        }
+
+        .hero-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .hero-text h1 {
+            font-size: 4rem;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-text p {
+            font-size: 1.25rem;
+            color: var(--light-text);
+            margin-bottom: 2.5rem;
+            max-width: 600px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .hero-image {
+            position: relative;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .hero-image img {
+            width: 100%;
+            max-width: 600px;
+            filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.1));
+        }
+
+        .features {
+            padding: 6rem 2rem;
+            background: white;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: var(--light-text);
+            font-size: 1.2rem;
+            margin-bottom: 4rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .features-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            border: 1px solid #e2e8f0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-icon i {
+            font-size: 1.8rem;
+            color: white;
+        }
+
+        .feature-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+
+        .feature-description {
+            color: var(--light-text);
+            line-height: 1.8;
+        }
+
+        .why-choose {
+            padding: 6rem 2rem;
+            background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+        }
+
+        .why-choose-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .why-choose-image {
+            position: relative;
+        }
+
+        .why-choose-image img {
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .why-choose-list {
+            list-style: none;
+        }
+
+        .why-choose-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+        }
+
+        .why-choose-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-color);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .why-choose-icon i {
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .why-choose-text h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+
+        .why-choose-text p {
+            color: var(--light-text);
+            line-height: 1.7;
+        }
+
+        .stats {
+            padding: 6rem 2rem;
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .stats-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .cta {
+            padding: 6rem 2rem;
+            background: white;
+            text-align: center;
+        }
+
+        .cta-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .cta h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-color);
+        }
+
+        .cta p {
+            font-size: 1.2rem;
+            color: var(--light-text);
+            margin-bottom: 2.5rem;
+        }
+
+        .footer {
+            background: var(--text-color);
+            color: white;
+            padding: 4rem 2rem 2rem;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 4rem;
+        }
+
+        .footer-brand h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-brand p {
+            color: #94a3b8;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            background: var(--primary-color);
+            transform: translateY(-3px);
+        }
+
+        .footer-section h4 {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            color: #94a3b8;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-text h1 {
+                font-size: 3rem;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .why-choose-content {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-right {
+                display: none;
+            }
+
+            .hero-text h1 {
+                font-size: 2.5rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                text-align: center;
+            }
+
+            .footer-social {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-vote-yea"></i>
+                VoteAdmin
+            </a>
+            <div class="nav-right">
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#why-us" class="nav-link">Why Us</a>
+                <a href="#contact" class="nav-link">Contact</a>
+                <a href="login.php" class="btn-login">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Admin Login
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>Secure University Voting Management</h1>
+                <p>Transform your university elections with our powerful admin platform. Manage candidates, monitor real-time results, and ensure transparent democratic processes.</p>
+                <div class="hero-buttons">
+                    <a href="login.php" class="btn-primary">
+                        <i class="fas fa-lock"></i>
+                        Access Admin Portal
+                    </a>
+                    <a href="#features" class="btn-secondary">Learn More</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="/api/placeholder/600/400" alt="Admin Dashboard Preview">
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="features">
+        <h2 class="section-title">Powerful Admin Features</h2>
+        <p class="section-subtitle">Everything you need to manage university elections efficiently and securely</p>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3 class="feature-title">Advanced Security</h3>
+                <p class="feature-description">Multi-layer authentication, encrypted votes, and comprehensive audit trails ensure election integrity.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3 class="feature-title">Real-time Analytics</h3>
+                <p class="feature-description">Monitor voting trends, participation rates, and results in real-time with interactive dashboards.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-users-cog"></i>
+                </div>
+                <h3 class="feature-title">User Management</h3>
+                <p class="feature-description">Efficiently manage student voters, candidates, and admin roles with granular permission controls.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <h3 class="feature-title">Election Scheduling</h3>
+                <p class="feature-description">Plan and automate election cycles with precise timing controls and notification systems.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-file-export"></i>
+                </div>
+                <h3 class="feature-title">Comprehensive Reports</h3>
+                <p class="feature-description">Generate detailed election reports, voter statistics, and audit documents with one click.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3 class="feature-title">Mobile Responsive</h3>
+                <p class="feature-description">Access the admin portal from any device with our fully responsive interface design.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="why-us" class="why-choose">
+        <div class="why-choose-content">
+            <div class="why-choose-image">
+                <img src="/api/placeholder/600/400" alt="Why Choose Us">
+            </div>
+            <div class="why-choose-text">
+                <h2 class="section-title">Why Choose Our Platform?</h2>
+                <ul class="why-choose-list">
+                    <li class="why-choose-item">
+                        <div class="why-choose-icon">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="why-choose-text">
+                            <h3>Proven Reliability</h3>
+                            <p>99.9% uptime guarantee with backup systems ensuring uninterrupted elections.</p>
+                        </div>
+                    </li>
+                    <li class="why-choose-item">
+                        <div class="why-choose-icon">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="why-choose-text">
+                            <h3>Easy Integration</h3>
+                            <p>Seamlessly integrate with existing university systems and student databases.</p>
+                        </div>
+                    </li>
+                    <li class="why-choose-item">
+                        <div class="why-choose-icon">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="why-choose-text">
+                            <h3>24/7 Support</h3>
+                            <p>Round-the-clock technical support to ensure smooth election operations.</p>
+                        </div>
+                    </li>
+                    <li class="why-choose-item">
+                        <div class="why-choose-icon">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="why-choose-text">
+                            <h3>Compliance Ready</h3>
+                            <p>Built to meet university governance and electoral compliance requirements.</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="stats">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">50+</div>
+                <div class="stat-label">Universities Trust Us</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">500K+</div>
+                <div class="stat-label">Votes Processed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">99.9%</div>
+                <div class="stat-label">System Uptime</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Support Available</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta">
+        <div class="cta-content">
+            <h2>Ready to Transform Your University Elections?</h2>
+            <p>Join leading universities in providing secure, transparent, and efficient voting experiences.</p>
+            <a href="/admin/login.php" class="btn-primary">
+                <i class="fas fa-arrow-right"></i>
+                Access Admin Portal
+            </a>
+        </div>
+    </section>
+
+    <footer id="contact" class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3>VoteAdmin</h3>
+                <p>Empowering universities with secure, efficient, and transparent online voting solutions.</p>
+                <div class="footer-social">
+                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#why-us">Why Us</a></li>
+                    <li><a href="login.php">Admin Login</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <ul class="footer-links">
+                    <li><a href="documentation.php">Documentation</a></li>
+                    <li><a href="support.php">Support Center</a></li>
+                    <li><a href="privacy.php">Privacy Policy</a></li>
+                    <li><a href="terms.php">Terms of Service</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Contact</h4>
+                <ul class="footer-links">
+                    <li><a href="mailto:admin@university.edu">admin@university.edu</a></li>
+                    <li><a href="tel:+1234567890">+1 (234) 567-890</a></li>
+                    <li><a href="#">University Campus</a></li>
+                    <li><a href="#">Monday - Friday: 9AM - 5PM</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 University Voting System. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
