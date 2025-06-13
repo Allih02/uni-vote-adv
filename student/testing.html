@@ -1,0 +1,277 @@
+<?php
+session_start();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Get form data
+    $registrationNumber = $_POST['registrationNumber'];
+    $firstName = $_POST['firstName'];
+    $lastName = $_POST['lastName'];
+    $email = $_POST['email'];
+    
+    // Validate registration number format
+    if (!preg_match('/^[A-Za-z0-9]{2}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}$/', $registrationNumber)) {
+        $error = 'Registration number must be in format XX-XXXX-XXXX';
+    }
+    // Validate email format
+    elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = 'Please enter a valid email address';
+    }
+    else {
+        // Database connection (replace with your actual credentials)
+        $conn = new mysqli('localhost', 'username', 'password', 'voter_registration');
+        
+        if ($conn->connect_error) {
+            die("Connection failed: " . $conn->connect_error);
+        }
+        
+        // Check if user already exists
+        $stmt = $conn->prepare("SELECT id FROM users WHERE registration_number = ? OR email = ?");
+        $stmt->bind_param("ss", $registrationNumber, $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if ($result->num_rows > 0) {
+            $error = 'A user with this registration number or email already exists';
+        } else {
+            // Generate default password (already base64 encoded in database by default)
+            $defaultPassword = 'cGFzc3dvcmQxMjM='; // 'password123' in base64
+            
+            // Insert new user
+            $stmt = $conn->prepare("INSERT INTO users (registration_number, first_name, last_name, email, password) VALUES (?, ?, ?, ?, ?)");
+            $stmt->bind_param("sssss", $registrationNumber, $firstName, $lastName, $email, $defaultPassword);
+            
+            if ($stmt->execute()) {
+                // Registration successful, store success message in session
+                $_SESSION['registration_success'] = true;
+                $_SESSION['registered_email'] = $email;
+                header('Location: registration-success.php');
+                exit;
+            } else {
+                $error = 'Registration failed. Please try again later.';
+            }
+        }
+        
+        $stmt->close();
+        $conn->close();
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voter Registration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .registration-container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .registration-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .registration-header h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .registration-header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .error-message {
+            background-color: #ffe5e5;
+            color: #ff3333;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .register-button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+
+        .register-button:hover {
+            opacity: 0.9;
+        }
+
+        .footer-text {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .footer-text a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .footer-text a:hover {
+            text-decoration: underline;
+        }
+
+        .form-info {
+            font-size: 12px;
+            color: #777;
+            margin-top: 5px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="registration-container">
+        <div class="registration-header">
+            <h1>Voter Registration</h1>
+            <p>Create a new account to access the voter portal</p>
+        </div>
+        
+        <form method="POST" action="register.php">
+            <?php if (!empty($error)): ?>
+                <div class="error-message">
+                    <?php echo $error; ?>
+                </div>
+            <?php endif; ?>
+            
+            <div class="form-group">
+                <label for="registrationNumber">Registration Number</label>
+                <input 
+                    type="text" 
+                    id="registrationNumber"
+                    name="registrationNumber" 
+                    placeholder="XX-XXXX-XXXX"
+                    pattern="[A-Za-z0-9]{2}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}"
+                    title="Format: XX-XXXX-XXXX"
+                    value="<?php echo isset($_POST['registrationNumber']) ? htmlspecialchars($_POST['registrationNumber']) : ''; ?>"
+                    required
+                >
+                <div class="form-info">Format: XX-XXXX-XXXX (e.g., AB-1234-5678)</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input 
+                    type="email" 
+                    id="email"
+                    name="email" 
+                    placeholder="example@domain.com"
+                    value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>"
+                    required
+                >
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="firstName">First Name</label>
+                    <input 
+                        type="text" 
+                        id="firstName"
+                        name="firstName" 
+                        placeholder="Enter your first name"
+                        value="<?php echo isset($_POST['firstName']) ? htmlspecialchars($_POST['firstName']) : ''; ?>"
+                        required
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="lastName">Last Name</label>
+                    <input 
+                        type="text" 
+                        id="lastName"
+                        name="lastName" 
+                        placeholder="Enter your last name"
+                        value="<?php echo isset($_POST['lastName']) ? htmlspecialchars($_POST['lastName']) : ''; ?>"
+                        required
+                    >
+                </div>
+            </div>
+            
+            <div class="form-info" style="margin-bottom: 20px;">
+                Note: A default password will be generated and sent to your email address.
+            </div>
+            
+            <button type="submit" class="register-button">Register</button>
+            
+            <div class="footer-text">
+                <p>Already have an account? <a href="login.php">Login here</a></p>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

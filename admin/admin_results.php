@@ -1,4 +1,162 @@
---info: #3b82f6;
+<?php
+// admin_results.php - Election Results & Analytics Dashboard
+session_start();
+
+// Database configuration
+$host = 'localhost';
+$dbname = 'voting_system';  // Correct database name
+$username = 'root';
+$password = '';
+
+// Initialize variables
+$pdo = null;
+$selected_election_id = null;
+$selected_election = null;
+$elections = [];
+$results = [];
+$voting_stats = [
+    'total_votes' => 0,
+    'eligible_voters' => 0,
+    'turnout_percentage' => 0,
+    'total_candidates' => 0
+];
+
+// Database connection with error handling
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+} catch(PDOException $e) {
+    $connection_error = "Connection failed: " . $e->getMessage();
+    error_log($connection_error);
+}
+
+// Only proceed if database connection is successful
+if ($pdo) {
+    // Get selected election ID from GET parameter
+    $selected_election_id = isset($_GET['election_id']) ? (int)$_GET['election_id'] : null;
+
+    // Get all elections for dropdown
+    try {
+        $stmt = $pdo->query("SELECT id, title, status, start_date, end_date FROM elections ORDER BY created_at DESC");
+        $elections = $stmt->fetchAll();
+    } catch(PDOException $e) {
+        error_log("Error fetching elections: " . $e->getMessage());
+        $elections = [];
+    }
+
+    // If no election is selected but elections exist, select the first one
+    if (!$selected_election_id && !empty($elections)) {
+        $selected_election_id = $elections[0]['id'];
+        header("Location: " . $_SERVER['PHP_SELF'] . "?election_id=" . $selected_election_id);
+        exit;
+    }
+
+    // Find the selected election details
+    if ($selected_election_id && !empty($elections)) {
+        foreach ($elections as $election) {
+            if ($election['id'] == $selected_election_id) {
+                $selected_election = $election;
+                break;
+            }
+        }
+    }
+
+    // If we have a selected election, fetch its results
+    if ($selected_election) {
+        try {
+            // Get election statistics
+            $stmt = $pdo->prepare("
+                SELECT 
+                    COUNT(DISTINCT v.voter_id) as total_votes,
+                    COUNT(DISTINCT c.id) as total_candidates,
+                    (SELECT COUNT(*) FROM voters WHERE status = 'active') as eligible_voters
+                FROM votes v
+                JOIN candidates c ON v.candidate_id = c.id
+                WHERE c.election_id = ?
+            ");
+            $stmt->execute([$selected_election_id]);
+            $stats = $stmt->fetch();
+            
+            if ($stats && $stats['total_votes'] !== null) {
+                $voting_stats['total_votes'] = (int)$stats['total_votes'];
+                $voting_stats['eligible_voters'] = (int)$stats['eligible_voters'];
+                $voting_stats['total_candidates'] = (int)$stats['total_candidates'];
+                
+                if ($voting_stats['eligible_voters'] > 0) {
+                    $voting_stats['turnout_percentage'] = round(
+                        ($voting_stats['total_votes'] / $voting_stats['eligible_voters']) * 100, 1
+                    );
+                }
+            }
+            
+            // Get candidate results grouped by position
+            $stmt = $pdo->prepare("
+                SELECT 
+                    c.id,
+                    c.full_name,
+                    c.position,
+                    c.profile_image,
+                    COUNT(v.id) as vote_count,
+                    ROUND((COUNT(v.id) * 100.0 / NULLIF((
+                        SELECT COUNT(*) 
+                        FROM votes v2 
+                        JOIN candidates c2 ON v2.candidate_id = c2.id 
+                        WHERE c2.election_id = ? AND c2.position = c.position
+                    ), 0)), 2) as vote_percentage
+                FROM candidates c
+                LEFT JOIN votes v ON c.id = v.candidate_id
+                WHERE c.election_id = ? AND c.status = 'active'
+                GROUP BY c.id, c.position
+                ORDER BY c.position, vote_count DESC
+            ");
+            $stmt->execute([$selected_election_id, $selected_election_id]);
+            $candidate_results = $stmt->fetchAll();
+            
+            // Group results by position
+            $results = [];
+            foreach ($candidate_results as $candidate) {
+                $position = $candidate['position'];
+                if (!isset($results[$position])) {
+                    $results[$position] = [];
+                }
+                $results[$position][] = $candidate;
+            }
+            
+        } catch(PDOException $e) {
+            error_log("Error fetching election results: " . $e->getMessage());
+        }
+    }
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Election Results & Analytics - Admin Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Variables */
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #a5b4fc;
+            --secondary: #8b5cf6;
+            --accent: #f43f5e;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --surface-hover: #f1f5f9;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --border-dark: #cbd5e1;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --info: #3b82f6;
             --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
             --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
             --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
@@ -135,6 +293,22 @@
             padding: 2rem;
         }
 
+        /* Error Alert */
+        .error-alert {
+            background: var(--error);
+            color: white;
+            padding: 1rem 2rem;
+            margin: 1rem 2rem;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .error-alert i {
+            font-size: 1.25rem;
+        }
+
         /* Election Selector */
         .election-selector {
             background: var(--surface);
@@ -171,15 +345,9 @@
             text-transform: uppercase;
         }
 
-        .status-active {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .status-completed {
-            background: #f3e8ff;
-            color: #6b21a8;
-        }
+        .status-active { background: #dcfce7; color: #166534; }
+        .status-completed { background: #f3e8ff; color: #6b21a8; }
+        .status-draft { background: #fef3c7; color: #92400e; }
 
         /* Overview Cards */
         .overview-grid {
@@ -290,6 +458,19 @@
         }
 
         /* Candidate Results */
+        .position-section {
+            margin-bottom: 2rem;
+        }
+
+        .position-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+        }
+
         .candidate-result {
             display: flex;
             align-items: center;
@@ -365,65 +546,6 @@
             font-weight: 600;
         }
 
-        /* Chart Container */
-        .chart-container {
-            position: relative;
-            height: 300px;
-            margin-bottom: 1rem;
-        }
-
-        .chart-small {
-            height: 200px;
-        }
-
-        /* Analytics Grid */
-        .analytics-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        /* Demographic Table */
-        .demographic-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .demographic-table th,
-        .demographic-table td {
-            padding: 0.75rem;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .demographic-table th {
-            background: var(--surface-hover);
-            font-weight: 600;
-            color: var(--text-primary);
-            font-size: 0.875rem;
-        }
-
-        .demographic-table tr:hover {
-            background: var(--surface-hover);
-        }
-
-        .turnout-indicator {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .turnout-circle {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-        }
-
-        .turnout-high { background: var(--success); }
-        .turnout-medium { background: var(--warning); }
-        .turnout-low { background: var(--error); }
-
         /* Buttons */
         .btn {
             display: inline-flex;
@@ -488,13 +610,21 @@
             100% { opacity: 1; }
         }
 
+        .no-data {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .no-data i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--text-muted);
+        }
+
         /* Responsive Design */
         @media (max-width: 1024px) {
             .results-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .analytics-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -536,10 +666,6 @@
             .overview-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
-
-            .chart-container {
-                height: 250px;
-            }
         }
 
         @media (max-width: 480px) {
@@ -551,65 +677,74 @@
 </head>
 <body>
     <div class="dashboard">
+        <!-- Display connection error if exists -->
+        <?php if (isset($connection_error)): ?>
+            <div class="error-alert">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>
+                    <strong>Database Connection Error:</strong><br>
+                    <?php echo htmlspecialchars($connection_error); ?><br>
+                    <small>Please check your database configuration and ensure the 'voting_system' database exists.</small>
+                </div>
+            </div>
+        <?php endif; ?>
+
         <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
+        <aside class="sidebar">
             <div class="sidebar-header">
-                <a href="admin_dashboard.php" class="logo">
-                    <i class="fas fa-shield-alt"></i>
-                    <span>VoteAdmin</span>
+                <a href="dashboard.php" class="logo">
+                    <i class="fas fa-vote-yea"></i>
+                    VoteAdmin
                 </a>
             </div>
-            
             <nav class="sidebar-nav">
                 <div class="nav-section">
                     <div class="nav-section-title">Main</div>
-                    <a href="admin_dashboard.php" class="nav-item">
+                    <a href="dashboard.php" class="nav-item">
                         <i class="fas fa-tachometer-alt"></i>
-                        <span>Dashboard</span>
+                        Dashboard
                     </a>
                     <a href="admin_elections.php" class="nav-item">
-                        <i class="fas fa-poll"></i>
-                        <span>Elections</span>
+                        <i class="fas fa-calendar-check"></i>
+                        Elections
                     </a>
                     <a href="admin_candidates.php" class="nav-item">
-                        <i class="fas fa-user-tie"></i>
-                        <span>Candidates</span>
+                        <i class="fas fa-users"></i>
+                        Candidates
                     </a>
                     <a href="admin_voters.php" class="nav-item">
-                        <i class="fas fa-users"></i>
-                        <span>Voters</span>
+                        <i class="fas fa-user-friends"></i>
+                        Voters
                     </a>
                 </div>
-                
                 <div class="nav-section">
                     <div class="nav-section-title">Reports & Analytics</div>
                     <a href="admin_results.php" class="nav-item active">
                         <i class="fas fa-chart-bar"></i>
-                        <span>Results</span>
+                        Results
                     </a>
                     <a href="admin_analytics.php" class="nav-item">
-                        <i class="fas fa-chart-line"></i>
-                        <span>Analytics</span>
+                        <i class="fas fa-analytics"></i>
+                        Analytics
                     </a>
                     <a href="admin_reports.php" class="nav-item">
                         <i class="fas fa-file-alt"></i>
-                        <span>Reports</span>
+                        Reports
                     </a>
                 </div>
-                
                 <div class="nav-section">
                     <div class="nav-section-title">System</div>
                     <a href="admin_settings.php" class="nav-item">
                         <i class="fas fa-cog"></i>
-                        <span>Settings</span>
+                        Settings
                     </a>
                     <a href="admin_users.php" class="nav-item">
                         <i class="fas fa-user-shield"></i>
-                        <span>Admin Users</span>
+                        Admin Users
                     </a>
                     <a href="logout.php" class="nav-item">
                         <i class="fas fa-sign-out-alt"></i>
-                        <span>Logout</span>
+                        Logout
                     </a>
                 </div>
             </nav>
@@ -617,538 +752,617 @@
 
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Top Bar -->
             <div class="top-bar">
                 <h1>Election Results & Analytics</h1>
                 <div class="top-bar-actions">
-                    <?php if ($selected_election['status'] === 'active'): ?>
                     <div class="live-indicator">
                         <div class="live-dot"></div>
-                        <span>Live Results</span>
+                        Live
                     </div>
-                    <?php endif; ?>
                     <button class="btn btn-secondary" onclick="exportResults()">
                         <i class="fas fa-download"></i>
                         Export Report
                     </button>
-                    <button class="btn btn-primary" onclick="refreshResults()">
+                    <button class="btn btn-primary" onclick="refreshPage()">
                         <i class="fas fa-sync-alt"></i>
                         Refresh
                     </button>
                 </div>
             </div>
 
-            <!-- Page Content -->
             <div class="page-content">
-                <!-- Election Selector -->
-                <div class="election-selector">
-                    <span class="selector-label">Select Election:</span>
-                    <select class="election-select" onchange="changeElection(this.value)">
-                        <?php foreach ($elections as $election): ?>
-                        <option value="<?php echo $election['id']; ?>" <?php echo $election['id'] == $selected_election['id'] ? 'selected' : ''; ?>>
-                            <?php echo htmlspecialchars($election['title']); ?>
-                        </option>
-                        <?php endforeach; ?>
-                    </select>
-                    <span class="election-status status-<?php echo $selected_election['status']; ?>">
-                        <?php echo ucfirst($selected_election['status']); ?>
-                    </span>
-                </div>
-
-                <!-- Overview Cards -->
-                <div class="overview-grid">
-                    <div class="overview-card">
-                        <div class="overview-header">
-                            <div class="overview-icon">
-                                <i class="fas fa-vote-yea"></i>
-                            </div>
-                        </div>
-                        <div class="overview-value"><?php echo number_format($selected_election['total_votes']); ?></div>
-                        <div class="overview-label">Total Votes Cast</div>
-                    </div>
-
-                    <div class="overview-card success">
-                        <div class="overview-header">
-                            <div class="overview-icon">
-                                <i class="fas fa-users"></i>
-                            </div>
-                        </div>
-                        <div class="overview-value"><?php echo number_format($selected_election['eligible_voters']); ?></div>
-                        <div class="overview-label">Eligible Voters</div>
-                    </div>
-
-                    <div class="overview-card warning">
-                        <div class="overview-header">
-                            <div class="overview-icon">
-                                <i class="fas fa-percentage"></i>
-                            </div>
-                        </div>
-                        <div class="overview-value"><?php echo number_format($selected_election['turnout_percentage'], 1); ?>%</div>
-                        <div class="overview-label">Voter Turnout</div>
-                    </div>
-
-                    <div class="overview-card info">
-                        <div class="overview-header">
-                            <div class="overview-icon">
-                                <i class="fas fa-user-tie"></i>
-                            </div>
-                        </div>
-                        <div class="overview-value"><?php echo count($selected_election['candidates']); ?></div>
-                        <div class="overview-label">Candidates</div>
-                    </div>
-                </div>
-
-                <!-- Results Grid -->
-                <div class="results-grid">
-                    <!-- Candidate Results -->
-                    <div class="results-card">
-                        <div class="results-header">
-                            <h3 class="results-title">Candidate Results</h3>
-                            <span style="font-size: 0.875rem; color: var(--text-muted);">
-                                Last updated: <?php echo date('H:i'); ?>
-                            </span>
-                        </div>
-                        <div class="results-body">
-                            <?php foreach ($selected_election['candidates'] as $candidate): ?>
-                            <div class="candidate-result">
-                                <div class="candidate-avatar">
-                                    <img src="<?php echo htmlspecialchars($candidate['image']); ?>" alt="<?php echo htmlspecialchars($candidate['name']); ?>">
-                                </div>
-                                <div class="candidate-info">
-                                    <div class="candidate-name"><?php echo htmlspecialchars($candidate['name']); ?></div>
-                                    <div class="candidate-position"><?php echo htmlspecialchars($candidate['position']); ?></div>
-                                    <div class="vote-bar">
-                                        <div class="vote-progress" style="width: <?php echo $candidate['percentage']; ?>%"></div>
-                                    </div>
-                                    <div class="vote-stats">
-                                        <span class="vote-count"><?php echo number_format($candidate['votes']); ?> votes</span>
-                                        <span class="vote-percentage"><?php echo number_format($candidate['percentage'], 1); ?>%</span>
-                                    </div>
-                                </div>
-                            </div>
+                <?php if ($pdo): ?>
+                    <!-- Election Selector -->
+                    <div class="election-selector">
+                        <label for="election-select" class="selector-label">Select Election:</label>
+                        <select id="election-select" class="election-select" onchange="changeElection(this.value)">
+                            <option value="">Choose an election...</option>
+                            <?php foreach ($elections as $election): ?>
+                                <option value="<?php echo htmlspecialchars($election['id']); ?>" 
+                                        <?php echo ($selected_election_id == $election['id']) ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($election['title']); ?>
+                                </option>
                             <?php endforeach; ?>
-                        </div>
+                        </select>
+                        
+                        <?php if ($selected_election): ?>
+                            <span class="election-status status-<?php echo htmlspecialchars($selected_election['status']); ?>">
+                                <?php echo htmlspecialchars($selected_election['status']); ?>
+                            </span>
+                        <?php endif; ?>
                     </div>
 
-                    <!-- Vote Distribution Chart -->
-                    <div class="results-card">
-                        <div class="results-header">
-                            <h3 class="results-title">Vote Distribution</h3>
-                        </div>
-                        <div class="results-body">
-                            <div class="chart-container chart-small">
-                                <canvas id="distributionChart"></canvas>
+                    <?php if ($selected_election): ?>
+                        <!-- Overview Cards -->
+                        <div class="overview-grid">
+                            <div class="overview-card">
+                                <div class="overview-header">
+                                    <div class="overview-icon">
+                                        <i class="fas fa-vote-yea"></i>
+                                    </div>
+                                </div>
+                                <div class="overview-value"><?php echo number_format($voting_stats['total_votes']); ?></div>
+                                <div class="overview-label">Total Votes Cast</div>
+                            </div>
+
+                            <div class="overview-card info">
+                                <div class="overview-header">
+                                    <div class="overview-icon">
+                                        <i class="fas fa-users"></i>
+                                    </div>
+                                </div>
+                                <div class="overview-value"><?php echo number_format($voting_stats['eligible_voters']); ?></div>
+                                <div class="overview-label">Eligible Voters</div>
+                            </div>
+
+                            <div class="overview-card success">
+                                <div class="overview-header">
+                                    <div class="overview-icon">
+                                        <i class="fas fa-percentage"></i>
+                                    </div>
+                                </div>
+                                <div class="overview-value"><?php echo $voting_stats['turnout_percentage']; ?>%</div>
+                                <div class="overview-label">Voter Turnout</div>
+                            </div>
+
+                            <div class="overview-card warning">
+                                <div class="overview-header">
+                                    <div class="overview-icon">
+                                        <i class="fas fa-user-tie"></i>
+                                    </div>
+                                </div>
+                                <div class="overview-value"><?php echo number_format($voting_stats['total_candidates']); ?></div>
+                                <div class="overview-label">Total Candidates</div>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                <!-- Analytics Grid -->
-                <div class="analytics-grid">
-                    <!-- Voting Trends -->
-                    <div class="results-card">
-                        <div class="results-header">
-                            <h3 class="results-title">Voting Trends</h3>
-                        </div>
-                        <div class="results-body">
-                            <div class="chart-container">
-                                <canvas id="trendsChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Demographic Analysis -->
-                    <div class="results-card">
-                        <div class="results-header">
-                            <h3 class="results-title">Demographic Analysis</h3>
-                        </div>
-                        <div class="results-body">
-                            <table class="demographic-table">
-                                <thead>
-                                    <tr>
-                                        <th>Faculty</th>
-                                        <th>Votes</th>
-                                        <th>Share</th>
-                                        <th>Turnout</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($demographic_data as $demo): ?>
-                                    <tr>
-                                        <td><?php echo htmlspecialchars($demo['faculty']); ?></td>
-                                        <td><?php echo number_format($demo['votes']); ?></td>
-                                        <td><?php echo number_format($demo['percentage'], 1); ?>%</td>
-                                        <td>
-                                            <div class="turnout-indicator">
-                                                <div class="turnout-circle <?php echo $demo['turnout'] >= 70 ? 'turnout-high' : ($demo['turnout'] >= 50 ? 'turnout-medium' : 'turnout-low'); ?>"></div>
-                                                <?php echo number_format($demo['turnout'], 1); ?>%
+                        <!-- Results Display -->
+                        <?php if (!empty($results)): ?>
+                            <div class="results-grid">
+                                <div class="results-card">
+                                    <div class="results-header">
+                                        <h2 class="results-title">Election Results</h2>
+                                    </div>
+                                    <div class="results-body">
+                                        <?php foreach ($results as $position => $candidates): ?>
+                                            <div class="position-section">
+                                                <h3 class="position-title"><?php echo htmlspecialchars($position); ?></h3>
+                                                
+                                                <?php foreach ($candidates as $candidate): ?>
+                                                    <div class="candidate-result">
+                                                        <div class="candidate-avatar">
+                                                            <img src="<?php echo htmlspecialchars($candidate['profile_image'] ?: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face'); ?>" 
+                                                                 alt="<?php echo htmlspecialchars($candidate['full_name']); ?>"
+                                                                 onerror="this.src='https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face'">
+                                                        </div>
+                                                        <div class="candidate-info">
+                                                            <div class="candidate-name"><?php echo htmlspecialchars($candidate['full_name']); ?></div>
+                                                            <div class="candidate-position"><?php echo htmlspecialchars($candidate['position']); ?></div>
+                                                            <div class="vote-bar">
+                                                                <div class="vote-progress" style="width: <?php echo $candidate['vote_percentage'] ?: 0; ?>%"></div>
+                                                            </div>
+                                                            <div class="vote-stats">
+                                                                <span class="vote-count"><?php echo number_format($candidate['vote_count']); ?> votes</span>
+                                                                <span class="vote-percentage"><?php echo number_format($candidate['vote_percentage'] ?: 0, 1); ?>%</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                <?php endforeach; ?>
                                             </div>
-                                        </td>
-                                    </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+
+                                <!-- Quick Stats Sidebar -->
+                                <div class="results-card">
+                                    <div class="results-header">
+                                        <h2 class="results-title">Quick Stats</h2>
+                                    </div>
+                                    <div class="results-body">
+                                        <div style="text-align: center; padding: 1rem;">
+                                            <i class="fas fa-chart-pie" style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;"></i>
+                                            <h4 style="margin-bottom: 1rem; color: var(--text-primary);">Election Summary</h4>
+                                            <div style="text-align: left;">
+                                                <div style="margin-bottom: 1rem; padding: 1rem; background: var(--surface-hover); border-radius: var(--radius-md);">
+                                                    <h5 style="color: var(--text-primary); margin-bottom: 0.5rem;">
+                                                        <i class="fas fa-trophy"></i> Leading Positions
+                                                    </h5>
+                                                    <?php 
+                                                    $position_count = 0;
+                                                    foreach ($results as $position => $candidates): 
+                                                        if ($position_count >= 3) break; // Show only top 3
+                                                        if (!empty($candidates)):
+                                                            $leader = $candidates[0]; // First candidate is the leader
+                                                    ?>
+                                                        <div style="margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border);">
+                                                            <p style="font-weight: 600; color: var(--text-primary); font-size: 0.875rem;">
+                                                                <?php echo htmlspecialchars($position); ?>
+                                                            </p>
+                                                            <p style="color: var(--success); font-size: 0.8rem;">
+                                                                <?php echo htmlspecialchars($leader['full_name']); ?>
+                                                                (<?php echo $leader['vote_count']; ?> votes)
+                                                            </p>
+                                                        </div>
+                                                    <?php 
+                                                        endif;
+                                                        $position_count++;
+                                                    endforeach; 
+                                                    ?>
+                                                </div>
+                                                
+                                                <div style="padding: 1rem; background: var(--surface-hover); border-radius: var(--radius-md);">
+                                                    <h5 style="color: var(--text-primary); margin-bottom: 0.5rem;">
+                                                        <i class="fas fa-info-circle"></i> Election Details
+                                                    </h5>
+                                                    <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
+                                                        <strong>Start:</strong> <?php echo date('M j, Y', strtotime($selected_election['start_date'])); ?>
+                                                    </p>
+                                                    <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
+                                                        <strong>End:</strong> <?php echo date('M j, Y', strtotime($selected_election['end_date'])); ?>
+                                                    </p>
+                                                    <p style="font-size: 0.875rem; color: var(--text-secondary);">
+                                                        <strong>Status:</strong> 
+                                                        <span style="color: var(--primary); font-weight: 600;">
+                                                            <?php echo ucfirst($selected_election['status']); ?>
+                                                        </span>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php else: ?>
+                            <div class="results-card">
+                                <div class="results-body">
+                                    <div class="no-data">
+                                        <i class="fas fa-chart-bar"></i>
+                                        <h3>No Results Available</h3>
+                                        <p>No voting results found for this election yet.</p>
+                                        <small style="color: var(--text-muted);">
+                                            Results will appear here once voting begins.
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
+                        <!-- Analytics Summary Table -->
+                        <?php if (!empty($results)): ?>
+                        <div style="margin-top: 2rem;">
+                            <div class="results-card">
+                                <div class="results-header">
+                                    <h2 class="results-title">
+                                        <i class="fas fa-table"></i>
+                                        Position Summary
+                                    </h2>
+                                </div>
+                                <div class="results-body">
+                                    <div style="overflow-x: auto;">
+                                        <table style="width: 100%; border-collapse: collapse; background: white; border-radius: var(--radius-md); overflow: hidden;">
+                                            <thead>
+                                                <tr style="background: var(--primary-light); color: var(--primary-dark);">
+                                                    <th style="padding: 1rem; text-align: left; font-weight: 600;">Position</th>
+                                                    <th style="padding: 1rem; text-align: center; font-weight: 600;">Candidates</th>
+                                                    <th style="padding: 1rem; text-align: center; font-weight: 600;">Total Votes</th>
+                                                    <th style="padding: 1rem; text-align: left; font-weight: 600;">Leading Candidate</th>
+                                                    <th style="padding: 1rem; text-align: center; font-weight: 600;">Lead Votes</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php foreach ($results as $position => $candidates): ?>
+                                                    <?php 
+                                                    $total_position_votes = array_sum(array_column($candidates, 'vote_count'));
+                                                    $leading_candidate = !empty($candidates) ? $candidates[0] : null;
+                                                    ?>
+                                                    <tr style="border-bottom: 1px solid var(--border);">
+                                                        <td style="padding: 1rem; font-weight: 600; color: var(--text-primary);">
+                                                            <?php echo htmlspecialchars($position); ?>
+                                                        </td>
+                                                        <td style="padding: 1rem; text-align: center; color: var(--text-secondary);">
+                                                            <?php echo count($candidates); ?>
+                                                        </td>
+                                                        <td style="padding: 1rem; text-align: center; font-weight: 600; color: var(--text-primary);">
+                                                            <?php echo number_format($total_position_votes); ?>
+                                                        </td>
+                                                        <td style="padding: 1rem;">
+                                                            <?php if ($leading_candidate): ?>
+                                                                <span style="font-weight: 600; color: var(--success);">
+                                                                    <?php echo htmlspecialchars($leading_candidate['full_name']); ?>
+                                                                </span>
+                                                                <br>
+                                                                <small style="color: var(--text-secondary);">
+                                                                    <?php echo number_format($leading_candidate['vote_percentage'], 1); ?>% of votes
+                                                                </small>
+                                                            <?php else: ?>
+                                                                <span style="color: var(--text-muted); font-style: italic;">No votes yet</span>
+                                                            <?php endif; ?>
+                                                        </td>
+                                                        <td style="padding: 1rem; text-align: center;">
+                                                            <?php if ($leading_candidate): ?>
+                                                                <span style="font-weight: 600; color: var(--primary);">
+                                                                    <?php echo number_format($leading_candidate['vote_count']); ?>
+                                                                </span>
+                                                            <?php else: ?>
+                                                                <span style="color: var(--text-muted);">-</span>
+                                                            <?php endif; ?>
+                                                        </td>
+                                                    </tr>
+                                                <?php endforeach; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+
+                    <?php else: ?>
+                        <!-- No Election Selected -->
+                        <div class="results-card">
+                            <div class="results-body">
+                                <div class="no-data">
+                                    <i class="fas fa-ballot-check"></i>
+                                    <h3>No Election Selected</h3>
+                                    <p>Please select an election from the dropdown above to view results.</p>
+                                    <?php if (empty($elections)): ?>
+                                        <div style="margin-top: 2rem; padding: 1rem; background: var(--warning-light); border-radius: var(--radius-md); color: var(--warning);">
+                                            <i class="fas fa-info-circle"></i>
+                                            <strong>No elections found in the system.</strong><br>
+                                            <small>Please create an election first to view results.</small>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+
+                <?php else: ?>
+                    <!-- Database Connection Failed -->
+                    <div class="results-card">
+                        <div class="results-body">
+                            <div class="no-data">
+                                <i class="fas fa-database" style="color: var(--error);"></i>
+                                <h3>Database Connection Failed</h3>
+                                <p>Unable to connect to the voting system database.</p>
+                                <div style="margin-top: 2rem; padding: 1rem; background: var(--error-light); border-radius: var(--radius-md); color: var(--error); text-align: left;">
+                                    <h4 style="margin-bottom: 1rem;">Troubleshooting Steps:</h4>
+                                    <ol style="margin-left: 1.5rem;">
+                                        <li>Ensure MySQL server is running</li>
+                                        <li>Verify the database name is 'voting_system'</li>
+                                        <li>Check database credentials (host, username, password)</li>
+                                        <li>Make sure the database exists and has the required tables</li>
+                                    </ol>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                <?php endif; ?>
+
+                <!-- Footer -->
+                <div style="margin-top: 3rem; padding: 2rem; text-align: center; color: var(--text-muted); border-top: 1px solid var(--border);">
+                    <p style="margin-bottom: 0.5rem;">
+                        <i class="fas fa-shield-alt"></i>
+                        University Voting System Admin Dashboard
+                    </p>
+                    <p style="font-size: 0.875rem;">
+                        Last updated: <?php echo date('F j, Y \a\t g:i A'); ?> | 
+                        <a href="#" onclick="refreshPage()" style="color: var(--primary); text-decoration: none;">
+                            <i class="fas fa-sync-alt"></i> Refresh Data
+                        </a>
+                    </p>
                 </div>
             </div>
         </main>
     </div>
 
     <script>
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeMobile();
-            initializeCharts();
-            
-            // Auto-refresh for active elections
-            <?php if ($selected_election['status'] === 'active'): ?>
-            setInterval(refreshResults, 30000); // Refresh every 30 seconds
-            <?php endif; ?>
-        });
+        // Auto-refresh functionality
+        let autoRefresh = false;
+        let refreshInterval;
 
-        function initializeMobile() {
-            if (window.innerWidth <= 768) {
-                const sidebarToggle = document.createElement('button');
-                sidebarToggle.innerHTML = '<i class="fas fa-bars"></i>';
-                sidebarToggle.className = 'btn btn-secondary';
-                sidebarToggle.style.marginRight = '1rem';
+        function toggleAutoRefresh() {
+            autoRefresh = !autoRefresh;
+            const refreshBtn = document.querySelector('.btn-primary');
+            
+            if (autoRefresh) {
+                refreshBtn.innerHTML = '<i class="fas fa-pause"></i> Pause Auto-Refresh';
+                refreshBtn.classList.add('btn-warning');
+                refreshBtn.classList.remove('btn-primary');
+                refreshInterval = setInterval(() => {
+                    location.reload();
+                }, 30000); // Refresh every 30 seconds
                 
-                document.querySelector('.top-bar h1').parentNode.insertBefore(sidebarToggle, document.querySelector('.top-bar h1'));
+                showNotification('Auto-refresh enabled (30s intervals)', 'success');
+            } else {
+                refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh';
+                refreshBtn.classList.add('btn-primary');
+                refreshBtn.classList.remove('btn-warning');
+                clearInterval(refreshInterval);
                 
-                sidebarToggle.addEventListener('click', function() {
-                    document.getElementById('sidebar').classList.toggle('open');
-                });
+                showNotification('Auto-refresh disabled', 'info');
             }
         }
 
-        function initializeCharts() {
-            // Vote Distribution Pie Chart
-            const distributionCtx = document.getElementById('distributionChart').getContext('2d');
-            const distributionChart = new Chart(distributionCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: [
-                        <?php foreach ($selected_election['candidates'] as $candidate): ?>
-                        '<?php echo addslashes($candidate['name']); ?>',
-                        <?php endforeach; ?>
-                    ],
-                    datasets: [{
-                        data: [
-                            <?php foreach ($selected_election['candidates'] as $candidate): ?>
-                            <?php echo $candidate['votes']; ?>,
-                            <?php endforeach; ?>
-                        ],
-                        backgroundColor: [
-                            '#6366f1',
-                            '#8b5cf6',
-                            '#f43f5e',
-                            '#10b981',
-                            '#f59e0b'
-                        ],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                padding: 20,
-                                usePointStyle: true,
-                                font: {
-                                    size: 12
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-
-            // Voting Trends Line Chart
-            const trendsCtx = document.getElementById('trendsChart').getContext('2d');
-            const trendsChart = new Chart(trendsCtx, {
-                type: 'line',
-                data: {
-                    labels: [
-                        <?php foreach ($voting_trends as $trend): ?>
-                        '<?php echo $trend['hour']; ?>',
-                        <?php endforeach; ?>
-                    ],
-                    datasets: [{
-                        label: 'Votes per Hour',
-                        data: [
-                            <?php foreach ($voting_trends as $trend): ?>
-                            <?php echo $trend['votes']; ?>,
-                            <?php endforeach; ?>
-                        ],
-                        borderColor: '#6366f1',
-                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                stepSize: 10
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    }
-                }
-            });
-        }
-
-        function changeElection(electionId) {
-            window.location.href = `admin_results.php?election=${electionId}`;
-        }
-
-        function refreshResults() {
-            // In a real application, this would fetch updated data
-            showNotification('Results refreshed successfully!', 'success');
-            
-            // Animate refresh button
-            const refreshBtn = document.querySelector('.fa-sync-alt');
-            refreshBtn.style.animation = 'spin 1s linear';
-            setTimeout(() => {
-                refreshBtn.style.animation = '';
-            }, 1000);
-        }
-
-        function exportResults() {
-            showNotification('Export feature coming soon!', 'info');
-        }
-
+        // Notification system
         function showNotification(message, type = 'info') {
             const notification = document.createElement('div');
-            notification.className = `notification notification-${type}`;
-            notification.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 0.75rem;">
-                    <i class="fas fa-${type === 'info' ? 'info-circle' : type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i>
-                    <span>${message}</span>
-                </div>
-            `;
-            
             notification.style.cssText = `
                 position: fixed;
-                top: 2rem;
-                right: 2rem;
-                background: white;
+                top: 20px;
+                right: 20px;
+                background: var(--${type === 'success' ? 'success' : type === 'error' ? 'error' : 'info'});
+                color: white;
                 padding: 1rem 1.5rem;
-                border-radius: 0.5rem;
-                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-                border-left: 4px solid var(--${type === 'info' ? 'info' : type === 'success' ? 'success' : 'warning'});
+                border-radius: var(--radius-md);
+                box-shadow: var(--shadow-lg);
                 z-index: 1000;
                 opacity: 0;
                 transform: translateX(100%);
                 transition: all 0.3s ease;
+                max-width: 300px;
+            `;
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                    <span>${message}</span>
+                </div>
             `;
             
             document.body.appendChild(notification);
             
+            // Animate in
             setTimeout(() => {
                 notification.style.opacity = '1';
                 notification.style.transform = 'translateX(0)';
             }, 100);
             
+            // Auto remove
             setTimeout(() => {
                 notification.style.opacity = '0';
                 notification.style.transform = 'translateX(100%)';
                 setTimeout(() => {
-                    if (document.body.contains(notification)) {
-                        document.body.removeChild(notification);
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
                     }
                 }, 300);
-            }, 4000);
+            }, 3000);
         }
 
-        // Add CSS animations
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes spin {
-                from { transform: rotate(0deg); }
-                to { transform: rotate(360deg); }
+        // Page refresh function
+        function refreshPage() {
+            const refreshBtn = document.querySelector('.btn-primary');
+            if (refreshBtn.innerHTML.includes('Pause')) {
+                toggleAutoRefresh();
+            } else {
+                refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
+                refreshBtn.disabled = true;
+                setTimeout(() => {
+                    location.reload();
+                }, 500);
+            }
+        }
+
+        // Election change function
+        function changeElection(electionId) {
+            if (electionId) {
+                showNotification('Loading election data...', 'info');
+                setTimeout(() => {
+                    window.location.href = '?election_id=' + electionId;
+                }, 200);
+            }
+        }
+
+        // Export results function
+        function exportResults() {
+            const electionId = document.getElementById('election-select').value;
+            if (electionId) {
+                showNotification('Preparing export...', 'info');
+                // In a real implementation, this would trigger the actual export
+                setTimeout(() => {
+                    showNotification('Export feature coming soon!', 'success');
+                }, 1500);
+            } else {
+                showNotification('Please select an election first', 'error');
+            }
+        }
+
+        // Animate progress bars on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const progressBars = document.querySelectorAll('.vote-progress');
+            progressBars.forEach((bar, index) => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, index * 200 + 800); // Staggered animation
+            });
+
+            // Animate overview cards
+            const overviewCards = document.querySelectorAll('.overview-card');
+            overviewCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 150 + 300);
+            });
+        });
+
+        // Real-time updates simulation
+        function simulateRealTimeUpdates() {
+            const liveDot = document.querySelector('.live-dot');
+            if (liveDot) {
+                setInterval(() => {
+                    // Simulate random data updates
+                    if (Math.random() < 0.15) { // 15% chance every 2 seconds
+                        liveDot.style.animation = 'none';
+                        liveDot.style.background = '#f59e0b'; // Orange flash
+                        setTimeout(() => {
+                            liveDot.style.animation = 'pulse-dot 2s infinite';
+                            liveDot.style.background = 'var(--success)';
+                        }, 300);
+                    }
+                }, 2000);
+            }
+        }
+
+        simulateRealTimeUpdates();
+
+        // Mobile sidebar toggle
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        // Add mobile menu button for responsive design
+        if (window.innerWidth <= 768) {
+            const topBar = document.querySelector('.top-bar');
+            const topBarActions = topBar.querySelector('.top-bar-actions');
+            const menuButton = document.createElement('button');
+            menuButton.innerHTML = '<i class="fas fa-bars"></i>';
+            menuButton.className = 'btn btn-secondary';
+            menuButton.onclick = toggleSidebar;
+            topBarActions.insertBefore(menuButton, topBarActions.firstChild);
+        }
+
+        // Close sidebar on outside click (mobile)
+        document.addEventListener('click', function(e) {
+            const sidebar = document.querySelector('.sidebar');
+            const menuButton = document.querySelector('.fa-bars')?.closest('button');
+            
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(e.target) && 
+                (!menuButton || !menuButton.contains(e.target))) {
+                sidebar.classList.remove('open');
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const sidebar = document.querySelector('.sidebar');
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('open');
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + R for refresh
+            if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+                e.preventDefault();
+                refreshPage();
+            }
+            
+            // Escape to close sidebar on mobile
+            if (e.key === 'Escape' && window.innerWidth <= 768) {
+                document.querySelector('.sidebar').classList.remove('open');
+            }
+        });
+
+        // Table sorting functionality
+        function sortTable(columnIndex, ascending = true) {
+            const table = document.querySelector('table');
+            if (!table) return;
+            
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            
+            rows.sort((a, b) => {
+                let aVal = a.cells[columnIndex].textContent.trim();
+                let bVal = b.cells[columnIndex].textContent.trim();
+                
+                // Check if values are numbers
+                const aNum = parseFloat(aVal.replace(/[^0-9.-]/g, ''));
+                const bNum = parseFloat(bVal.replace(/[^0-9.-]/g, ''));
+                
+                if (!isNaN(aNum) && !isNaN(bNum)) {
+                    return ascending ? aNum - bNum : bNum - aNum;
+                }
+                
+                return ascending ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+            });
+            
+            // Re-append sorted rows
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
+        // Add click handlers to table headers for sorting
+        document.addEventListener('DOMContentLoaded', function() {
+            const headers = document.querySelectorAll('th');
+            headers.forEach((header, index) => {
+                header.style.cursor = 'pointer';
+                header.style.userSelect = 'none';
+                header.addEventListener('click', () => {
+                    sortTable(index, !header.classList.contains('sorted-desc'));
+                    
+                    // Update header indicators
+                    headers.forEach(h => h.classList.remove('sorted-asc', 'sorted-desc'));
+                    header.classList.add(header.classList.contains('sorted-desc') ? 'sorted-asc' : 'sorted-desc');
+                });
+            });
+        });
+
+        // Print functionality
+        function printResults() {
+            window.print();
+        }
+
+        // Add print styles
+        const printStyles = `
+            @media print {
+                .sidebar, .top-bar-actions, .btn { display: none !important; }
+                .main-content { margin-left: 0 !important; }
+                .top-bar { border-bottom: 2px solid #000; }
+                .results-card { break-inside: avoid; }
+                .page-content { padding: 1rem !important; }
             }
         `;
-        document.head.appendChild(style);
+        
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = printStyles;
+        document.head.appendChild(styleSheet);
+
+        // Initialize page
+        console.log('🗳️ University Voting System Admin Dashboard loaded successfully');
+        console.log('📊 Election Results & Analytics module active');
+        console.log('🔧 Database: voting_system');
+        
+        // Show success message if data loaded
+        if (document.querySelector('.overview-card')) {
+            setTimeout(() => {
+                showNotification('Election data loaded successfully! 📊', 'success');
+            }, 1000);
+        }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+        });
     </script>
 </body>
-</html><?php
-// Election Results & Analytics - No authentication required for demo
-// session_start();
-// if (!isset($_SESSION["admin_id"]) || $_SESSION["role"] !== "admin") {
-//     header("Location: admin_login.php");
-//     exit();
-// }
-
-// Mock admin data
-$admin_user = [
-    "admin_id" => 1,
-    "fullname" => "Dr. Sarah Johnson",
-    "email" => "admin@university.edu",
-    "role" => "Administrator"
-];
-
-// Mock election results data
-$elections = [
-    [
-        "id" => 1,
-        "title" => "Student Council Elections 2025",
-        "status" => "active",
-        "start_date" => "2025-06-01",
-        "end_date" => "2025-06-30",
-        "total_votes" => 324,
-        "eligible_voters" => 1250,
-        "turnout_percentage" => 25.9,
-        "candidates" => [
-            [
-                "id" => 1,
-                "name" => "Allih A. Abubakar",
-                "position" => "Student Body President",
-                "votes" => 156,
-                "percentage" => 48.1,
-                "image" => "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face"
-            ],
-            [
-                "id" => 2,
-                "name" => "Sarah Chen",
-                "position" => "Student Body President",
-                "votes" => 142,
-                "percentage" => 43.8,
-                "image" => "https://images.unsplash.com/photo-1494790108755-2616b169b9c0?w=100&h=100&fit=crop&crop=face"
-            ],
-            [
-                "id" => 6,
-                "name" => "Lisa Park",
-                "position" => "Cultural Representative",
-                "votes" => 26,
-                "percentage" => 8.1,
-                "image" => "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face"
-            ]
-        ]
-    ],
-    [
-        "id" => 3,
-        "title" => "Graduation Committee Elections",
-        "status" => "completed",
-        "start_date" => "2025-04-01",
-        "end_date" => "2025-04-15",
-        "total_votes" => 156,
-        "eligible_voters" => 200,
-        "turnout_percentage" => 78.0,
-        "candidates" => [
-            [
-                "id" => 7,
-                "name" => "Alex Johnson",
-                "position" => "Committee Chair",
-                "votes" => 89,
-                "percentage" => 57.1,
-                "image" => "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face"
-            ],
-            [
-                "id" => 8,
-                "name" => "Maria Garcia",
-                "position" => "Committee Chair",
-                "votes" => 67,
-                "percentage" => 42.9,
-                "image" => "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face"
-            ]
-        ]
-    ]
-];
-
-// Mock voting trends data (hourly for current election)
-$voting_trends = [
-    ["hour" => "08:00", "votes" => 12],
-    ["hour" => "09:00", "votes" => 28],
-    ["hour" => "10:00", "votes" => 45],
-    ["hour" => "11:00", "votes" => 67],
-    ["hour" => "12:00", "votes" => 52],
-    ["hour" => "13:00", "votes" => 38],
-    ["hour" => "14:00", "votes" => 56],
-    ["hour" => "15:00", "votes" => 42],
-    ["hour" => "16:00", "votes" => 34],
-    ["hour" => "17:00", "votes" => 18]
-];
-
-// Mock demographic data
-$demographic_data = [
-    [
-        "faculty" => "Science & Technology",
-        "votes" => 98,
-        "percentage" => 30.2,
-        "turnout" => 65.3
-    ],
-    [
-        "faculty" => "Business & Economics", 
-        "votes" => 87,
-        "percentage" => 26.9,
-        "turnout" => 58.4
-    ],
-    [
-        "faculty" => "Engineering",
-        "votes" => 76,
-        "percentage" => 23.5,
-        "turnout" => 72.4
-    ],
-    [
-        "faculty" => "Arts & Humanities",
-        "votes" => 45,
-        "percentage" => 13.9,
-        "turnout" => 48.9
-    ],
-    [
-        "faculty" => "Health Sciences",
-        "votes" => 18,
-        "percentage" => 5.5,
-        "turnout" => 75.0
-    ]
-];
-
-// Get selected election for detailed view
-$selected_election_id = isset($_GET['election']) ? intval($_GET['election']) : 1;
-$selected_election = array_filter($elections, function($e) use ($selected_election_id) {
-    return $e['id'] == $selected_election_id;
-});
-$selected_election = !empty($selected_election) ? reset($selected_election) : $elections[0];
-?>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Election Results & Analytics - Admin Dashboard</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --primary-light: #a5b4fc;
-            --secondary: #8b5cf6;
-            --accent: #f43f5e;
-            --background: #f8fafc;
-            --surface: #ffffff;
-            --surface-hover: #f1f5f9;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --text-muted: #94a3b8;
-            --border: #e2e8f0;
-            --border-dark: #cbd5e1;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --error: #ef4444;
-            --
+</html>
