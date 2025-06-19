@@ -1,64 +1,260 @@
 <?php
-// Remove authentication requirement - vote page works independently now
-// session_start();
-// if (!isset($_SESSION["user_id"])) {
-//     header("Location: login.php");
-//     exit();
-// }
+// vote.php - Student Voting Interface
+session_start();
 
-// Get election ID from URL
-$election_id = isset($_GET["election_id"]) ? intval($_GET["election_id"]) : 0;
+// Database Configuration
+class Database {
+    private $host = 'localhost';
+    private $db_name = 'voting_system';
+    private $username = 'root';
+    private $password = '';
+    private $conn;
 
-// Mock user data for demonstration purposes
-$mock_user = [
-    "user_id" => 1,
-    "fullname" => "John Doe",
-    "registration_number" => "REG-2024-001",
-    "program" => "Computer Science"
-];
-
-// Since we're removing database dependency, use static candidate data
-$candidates = [
-    1 => [
-        'name' => 'Allih A. Abubakar',
-        'position' => 'Student Body President',
-        'platform' => 'Campus Sustainability & Student Wellness',
-        'image' => 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
-        'color' => '#4F46E5',
-        'achievements' => 'Led Green Campus Initiative, Founded Mental Health Awareness Week'
-    ],
-    2 => [
-        'name' => 'Sarah Chen',
-        'position' => 'Student Body President',
-        'platform' => 'Academic Excellence & Campus Unity',
-        'image' => 'https://images.unsplash.com/photo-1494790108755-2616b169b9c0?w=400&h=400&fit=crop&crop=face',
-        'color' => '#8B5CF6',
-        'achievements' => 'Academic Senate Representative, Organized Diversity Summit 2024'
-    ],
-];
-
-// Process vote submission (simplified without database)
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $candidateId = $_POST['candidateId'];
-    
-    // In a real application, you would save to database here
-    // For demonstration, we'll just redirect with success
-    header('Location: dashboard.php?success=1');
-    exit;
+    public function getConnection() {
+        $this->conn = null;
+        try {
+            $this->conn = new PDO(
+                "mysql:host=" . $this->host . ";dbname=" . $this->db_name,
+                $this->username,
+                $this->password,
+                array(
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"
+                )
+            );
+        } catch(PDOException $exception) {
+            echo "Connection error: " . $exception->getMessage();
+        }
+        return $this->conn;
+    }
 }
 
-// Mock user info for backward compatibility
-$userInfo = [
-    'username' => $mock_user['registration_number'],
-    'full_name' => $mock_user['fullname'],
-    'program' => $mock_user['program']
-];
+// Helper functions
+function executeQuery($sql, $params = []) {
+    $database = new Database();
+    $db = $database->getConnection();
+    try {
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt;
+    } catch(PDOException $e) {
+        error_log("Database query error: " . $e->getMessage());
+        return false;
+    }
+}
 
-$studentInfo = [
-    'name' => $mock_user['fullname'],
-    'id' => $mock_user['user_id'],
-    'program' => $mock_user['program']
-];
+function fetchAll($sql, $params = []) {
+    $stmt = executeQuery($sql, $params);
+    return $stmt ? $stmt->fetchAll() : [];
+}
+
+function fetchOne($sql, $params = []) {
+    $stmt = executeQuery($sql, $params);
+    return $stmt ? $stmt->fetch() : null;
+}
+
+function logAuditAction($user_type, $user_id, $action, $entity_type, $entity_id, $new_values) {
+    $query = "INSERT INTO audit_logs (user_type, user_id, action, entity_type, entity_id, new_values, ip_address, user_agent)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    
+    $params = [
+        $user_type,
+        $user_id,
+        $action,
+        $entity_type,
+        $entity_id,
+        json_encode($new_values),
+        $_SERVER['REMOTE_ADDR'] ?? null,
+        $_SERVER['HTTP_USER_AGENT'] ?? null
+    ];
+    
+    executeQuery($query, $params);
+}
+
+// Check if user is logged in
+if (!isset($_SESSION['voter_id'])) {
+    header("Location: student_login.php");
+    exit();
+}
+
+// Get election ID from URL
+$election_id = $_GET['election_id'] ?? 0;
+if (!$election_id) {
+    header("Location: dashboard.php?error=no_election_selected");
+    exit();
+}
+
+// Get voter information
+$voter = fetchOne("SELECT * FROM voters WHERE id = ?", [$_SESSION['voter_id']]);
+if (!$voter) {
+    session_destroy();
+    header("Location: student_login.php?error=session_expired");
+    exit();
+}
+
+// Get election details and verify eligibility
+$election = fetchOne("
+    SELECT * FROM elections 
+    WHERE id = ? 
+    AND status = 'active' 
+    AND start_date <= NOW() 
+    AND end_date >= NOW()
+    AND JSON_CONTAINS(eligible_years, ?)
+    AND JSON_CONTAINS(eligible_faculties, ?)
+", [
+    $election_id,
+    '"' . $voter['year'] . '"',
+    '"' . $voter['faculty'] . '"'
+]);
+
+if (!$election) {
+    header("Location: dashboard.php?error=election_not_available");
+    exit();
+}
+
+// Check if voter has already voted in this election
+$existing_vote = fetchOne("SELECT * FROM votes WHERE voter_id = ? AND election_id = ?", [$voter['id'], $election_id]);
+if ($existing_vote) {
+    header("Location: dashboard.php?error=already_voted");
+    exit();
+}
+
+// Get election positions
+$positions = fetchAll("
+    SELECT * FROM positions 
+    WHERE election_id = ? 
+    ORDER BY display_order, title
+", [$election_id]);
+
+// Get candidates grouped by position
+$candidates_by_position = [];
+if (!empty($positions)) {
+    foreach ($positions as $position) {
+        $candidates_by_position[$position['title']] = fetchAll("
+            SELECT c.*, v.profile_image 
+            FROM candidates c
+            LEFT JOIN voters v ON c.voter_id = v.id
+            WHERE c.election_id = ? 
+            AND c.position = ? 
+            AND c.status = 'active'
+            ORDER BY c.full_name
+        ", [$election_id, $position['title']]);
+    }
+} else {
+    // If no positions defined, get all candidates
+    $candidates_by_position['General'] = fetchAll("
+        SELECT c.*, v.profile_image 
+        FROM candidates c
+        LEFT JOIN voters v ON c.voter_id = v.id
+        WHERE c.election_id = ? 
+        AND c.status = 'active'
+        ORDER BY c.full_name
+    ", [$election_id]);
+}
+
+// Handle vote submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_vote'])) {
+    $selected_candidates = $_POST['candidates'] ?? [];
+    
+    if (empty($selected_candidates)) {
+        $error_message = "Please select at least one candidate to vote for.";
+    } else {
+        try {
+            $database = new Database();
+            $db = $database->getConnection();
+            $db->beginTransaction();
+            
+            // Verify election is still active and voter hasn't voted
+            $election_check = fetchOne("
+                SELECT * FROM elections 
+                WHERE id = ? AND status = 'active' 
+                AND start_date <= NOW() AND end_date >= NOW()
+            ", [$election_id]);
+            
+            $vote_check = fetchOne("SELECT * FROM votes WHERE voter_id = ? AND election_id = ?", [$voter['id'], $election_id]);
+            
+            if (!$election_check) {
+                throw new Exception("Election is no longer active");
+            }
+            
+            if ($vote_check) {
+                throw new Exception("You have already voted in this election");
+            }
+            
+            // Insert votes for selected candidates
+            $vote_data = [];
+            foreach ($selected_candidates as $candidate_id) {
+                // Verify candidate belongs to this election
+                $candidate = fetchOne("SELECT * FROM candidates WHERE id = ? AND election_id = ? AND status = 'active'", [$candidate_id, $election_id]);
+                
+                if ($candidate) {
+                    // Generate vote hash for anonymity
+                    $vote_hash = hash('sha256', $voter['id'] . $election_id . $candidate_id . time() . rand());
+                    
+                    // Insert vote
+                    $vote_query = "INSERT INTO votes (voter_id, election_id, candidate_id, vote_hash, ip_address, user_agent) VALUES (?, ?, ?, ?, ?, ?)";
+                    executeQuery($vote_query, [
+                        $voter['id'],
+                        $election_id,
+                        $candidate_id,
+                        $vote_hash,
+                        $_SERVER['REMOTE_ADDR'] ?? null,
+                        $_SERVER['HTTP_USER_AGENT'] ?? null
+                    ]);
+                    
+                    // Update candidate vote count
+                    executeQuery("UPDATE candidates SET vote_count = vote_count + 1 WHERE id = ?", [$candidate_id]);
+                    
+                    $vote_data[] = [
+                        'candidate_id' => $candidate_id,
+                        'candidate_name' => $candidate['full_name'],
+                        'position' => $candidate['position']
+                    ];
+                }
+            }
+            
+            // Log audit action
+            logAuditAction('voter', $voter['id'], 'VOTE', 'election', $election_id, [
+                'election_title' => $election['title'],
+                'candidates_voted' => $vote_data
+            ]);
+            
+            $db->commit();
+            
+            // Redirect to success page
+            header("Location: vote_success.php?election_id=" . $election_id);
+            exit();
+            
+        } catch (Exception $e) {
+            $db->rollback();
+            $error_message = "An error occurred while submitting your vote: " . $e->getMessage();
+            error_log("Voting error for voter " . $voter['id'] . ": " . $e->getMessage());
+        }
+    }
+}
+
+// Calculate time remaining
+function getTimeRemaining($end_date) {
+    $now = new DateTime();
+    $end = new DateTime($end_date);
+    
+    if ($now > $end) {
+        return "Election ended";
+    }
+    
+    $interval = $now->diff($end);
+    
+    if ($interval->days > 0) {
+        return $interval->days . " day" . ($interval->days > 1 ? "s" : "") . " remaining";
+    } elseif ($interval->h > 0) {
+        return $interval->h . " hour" . ($interval->h > 1 ? "s" : "") . " remaining";
+    } else {
+        return $interval->i . " minute" . ($interval->i > 1 ? "s" : "") . " remaining";
+    }
+}
+
+$time_remaining = getTimeRemaining($election['end_date']);
 ?>
 
 <!DOCTYPE html>
@@ -66,25 +262,32 @@ $studentInfo = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cast Your Vote - Student Elections</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>Vote - <?php echo htmlspecialchars($election['title']); ?></title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #4F46E5;
-            --primary-dark: #4338CA;
-            --primary-light: #C7D2FE;
-            --secondary: #8B5CF6;
-            --accent: #EC4899;
-            --background: #F9FAFB;
-            --foreground: #111827;
-            --muted: #6B7280;
-            --card: #FFFFFF;
-            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-            --heading-font: 'Poppins', sans-serif;
-            --body-font: 'Inter', sans-serif;
+            --primary: #4f46e5;
+            --primary-dark: #3730a3;
+            --primary-light: #a5b4fc;
+            --secondary: #7c3aed;
+            --accent: #ec4899;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --surface-hover: #f1f5f9;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --info: #3b82f6;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --radius: 0.75rem;
         }
-
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
 
         * {
             margin: 0;
@@ -93,694 +296,985 @@ $studentInfo = [
         }
 
         body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--background);
-            min-height: 100vh;
-            font-family: var(--body-font);
-            color: var(--foreground);
-            overflow-x: hidden;
+            color: var(--text-primary);
+            line-height: 1.6;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 1.5rem;
+            padding: 2rem;
         }
 
-        .back-btn {
+        /* Header */
+        .header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .btn {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            color: var(--muted);
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            font-weight: 500;
             text-decoration: none;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-            border-radius: 8px;
-            margin: 1rem 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
 
-        .back-btn:hover {
-            color: var(--foreground);
-            background: rgba(0, 0, 0, 0.03);
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
         }
 
-        .hero-section {
-            padding: 3rem 0;
-            text-align: center;
-            background: linear-gradient(135deg, #EEF2FF 0%, #F3E8FF 100%);
-            border-radius: 20px;
-            margin: 2rem 0;
-            position: relative;
-            overflow: hidden;
+        .btn-outline:hover {
+            background: var(--surface-hover);
         }
 
-        .hero-section::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0) 70%);
-            animation: pulse 15s ease-in-out infinite alternate;
-        }
-
-        .hero-section h1 {
-            font-family: var(--heading-font);
-            font-size: 3rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            position: relative;
-        }
-
-        .hero-section p {
-            color: var(--muted);
-            font-size: 1.2rem;
-            max-width: 600px;
-            margin: 0 auto 2rem;
-            position: relative;
-        }
-
-        .timeline {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 2rem;
-            position: relative;
-        }
-
-        .timeline-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100px;
-            position: relative;
-        }
-
-        .timeline-item:not(:last-child)::after {
-            content: '';
-            position: absolute;
-            top: 25px;
-            right: -50%;
-            width: 100%;
-            height: 2px;
-            background: var(--primary-light);
-            z-index: 0;
-        }
-
-        .timeline-circle {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: var(--primary-light);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 0.5rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        .timeline-circle.active {
+        .btn-primary {
             background: var(--primary);
             color: white;
-            box-shadow: 0 0 0 5px rgba(79, 70, 229, 0.2);
         }
 
-        .timeline-text {
-            font-size: 0.75rem;
-            text-align: center;
-            color: var(--muted);
+        .btn-primary:hover {
+            background: var(--primary-dark);
         }
 
-        .timeline-item.active .timeline-text {
-            color: var(--primary);
-            font-weight: 600;
+        .btn-primary:disabled {
+            background: var(--text-muted);
+            cursor: not-allowed;
         }
 
-        .voting-container {
+        /* Election Header */
+        .election-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2rem;
+            border-radius: var(--radius);
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .election-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .election-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-top: 1rem;
+            opacity: 0.9;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius);
+            margin-bottom: 2rem;
+            border: 1px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .alert-error {
+            background: rgb(239 68 68 / 0.1);
+            border-color: rgb(239 68 68 / 0.2);
+            color: #dc2626;
+        }
+
+        .alert-warning {
+            background: rgb(245 158 11 / 0.1);
+            border-color: rgb(245 158 11 / 0.2);
+            color: #d97706;
+        }
+
+        .alert-info {
+            background: rgb(59 130 246 / 0.1);
+            border-color: rgb(59 130 246 / 0.2);
+            color: #2563eb;
+        }
+
+        /* Voting Form */
+        .voting-form {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+        }
+
+        .position-section {
+            margin-bottom: 3rem;
+        }
+
+        .position-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .position-header {
+            padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            border-radius: var(--radius);
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .position-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .position-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        /* Candidate Cards */
+        .candidates-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
+            gap: 1.5rem;
         }
 
         .candidate-card {
-            background: var(--card);
-            border-radius: 20px;
-            padding: 2rem;
-            box-shadow: var(--card-shadow);
-            transition: all 0.4s ease;
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
             cursor: pointer;
+            transition: all 0.3s ease;
             position: relative;
-            overflow: hidden;
-            border: 2px solid transparent;
-        }
-
-        .candidate-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 8px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
         }
 
         .candidate-card:hover {
-            transform: translateY(-10px) scale(1.02);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        }
-
-        .candidate-card:hover::before {
-            opacity: 1;
+            border-color: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
         }
 
         .candidate-card.selected {
             border-color: var(--primary);
-            box-shadow: 0 0 0 5px rgba(79, 70, 229, 0.1);
+            background: rgb(99 102 241 / 0.05);
         }
 
-        .candidate-card.selected::before {
-            opacity: 1;
-        }
-
-        .candidate-card-inner {
-            position: relative;
-            z-index: 1;
-        }
-
-        .candidate-checkmark {
+        .candidate-card.selected::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
             position: absolute;
             top: 1rem;
             right: 1rem;
-            width: 26px;
-            height: 26px;
+            background: var(--primary);
+            color: white;
+            width: 2rem;
+            height: 2rem;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.9rem;
-            opacity: 0;
-            transform: scale(0.5);
-            transition: all 0.3s ease;
+            font-size: 0.875rem;
         }
 
-        .candidate-card.selected .candidate-checkmark {
-            opacity: 1;
-            transform: scale(1);
+        .candidate-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
         }
 
-        .candidate-image {
-            width: 180px;
-            height: 180px;
+        .candidate-avatar {
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
-            margin: 0 auto 1.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
             overflow: hidden;
-            border: 5px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-            transition: all 0.5s ease;
         }
 
-        .candidate-image img {
+        .candidate-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.7s ease;
         }
 
-        .candidate-card:hover .candidate-image img {
-            transform: scale(1.05);
-        }
-
-        .candidate-info {
-            text-align: center;
-        }
-
-        .candidate-info h2 {
-            font-family: var(--heading-font);
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-            transition: color 0.3s ease;
-        }
-
-        .candidate-info .position {
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 1rem;
+        .candidate-info h3 {
+            font-size: 1.125rem;
             font-weight: 600;
-        }
-
-        .platform {
-            font-size: 0.95rem;
-            line-height: 1.6;
-            margin-bottom: 1.5rem;
-            color: var(--muted);
-        }
-
-        .candidate-stats {
-            display: flex;
-            justify-content: center;
-            margin-top: 1rem;
-            margin-bottom: 1rem;
-            gap: 1rem;
-            font-size: 0.85rem;
-        }
-
-        .stat {
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-        }
-
-        .stat i {
-            font-size: 0.75rem;
-        }
-
-        .achievements {
-            background: rgba(250, 250, 250, 0.5);
-            border-radius: 10px;
-            padding: 0.75rem;
-            font-size: 0.85rem;
-            color: var(--muted);
-            margin-bottom: 1.5rem;
-            line-height: 1.4;
-        }
-
-        .achievements strong {
-            display: block;
-            color: var(--foreground);
+            color: var(--text-primary);
             margin-bottom: 0.25rem;
-            font-size: 0.9rem;
         }
 
-        .vote-button-container {
-            padding: 1.5rem 0;
-            position: sticky;
-            bottom: 0;
-            background: linear-gradient(0deg, rgba(249, 250, 251, 1) 0%, rgba(249, 250, 251, 0.9) 90%, rgba(249, 250, 251, 0) 100%);
-            z-index: 10;
+        .candidate-details {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
         }
 
-        .vote-btn {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: white;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 12px;
-            font-size: 1.1rem;
+        .candidate-manifesto {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            line-height: 1.6;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .manifesto-label {
             font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.75rem;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.25);
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
         }
 
-        .vote-btn::before {
-            content: '';
+        /* Hidden Radio Inputs */
+        .candidate-radio {
             position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: all 0.6s ease;
+            opacity: 0;
+            pointer-events: none;
         }
 
-        .vote-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.35);
-        }
-
-        .vote-btn:hover::before {
-            left: 100%;
-        }
-
-        .vote-btn:disabled {
-            background: #CBD5E1;
-            box-shadow: none;
-            cursor: not-allowed;
-        }
-
-        .vote-btn:disabled::before {
+        /* Vote Summary */
+        .vote-summary {
+            background: rgb(59 130 246 / 0.05);
+            border: 1px solid rgb(59 130 246 / 0.2);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin: 2rem 0;
             display: none;
         }
 
-        .footer {
-            margin-top: 3rem;
-            padding: 2rem 0;
-            text-align: center;
-            color: var(--muted);
-            font-size: 0.85rem;
-            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        .vote-summary.show {
+            display: block;
         }
 
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
+        .summary-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
             margin-bottom: 1rem;
         }
 
-        .footer-link {
-            color: var(--muted);
-            text-decoration: none;
-            transition: color 0.3s ease;
+        .selected-candidate {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--surface);
+            border-radius: var(--radius);
+            margin-bottom: 0.5rem;
+            border: 1px solid var(--border);
         }
 
-        .footer-link:hover {
-            color: var(--primary);
+        .selected-candidate:last-child {
+            margin-bottom: 0;
         }
 
-        /* Animations */
-        @keyframes pulse {
-            0% { transform: translate(0, 0) scale(1); opacity: 0.7; }
-            50% { transform: translate(-2%, -2%) scale(1.05); opacity: 0.8; }
-            100% { transform: translate(0, 0) scale(1); opacity: 0.7; }
+        /* Submit Section */
+        .submit-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2rem;
+            text-align: center;
+            margin-top: 2rem;
         }
 
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
+        .submit-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
         }
 
-        .selected .candidate-image {
-            animation: float 3s ease-in-out infinite;
-            border-color: var(--primary-light);
+        .submit-subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
         }
 
-        /* Responsive styles */
+        .submit-btn {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 3rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .submit-btn:disabled {
+            background: var(--text-muted);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Loading State */
+        .loading {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .spinner {
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
         @media (max-width: 768px) {
-            .hero-section h1 {
-                font-size: 2.2rem;
+            .container {
+                padding: 1rem;
             }
-            
-            .hero-section p {
-                font-size: 1rem;
+
+            .header {
+                padding: 1rem;
             }
-            
-            .voting-container {
+
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+
+            .election-title {
+                font-size: 1.5rem;
+            }
+
+            .election-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .candidates-grid {
                 grid-template-columns: 1fr;
             }
-            
-            .timeline {
-                flex-wrap: wrap;
-                gap: 1rem;
+
+            .candidate-header {
+                flex-direction: column;
+                text-align: center;
             }
-            
-            .timeline-item:not(:last-child)::after {
-                display: none;
+
+            .submit-btn {
+                width: 100%;
+                justify-content: center;
             }
         }
 
-        /* Theme colors for each candidate */
-        #candidate-1::before {
-            background: #4F46E5;
-        }
-        
-        #candidate-2::before {
-            background: #8B5CF6;
-        }
-        
-        #candidate-1 .position,
-        #candidate-1.selected h2,
-        #candidate-1 .candidate-checkmark {
-            color: #4F46E5;
-        }
-        
-        #candidate-2 .position,
-        #candidate-2.selected h2,
-        #candidate-2 .candidate-checkmark {
-            color: #8B5CF6;
-        }
-        
-        #candidate-1.selected .candidate-checkmark {
-            background: #4F46E5;
-            color: white;
-        }
-        
-        #candidate-2.selected .candidate-checkmark {
-            background: #8B5CF6;
-            color: white;
-        }
-
-        /* Notification Popup Styles */
-        .notification-popup {
+        /* Time Warning */
+        .time-warning {
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.9);
-            background: white;
-            border-radius: 16px;
-            padding: 2rem;
-            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.15);
+            top: 80px;
+            right: 1rem;
+            background: var(--warning);
+            color: white;
+            padding: 1rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
             z-index: 1000;
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            display: none;
         }
-        
-        .notification-popup.show {
-            opacity: 1;
-            visibility: visible;
-            transform: translate(-50%, -50%) scale(1);
+
+        .time-warning.show {
+            display: block;
+            animation: slideIn 0.3s ease;
         }
-        
-        .notification-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
         }
-        
-        .notification-icon {
-            font-size: 3rem;
-            color: #10B981;
-            margin-bottom: 1rem;
-            animation: scaleIn 0.5s ease forwards;
+
+        /* Accessibility */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
         }
-        
-        .notification-text h3 {
-            font-family: var(--heading-font);
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-            color: var(--foreground);
+
+        /* Focus States */
+        .candidate-card:focus-within {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
         }
-        
-        .notification-text p {
-            color: var(--muted);
-            font-size: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .notification-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(3px);
-            z-index: 999;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-        
-        .notification-overlay.show {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        @keyframes scaleIn {
-            0% { transform: scale(0); }
-            70% { transform: scale(1.2); }
-            100% { transform: scale(1); }
+
+        /* Print Styles */
+        @media print {
+            .header, .submit-section, .time-warning {
+                display: none !important;
+            }
+            
+            .candidate-card {
+                break-inside: avoid;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <a href="dashboard.php" class="back-btn">
-            <i class="fas fa-arrow-left"></i>
-            Back to Dashboard
-        </a>
-
-        <div class="hero-section">
-            <h1>Student Body Elections</h1>
-            <p>Your voice matters! Select your preferred candidate to shape the future of our campus community.</p>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-vote-yea"></i>
+                <span>University Voting System</span>
+            </div>
             
-            <div class="timeline">
-                <div class="timeline-item">
-                    <div class="timeline-circle">
-                        <i class="fas fa-check"></i>
-                    </div>
-                    <div class="timeline-text">Registration</div>
+            <nav class="header-nav">
+                <a href="dashboard.php" class="btn btn-outline">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Dashboard
+                </a>
+                <a href="logout.php" class="btn btn-outline">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Time Warning -->
+    <div class="time-warning" id="timeWarning">
+        <i class="fas fa-clock"></i>
+        <span id="timeWarningText">Election ending soon!</span>
+    </div>
+
+    <div class="container">
+        <!-- Election Header -->
+        <div class="election-header">
+            <h1 class="election-title"><?php echo htmlspecialchars($election['title']); ?></h1>
+            <p><?php echo htmlspecialchars($election['description']); ?></p>
+            
+            <div class="election-meta">
+                <div class="meta-item">
+                    <i class="fas fa-user"></i>
+                    <span>Voting as: <?php echo htmlspecialchars($voter['full_name']); ?></span>
                 </div>
-                <div class="timeline-item active">
-                    <div class="timeline-circle active">
-                        <i class="fas fa-vote-yea"></i>
-                    </div>
-                    <div class="timeline-text">Vote</div>
+                <div class="meta-item">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span><?php echo htmlspecialchars($voter['program']); ?> - <?php echo htmlspecialchars($voter['year']); ?></span>
                 </div>
-                <div class="timeline-item">
-                    <div class="timeline-circle">
-                        <i class="fas fa-poll"></i>
-                    </div>
-                    <div class="timeline-text">Results</div>
+                <div class="meta-item">
+                    <i class="fas fa-building"></i>
+                    <span><?php echo htmlspecialchars($voter['faculty']); ?></span>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-clock"></i>
+                    <span><?php echo $time_remaining; ?></span>
                 </div>
             </div>
         </div>
 
-        <form method="POST" action="vote.php" id="voteForm">
-            <input type="hidden" name="candidateId" id="candidateId" required>
-            
-            <div class="voting-container">
-                <?php foreach ($candidates as $id => $candidate): ?>
-                <div class="candidate-card" onclick="selectCandidate(<?php echo $id; ?>)" id="candidate-<?php echo $id; ?>">
-                    <div class="candidate-card-inner">
-                        <div class="candidate-checkmark">
-                            <i class="fas fa-check"></i>
-                        </div>
-                        <div class="candidate-image">
-                            <img src="<?php echo htmlspecialchars($candidate['image']); ?>" alt="<?php echo htmlspecialchars($candidate['name']); ?>">
-                        </div>
-                        <div class="candidate-info">
-                            <h2><?php echo htmlspecialchars($candidate['name']); ?></h2>
-                            <div class="position"><?php echo htmlspecialchars($candidate['position']); ?></div>
-                            <p class="platform"><?php echo htmlspecialchars($candidate['platform']); ?></p>
-                            
-                            <div class="achievements">
-                                <strong>Achievements</strong>
-                                <?php echo htmlspecialchars($candidate['achievements']); ?>
-                            </div>
-                            
-                            <div class="candidate-stats">
-                                <div class="stat">
-                                    <i class="fas fa-star"></i>
-                                    Experience
+        <!-- Error Messages -->
+        <?php if (isset($error_message)): ?>
+            <div class="alert alert-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <?php echo htmlspecialchars($error_message); ?>
+            </div>
+        <?php endif; ?>
+
+        <!-- Important Notice -->
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <strong>Important:</strong> You can only vote once in this election. Please review your choices carefully before submitting.
+        </div>
+
+        <!-- Voting Form -->
+        <form method="POST" id="votingForm" class="voting-form">
+            <?php foreach ($candidates_by_position as $position => $candidates): ?>
+                <?php if (empty($candidates)) continue; ?>
+                
+                <div class="position-section">
+                    <div class="position-header">
+                        <h2 class="position-title"><?php echo htmlspecialchars($position); ?></h2>
+                        <p class="position-subtitle">Select one candidate for this position</p>
+                    </div>
+                    
+                    <div class="candidates-grid">
+                        <?php foreach ($candidates as $candidate): ?>
+                            <div class="candidate-card" data-candidate-id="<?php echo $candidate['id']; ?>" data-position="<?php echo htmlspecialchars($position); ?>">
+                                <input type="radio" 
+                                       name="candidates[<?php echo htmlspecialchars($position); ?>]" 
+                                       value="<?php echo $candidate['id']; ?>" 
+                                       id="candidate_<?php echo $candidate['id']; ?>"
+                                       class="candidate-radio">
+                                
+                                <div class="candidate-header">
+                                    <div class="candidate-avatar">
+                                        <?php if ($candidate['profile_image']): ?>
+                                            <img src="<?php echo htmlspecialchars($candidate['profile_image']); ?>" 
+                                                 alt="<?php echo htmlspecialchars($candidate['full_name']); ?>">
+                                        <?php else: ?>
+                                            <?php echo strtoupper(substr($candidate['full_name'], 0, 1)); ?>
+                                        <?php endif; ?>
+                                    </div>
+                                    
+                                    <div class="candidate-info">
+                                        <h3><?php echo htmlspecialchars($candidate['full_name']); ?></h3>
+                                        <div class="candidate-details">
+                                            <?php if ($candidate['student_id']): ?>
+                                                <div>ID: <?php echo htmlspecialchars($candidate['student_id']); ?></div>
+                                            <?php endif; ?>
+                                            <?php if ($candidate['program']): ?>
+                                                <div><?php echo htmlspecialchars($candidate['program']); ?></div>
+                                            <?php endif; ?>
+                                            <?php if ($candidate['year']): ?>
+                                                <div><?php echo htmlspecialchars($candidate['year']); ?></div>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="stat">
-                                    <i class="fas fa-users"></i>
-                                    Leadership
-                                </div>
+                                
+                                <?php if ($candidate['manifesto']): ?>
+                                    <div class="candidate-manifesto">
+                                        <div class="manifesto-label">Manifesto:</div>
+                                        <?php echo nl2br(htmlspecialchars($candidate['manifesto'])); ?>
+                                    </div>
+                                <?php endif; ?>
                             </div>
-                        </div>
+                        <?php endforeach; ?>
                     </div>
                 </div>
-                <?php endforeach; ?>
+            <?php endforeach; ?>
+
+            <!-- Vote Summary -->
+            <div class="vote-summary" id="voteSummary">
+                <h3 class="summary-title">Your Selections</h3>
+                <div id="selectedCandidates"></div>
             </div>
 
-            <div class="vote-button-container">
-                <button type="submit" class="vote-btn" id="submitBtn" disabled>
-                    <i class="fas fa-vote-yea"></i>
-                    Submit Your Vote
-                    <span id="selectedCandidateName"></span>
+            <!-- Submit Section -->
+            <div class="submit-section">
+                <h3 class="submit-title">Submit Your Vote</h3>
+                <p class="submit-subtitle">
+                    Please review your selections above. Once submitted, your vote cannot be changed.
+                </p>
+                
+                <button type="submit" name="submit_vote" class="submit-btn" id="submitBtn" disabled>
+                    <span class="submit-text">
+                        <i class="fas fa-vote-yea"></i>
+                        Cast My Vote
+                    </span>
+                    <span class="loading" id="submitLoading">
+                        <div class="spinner"></div>
+                        Submitting...
+                    </span>
                 </button>
+                
+                <div style="margin-top: 1rem; font-size: 0.875rem; color: var(--text-secondary);">
+                    <i class="fas fa-shield-alt"></i>
+                    Your vote is anonymous and secure
+                </div>
             </div>
         </form>
     </div>
 
-    <div class="footer">
-        <div class="container">
-            <div class="footer-links">
-                <a href="#" class="footer-link">Election Guidelines</a>
-                <a href="#" class="footer-link">Privacy Policy</a>
-                <a href="#" class="footer-link">Contact Support</a>
-            </div>
-            <p>&copy; <?php echo date('Y'); ?> University Student Elections. All rights reserved.</p>
-        </div>
-    </div>
-
-    <!-- Vote notification popup -->
-    <div id="voteNotification" class="notification-popup">
-        <div class="notification-content">
-            <div class="notification-icon">
-                <i class="fas fa-check-circle"></i>
-            </div>
-            <div class="notification-text">
-                <h3>Success!</h3>
-                <p>Your vote has been submitted successfully.</p>
-            </div>
-        </div>
-    </div>
-
     <script>
-        function selectCandidate(id) {
-            // Remove selection from all cards
+        // Global variables
+        let selectedCandidates = {};
+        let timeRemaining = new Date('<?php echo $election['end_date']; ?>').getTime();
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeVoting();
+            startTimeWarning();
+            
+            // Add keyboard navigation
+            document.addEventListener('keydown', handleKeyboardNavigation);
+        });
+
+        function initializeVoting() {
+            // Add click handlers to candidate cards
             document.querySelectorAll('.candidate-card').forEach(card => {
-                card.classList.remove('selected');
+                card.addEventListener('click', function() {
+                    const candidateId = this.dataset.candidateId;
+                    const position = this.dataset.position;
+                    const radio = this.querySelector('.candidate-radio');
+                    
+                    // Clear other selections for this position
+                    document.querySelectorAll(`input[name="candidates[${position}]"]`).forEach(r => {
+                        r.checked = false;
+                        r.closest('.candidate-card').classList.remove('selected');
+                    });
+                    
+                    // Select this candidate
+                    radio.checked = true;
+                    this.classList.add('selected');
+                    
+                    // Update selections
+                    selectedCandidates[position] = {
+                        id: candidateId,
+                        name: this.querySelector('.candidate-info h3').textContent,
+                        position: position
+                    };
+                    
+                    updateVoteSummary();
+                    updateSubmitButton();
+                });
             });
-            
-            // Add selection to clicked card
-            const selectedCard = document.getElementById('candidate-' + id);
-            selectedCard.classList.add('selected');
-            
-            // Update hidden input and enable submit button
-            document.getElementById('candidateId').value = id;
-            document.getElementById('submitBtn').disabled = false;
-            
-            // Get candidate name for the button
-            const candidateName = selectedCard.querySelector('h2').textContent;
-            document.getElementById('selectedCandidateName').textContent = ' for ' + candidateName;
-            
-            // Smooth scroll to the vote button
-            document.querySelector('.vote-button-container').scrollIntoView({ 
-                behavior: 'smooth',
-                block: 'center'
+
+            // Add change handlers to radio buttons
+            document.querySelectorAll('.candidate-radio').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    if (this.checked) {
+                        this.closest('.candidate-card').click();
+                    }
+                });
+            });
+
+            // Form submission handler
+            document.getElementById('votingForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (Object.keys(selectedCandidates).length === 0) {
+                    showAlert('Please select at least one candidate before submitting your vote.', 'error');
+                    return;
+                }
+                
+                // Show confirmation dialog
+                if (confirmVoteSubmission()) {
+                    submitVote();
+                }
             });
         }
-        
-        // Add entrance animations and form submission handling
-        document.addEventListener('DOMContentLoaded', function() {
-            const cards = document.querySelectorAll('.candidate-card');
-            cards.forEach((card, index) => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(20px)';
-                setTimeout(() => {
-                    card.style.transition = 'all 0.5s ease';
-                    card.style.opacity = '1';
-                    card.style.transform = 'translateY(0)';
-                }, 100 * (index + 1));
+
+        function updateVoteSummary() {
+            const summaryDiv = document.getElementById('voteSummary');
+            const candidatesDiv = document.getElementById('selectedCandidates');
+            
+            if (Object.keys(selectedCandidates).length === 0) {
+                summaryDiv.classList.remove('show');
+                return;
+            }
+            
+            let html = '';
+            Object.values(selectedCandidates).forEach(candidate => {
+                html += `
+                    <div class="selected-candidate">
+                        <i class="fas fa-check-circle" style="color: var(--success);"></i>
+                        <div>
+                            <strong>${escapeHtml(candidate.name)}</strong>
+                            <div style="font-size: 0.875rem; color: var(--text-secondary);">
+                                ${escapeHtml(candidate.position)}
+                            </div>
+                        </div>
+                    </div>
+                `;
             });
             
-            // Add event listener for form submission
-            document.getElementById('voteForm').addEventListener('submit', function(e) {
-                e.preventDefault(); // Prevent the default form submission
-                
-                // Create overlay
-                const overlay = document.createElement('div');
-                overlay.className = 'notification-overlay';
-                document.body.appendChild(overlay);
-                
-                // Show notification and overlay
-                setTimeout(() => {
-                    overlay.classList.add('show');
-                    document.getElementById('voteNotification').classList.add('show');
-                }, 100);
-                
-                // Simulate form submission (since we removed database dependency)
-                setTimeout(() => {
-                    // Redirect to dashboard with success parameter
-                    window.location.href = 'dashboard.php?success=1';
-                }, 2000);
+            candidatesDiv.innerHTML = html;
+            summaryDiv.classList.add('show');
+        }
+
+        function updateSubmitButton() {
+            const submitBtn = document.getElementById('submitBtn');
+            const hasSelections = Object.keys(selectedCandidates).length > 0;
+            
+            submitBtn.disabled = !hasSelections;
+            
+            if (hasSelections) {
+                submitBtn.classList.add('enabled');
+                submitBtn.style.background = 'var(--primary)';
+            } else {
+                submitBtn.classList.remove('enabled');
+                submitBtn.style.background = 'var(--text-muted)';
+            }
+        }
+
+        function confirmVoteSubmission() {
+            const candidateNames = Object.values(selectedCandidates).map(c => c.name).join(', ');
+            
+            return confirm(
+                `Are you sure you want to cast your vote for: ${candidateNames}?\n\n` +
+                'This action cannot be undone. You will not be able to vote again in this election.'
+            );
+        }
+
+        function submitVote() {
+            const submitBtn = document.getElementById('submitBtn');
+            const submitText = submitBtn.querySelector('.submit-text');
+            const submitLoading = document.getElementById('submitLoading');
+            
+            // Show loading state
+            submitBtn.disabled = true;
+            submitText.style.display = 'none';
+            submitLoading.style.display = 'flex';
+            
+            // Convert selectedCandidates to form format
+            const formData = new FormData();
+            formData.append('submit_vote', '1');
+            
+            Object.values(selectedCandidates).forEach(candidate => {
+                formData.append('candidates[]', candidate.id);
             });
+            
+            // Submit via AJAX for better UX (optional)
+            fetch(window.location.href, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                } else {
+                    return response.text();
+                }
+            })
+            .then(html => {
+                if (html) {
+                    // If there's an error, reload the page to show it
+                    window.location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error submitting vote:', error);
+                showAlert('An error occurred while submitting your vote. Please try again.', 'error');
+                
+                // Reset button state
+                submitBtn.disabled = false;
+                submitText.style.display = 'flex';
+                submitLoading.style.display = 'none';
+            });
+        }
+
+        function startTimeWarning() {
+            const warningDiv = document.getElementById('timeWarning');
+            const warningText = document.getElementById('timeWarningText');
+            
+            function updateTimeWarning() {
+                const now = new Date().getTime();
+                const distance = timeRemaining - now;
+                
+                if (distance < 0) {
+                    // Election ended
+                    showAlert('This election has ended. You can no longer vote.', 'error');
+                    document.getElementById('submitBtn').disabled = true;
+                    return;
+                }
+                
+                const hours = Math.floor(distance / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                
+                // Show warning if less than 1 hour remaining
+                if (distance < 3600000) { // 1 hour
+                    warningText.textContent = `Election ends in ${hours}h ${minutes}m`;
+                    warningDiv.classList.add('show');
+                } else if (distance < 1800000) { // 30 minutes
+                    warningText.textContent = `Only ${minutes} minutes left to vote!`;
+                    warningDiv.style.background = 'var(--error)';
+                    warningDiv.classList.add('show');
+                }
+            }
+            
+            // Update immediately and then every minute
+            updateTimeWarning();
+            setInterval(updateTimeWarning, 60000);
+        }
+
+        function handleKeyboardNavigation(e) {
+            // Handle keyboard navigation for accessibility
+            if (e.key === 'Enter' || e.key === ' ') {
+                const focused = document.activeElement;
+                if (focused.classList.contains('candidate-card')) {
+                    e.preventDefault();
+                    focused.click();
+                }
+            }
+        }
+
+        function showAlert(message, type = 'info') {
+            // Create and show an alert
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            
+            const icon = type === 'error' ? 'fa-exclamation-circle' : 
+                        type === 'success' ? 'fa-check-circle' : 'fa-info-circle';
+            
+            alert.innerHTML = `
+                <i class="fas ${icon}"></i>
+                ${escapeHtml(message)}
+            `;
+            
+            // Insert at top of container
+            const container = document.querySelector('.container');
+            container.insertBefore(alert, container.firstChild);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (alert.parentNode) {
+                    alert.parentNode.removeChild(alert);
+                }
+            }, 5000);
+            
+            // Scroll to top to show alert
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Prevent accidental page reload
+        window.addEventListener('beforeunload', function(e) {
+            if (Object.keys(selectedCandidates).length > 0) {
+                e.preventDefault();
+                e.returnValue = 'You have unsaved selections. Are you sure you want to leave?';
+                return e.returnValue;
+            }
         });
+
+        // Auto-save selections to sessionStorage
+        function saveSelections() {
+            sessionStorage.setItem('voting_selections', JSON.stringify(selectedCandidates));
+        }
+
+        function loadSelections() {
+            const saved = sessionStorage.getItem('voting_selections');
+            if (saved) {
+                try {
+                    const selections = JSON.parse(saved);
+                    Object.entries(selections).forEach(([position, candidate]) => {
+                        const radio = document.querySelector(`input[value="${candidate.id}"]`);
+                        if (radio) {
+                            radio.click();
+                        }
+                    });
+                } catch (e) {
+                    console.error('Error loading saved selections:', e);
+                }
+            }
+        }
+
+        // Load saved selections on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSelections();
+        });
+
+        // Save selections when they change
+        function updateVoteSummary() {
+            const summaryDiv = document.getElementById('voteSummary');
+            const candidatesDiv = document.getElementById('selectedCandidates');
+            
+            if (Object.keys(selectedCandidates).length === 0) {
+                summaryDiv.classList.remove('show');
+                return;
+            }
+            
+            let html = '';
+            Object.values(selectedCandidates).forEach(candidate => {
+                html += `
+                    <div class="selected-candidate">
+                        <i class="fas fa-check-circle" style="color: var(--success);"></i>
+                        <div>
+                            <strong>${escapeHtml(candidate.name)}</strong>
+                            <div style="font-size: 0.875rem; color: var(--text-secondary);">
+                                ${escapeHtml(candidate.position)}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            candidatesDiv.innerHTML = html;
+            summaryDiv.classList.add('show');
+            
+            // Save selections
+            saveSelections();
+        }
+
+        // Print functionality
+        function printBallot() {
+            window.print();
+        }
+
+        // Add print button (optional)
+        document.addEventListener('DOMContentLoaded', function() {
+            const headerNav = document.querySelector('.header-nav');
+            const printBtn = document.createElement('button');
+            printBtn.className = 'btn btn-outline';
+            printBtn.innerHTML = '<i class="fas fa-print"></i> Print Ballot';
+            printBtn.onclick = printBallot;
+            headerNav.insertBefore(printBtn, headerNav.lastElementChild);
+        });
+
+        console.log('Voting interface initialized');
+        console.log('Election ID:', <?php echo $election_id; ?>);
+        console.log('Available positions:', <?php echo json_encode(array_keys($candidates_by_position)); ?>);
     </script>
 </body>
 </html>

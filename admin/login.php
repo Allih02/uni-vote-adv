@@ -5,7 +5,7 @@ require_once 'config/database.php';
 
 // Check if already logged in
 if(isset($_SESSION['admin_id'])) {
-    header("Location: dashboard.php");
+    header("Location: admin_dashboard.php");
     exit();
 }
 
@@ -88,9 +88,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
                         $_SESSION['admin_id'] = $admin['admin_id'];
                         $_SESSION['admin_name'] = $admin['full_name'];
                         $_SESSION['admin_email'] = $email;
-                        $_SESSION['login_time'] = time(); // Track login time
-                        $_SESSION['last_activity'] = time(); // Track last activity
-                        $_SESSION['session_lifetime'] = 900; // 15 minutes in seconds
+                        $_SESSION['login_time'] = time();
+                        $_SESSION['last_activity'] = time();
+                        $_SESSION['session_lifetime'] = 900;
                         
                         // Update last login
                         $stmt = $conn->prepare("UPDATE admins SET last_login = CURRENT_TIMESTAMP WHERE admin_id = ?");
@@ -108,7 +108,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
                         }
                         
                         // Redirect to dashboard
-                        header("Location: dashboard.php");
+                        header("Location: admin_dashboard.php");
                         exit();
                     }
                 } else {
@@ -146,8 +146,8 @@ if(isset($_COOKIE['admin_remember']) && !isset($_SESSION['admin_id'])) {
             $_SESSION['admin_id'] = $admin['admin_id'];
             $_SESSION['admin_name'] = $admin['full_name'];
             $_SESSION['admin_email'] = $admin['email'];
-            
-            header("Location: dashboard.php");
+
+            header("Location: admin_dashboard.php");
             exit();
         }
     } catch(PDOException $e) {
@@ -161,7 +161,8 @@ if(isset($_COOKIE['admin_remember']) && !isset($_SESSION['admin_id'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login - University Voting System</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -170,83 +171,124 @@ if(isset($_COOKIE['admin_remember']) && !isset($_SESSION['admin_id'])) {
         }
 
         :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --secondary: #8b5cf6;
-            --accent: #f43f5e;
+            --primary-blue: #2563eb;
+            --primary-blue-dark: #1d4ed8;
+            --primary-blue-light: #3b82f6;
+            --secondary-blue: #1e40af;
+            --accent-blue: #60a5fa;
             --background: #f8fafc;
             --surface: #ffffff;
-            --text-primary: #1e293b;
+            --surface-elevated: #f1f5f9;
+            --text-primary: #0f172a;
             --text-secondary: #64748b;
+            --text-muted: #94a3b8;
             --border: #e2e8f0;
-            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --border-focus: #3b82f6;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
         }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--background);
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
             color: var(--text-primary);
             min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* University Header */
+        .university-header {
+            background: var(--surface);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .university-brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .university-logo {
+            width: 60px;
+            height: 60px;
+            background: var(--primary-blue);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 1rem;
-        }
-
-        .login-container {
-            width: 100%;
-            max-width: 1200px;
-            display: grid;
-            grid-template-columns: 1.2fr 1fr;
-            background: var(--surface);
-            border-radius: 1.5rem;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-        }
-
-        .login-form-section {
-            padding: 3rem;
-        }
-
-        .login-image-section {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            padding: 3rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
             color: white;
+            font-size: 1.8rem;
+            font-weight: 700;
+            box-shadow: var(--shadow-md);
             position: relative;
             overflow: hidden;
         }
 
-        .login-image-section::before {
+        .university-logo::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.133 7-7s-3.134-7-7-7-7 3.133-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.133 7-7s-3.134-7-7-7-7 3.133-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23FFFFFF' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
-            animation: backgroundMove 20s linear infinite;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            z-index: 0;
         }
 
-        @keyframes backgroundMove {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(-50px, -50px); }
+        .university-logo i {
+            position: relative;
+            z-index: 1;
         }
 
-        .logo {
+        .university-info h1 {
             font-size: 1.5rem;
             font-weight: 700;
-            margin-bottom: 2rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
         }
 
-        .logo i {
-            font-size: 1.8rem;
-            color: var(--primary);
+        .university-info p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        /* Main Container */
+        .login-container {
+            min-height: calc(100vh - 92px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .login-wrapper {
+            width: 100%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: var(--surface);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--border);
+        }
+
+        /* Form Section */
+        .form-section {
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .form-container {
@@ -256,45 +298,57 @@ if(isset($_COOKIE['admin_remember']) && !isset($_SESSION['admin_id'])) {
         }
 
         .form-header {
-            margin-bottom: 2rem;
             text-align: center;
+            margin-bottom: 2.5rem;
         }
 
-        .form-header h1 {
+        .form-header h2 {
             font-size: 2rem;
             font-weight: 700;
+            color: var(--text-primary);
             margin-bottom: 0.5rem;
         }
 
         .form-header p {
             color: var(--text-secondary);
             font-size: 1rem;
+            font-weight: 500;
         }
 
-        .tabs {
+        /* Tabs */
+        .auth-tabs {
             display: flex;
-            gap: 1rem;
+            background: var(--surface-elevated);
+            border-radius: 12px;
+            padding: 0.25rem;
             margin-bottom: 2rem;
         }
 
-        .tab {
+        .auth-tab {
             flex: 1;
-            padding: 0.75rem;
-            border: 2px solid var(--border);
+            padding: 0.75rem 1rem;
+            border: none;
             background: transparent;
-            border-radius: 0.75rem;
+            border-radius: 8px;
             font-weight: 600;
+            font-size: 0.875rem;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
             color: var(--text-secondary);
         }
 
-        .tab.active {
-            border-color: var(--primary);
-            background: var(--primary);
+        .auth-tab.active {
+            background: var(--primary-blue);
             color: white;
+            box-shadow: var(--shadow-sm);
         }
 
+        .auth-tab:hover:not(.active) {
+            background: white;
+            color: var(--text-primary);
+        }
+
+        /* Form Elements */
         .form-group {
             margin-bottom: 1.5rem;
         }
@@ -302,32 +356,34 @@ if(isset($_COOKIE['admin_remember']) && !isset($_SESSION['admin_id'])) {
         .form-label {
             display: block;
             margin-bottom: 0.5rem;
-            font-weight: 500;
+            font-weight: 600;
             color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .input-wrapper {
+            position: relative;
         }
 
         .form-input {
             width: 100%;
-            padding: 0.75rem 1rem;
+            padding: 0.875rem 1rem;
             border: 2px solid var(--border);
-            border-radius: 0.75rem;
+            border-radius: 10px;
             font-size: 1rem;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
             background: var(--surface);
+            color: var(--text-primary);
         }
 
         .form-input:focus {
             outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
         .form-input::placeholder {
-            color: var(--text-secondary);
-        }
-
-        .password-input-wrapper {
-            position: relative;
+            color: var(--text-muted);
         }
 
         .password-toggle {
@@ -337,138 +393,199 @@ if(isset($_COOKIE['admin_remember']) && !isset($_SESSION['admin_id'])) {
             transform: translateY(-50%);
             background: none;
             border: none;
-            color: var(--text-secondary);
+            color: var(--text-muted);
             cursor: pointer;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            padding: 0.25rem;
+            border-radius: 4px;
+            transition: color 0.2s ease;
         }
 
         .password-toggle:hover {
             color: var(--text-primary);
         }
 
-        .form-checkbox {
+        .checkbox-group {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
             margin-bottom: 1.5rem;
         }
 
-        .form-checkbox input[type="checkbox"] {
-            width: 1.25rem;
-            height: 1.25rem;
+        .checkbox-input {
+            width: 1.125rem;
+            height: 1.125rem;
             border: 2px solid var(--border);
-            border-radius: 0.375rem;
+            border-radius: 4px;
             cursor: pointer;
+            accent-color: var(--primary-blue);
         }
 
-        .form-checkbox label {
+        .checkbox-label {
             font-size: 0.875rem;
             color: var(--text-secondary);
             cursor: pointer;
+            font-weight: 500;
         }
 
-        .submit-btn {
+        .submit-button {
             width: 100%;
-            padding: 0.875rem;
-            background: var(--primary);
+            padding: 0.875rem 1rem;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
             color: white;
             border: none;
-            border-radius: 0.75rem;
+            border-radius: 10px;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
         }
 
-        .submit-btn:hover {
-            background: var(--primary-dark);
+        .submit-button:hover {
+            background: linear-gradient(135deg, var(--primary-blue-dark) 0%, var(--secondary-blue) 100%);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
         }
 
-        .submit-btn:active {
-            transform: translateY(1px);
+        .submit-button:active {
+            transform: translateY(0);
         }
 
         .form-footer {
-            margin-top: 1.5rem;
             text-align: center;
+            margin-top: 1.5rem;
         }
 
         .form-footer a {
-            color: var(--primary);
+            color: var(--primary-blue);
             text-decoration: none;
-            font-weight: 500;
+            font-weight: 600;
+            font-size: 0.875rem;
         }
 
         .form-footer a:hover {
             text-decoration: underline;
         }
 
-        .feature-list {
+        /* Info Section */
+        .info-section {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .info-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            animation: backgroundMove 20s linear infinite;
+        }
+
+        @keyframes backgroundMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(-60px, -60px); }
+        }
+
+        .info-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .info-header {
+            margin-bottom: 2rem;
+        }
+
+        .info-header h3 {
+            font-size: 2.25rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .info-header p {
+            font-size: 1.125rem;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .features-list {
             list-style: none;
             margin-top: 2rem;
         }
 
-        .feature-list li {
+        .feature-item {
             display: flex;
             align-items: center;
             gap: 1rem;
             margin-bottom: 1.5rem;
-            font-size: 1.1rem;
+            font-size: 1rem;
+            font-weight: 500;
         }
 
-        .feature-list i {
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 0.5rem;
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 1.25rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        .back-home {
-            position: absolute;
-            top: 2rem;
-            left: 2rem;
-            color: var(--text-secondary);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
-
-        .back-home:hover {
-            color: var(--primary);
-        }
-
+        /* Alerts */
         .alert {
-            padding: 1rem;
-            border-radius: 0.5rem;
+            padding: 1rem 1.25rem;
+            border-radius: 10px;
             margin-bottom: 1.5rem;
             display: none;
+            font-weight: 500;
+            font-size: 0.875rem;
         }
 
         .alert.error {
-            background: #fee2e2;
+            background: #fef2f2;
             color: #dc2626;
             border: 1px solid #fecaca;
         }
 
         .alert.success {
-            background: #dcfce7;
+            background: #f0fdf4;
             color: #16a34a;
             border: 1px solid #bbf7d0;
         }
 
+        .alert.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Divider */
         .divider {
             display: flex;
             align-items: center;
-            text-align: center;
             margin: 2rem 0;
         }
 
@@ -476,61 +593,111 @@ if(isset($_COOKIE['admin_remember']) && !isset($_SESSION['admin_id'])) {
         .divider::after {
             content: '';
             flex: 1;
-            border-bottom: 1px solid var(--border);
+            height: 1px;
+            background: var(--border);
         }
 
         .divider span {
             padding: 0 1rem;
-            color: var(--text-secondary);
+            color: var(--text-muted);
             font-size: 0.875rem;
+            font-weight: 500;
         }
 
+        /* Social Login */
         .social-login {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 1rem;
+            gap: 0.75rem;
         }
 
-        .social-btn {
-            padding: 0.75rem;
+        .social-button {
+            padding: 0.75rem 1rem;
             border: 2px solid var(--border);
             background: var(--surface);
-            border-radius: 0.75rem;
+            border-radius: 8px;
             font-weight: 600;
+            font-size: 0.875rem;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
+            color: var(--text-secondary);
         }
 
-        .social-btn:hover {
-            border-color: var(--primary);
-            background: var(--background);
+        .social-button:hover {
+            border-color: var(--primary-blue);
+            background: var(--surface-elevated);
+            color: var(--text-primary);
         }
 
-        @media (max-width: 968px) {
-            .login-container {
+        /* Back Button */
+        .back-button {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.875rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .back-button:hover {
+            color: var(--primary-blue);
+            background: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .login-wrapper {
                 grid-template-columns: 1fr;
                 max-width: 500px;
             }
 
-            .login-image-section {
+            .info-section {
                 display: none;
             }
 
-            .login-form-section {
-                padding: 2rem;
+            .form-section {
+                padding: 2.5rem;
             }
         }
 
-        @media (max-width: 480px) {
-            .login-form-section {
-                padding: 1.5rem;
+        @media (max-width: 768px) {
+            .university-header {
+                padding: 1rem;
             }
 
-            .form-header h1 {
+            .university-logo {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5rem;
+            }
+
+            .university-info h1 {
+                font-size: 1.25rem;
+            }
+
+            .login-container {
+                padding: 1rem;
+            }
+
+            .form-section {
+                padding: 2rem;
+            }
+
+            .form-header h2 {
                 font-size: 1.75rem;
             }
 
@@ -538,198 +705,315 @@ if(isset($_COOKIE['admin_remember']) && !isset($_SESSION['admin_id'])) {
                 grid-template-columns: 1fr;
             }
         }
+
+        @media (max-width: 480px) {
+            .university-header {
+                padding: 0.75rem;
+            }
+
+            .university-brand {
+                gap: 0.75rem;
+            }
+
+            .form-section {
+                padding: 1.5rem;
+            }
+
+            .form-header h2 {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.2),
+                transparent
+            );
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
     </style>
 </head>
 <body>
-    <a href="/project-folder/admin/adminhome.html" class="back-home">
+    <!-- Back Button -->
+    <a href="/project-folder/admin/adminhome.html" class="back-button">
         <i class="fas fa-arrow-left"></i>
         Back to Home
     </a>
 
-    <div class="login-container">
-        <div class="login-form-section">
-            <div class="form-container">
-                <div class="logo">
-                    <i class="fas fa-vote-yea"></i>
-                    VoteAdmin
-                </div>
-
-                <div class="form-header">
-                    <h1>Welcome Back</h1>
-                    <p>Sign in to access the admin dashboard</p>
-                </div>
-
-                <div class="tabs">
-                    <button class="tab active" data-target="login">Login</button>
-                    <button class="tab" data-target="register">Register</button>
-                </div>
-
-                <div class="alert error" id="errorAlert"></div>
-                <div class="alert success" id="successAlert"></div>
-
-                <!-- Login Form -->
-                <form id="loginForm" class="auth-form" method="POST" action="">
-                    <input type="hidden" name="action" value="login">
-                    
-                    <div class="form-group">
-                        <label class="form-label" for="loginEmail">Email address</label>
-                        <input 
-                            type="email" 
-                            class="form-input" 
-                            id="loginEmail" 
-                            name="email" 
-                            placeholder="admin@university.edu"
-                            required
-                        >
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="loginPassword">Password</label>
-                        <div class="password-input-wrapper">
-                            <input 
-                                type="password" 
-                                class="form-input" 
-                                id="loginPassword" 
-                                name="password" 
-                                placeholder="Enter your password"
-                                required
-                            >
-                            <button type="button" class="password-toggle" onclick="togglePassword('loginPassword')">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="form-checkbox">
-                        <input type="checkbox" id="remember" name="remember">
-                        <label for="remember">Remember me for 30 days</label>
-                    </div>
-
-                    <button type="submit" class="submit-btn">Sign In</button>
-
-                    <div class="form-footer">
-                        <a href="forgot-password.php">Forgot your password?</a>
-                    </div>
-                </form>
-
-                <!-- Register Form -->
-                <form id="registerForm" class="auth-form" style="display: none;" method="POST" action="">
-                    <input type="hidden" name="action" value="register">
-                    
-                    <div class="form-group">
-                        <label class="form-label" for="fullName">Full name</label>
-                        <input 
-                            type="text" 
-                            class="form-input" 
-                            id="fullName" 
-                            name="fullname" 
-                            placeholder="John Doe"
-                            required
-                        >
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="registerEmail">Email address</label>
-                        <input 
-                            type="email" 
-                            class="form-input" 
-                            id="registerEmail" 
-                            name="email" 
-                            placeholder="admin@university.edu"
-                            required
-                        >
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="registerPassword">Password</label>
-                        <div class="password-input-wrapper">
-                            <input 
-                                type="password" 
-                                class="form-input" 
-                                id="registerPassword" 
-                                name="password" 
-                                placeholder="Create a password"
-                                required
-                                minlength="8"
-                            >
-                            <button type="button" class="password-toggle" onclick="togglePassword('registerPassword')">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="confirmPassword">Confirm password</label>
-                        <div class="password-input-wrapper">
-                            <input 
-                                type="password" 
-                                class="form-input" 
-                                id="confirmPassword" 
-                                name="confirm_password" 
-                                placeholder="Confirm your password"
-                                required
-                            >
-                            <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword')">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="submit-btn">Create Account</button>
-
-                    <div class="form-footer">
-                        <p>Already have an account? <a href="#" onclick="switchTab('login')">Sign in</a></p>
-                    </div>
-                </form>
-
-                <div class="divider">
-                    <span>or continue with</span>
-                </div>
-
-                <div class="social-login">
-                    <button type="button" class="social-btn">
-                        <i class="fab fa-google"></i>
-                        Google
-                    </button>
-                    <button type="button" class="social-btn">
-                        <i class="fab fa-microsoft"></i>
-                        Microsoft
-                    </button>
-                </div>
+    <!-- University Header -->
+    <header class="university-header">
+        <div class="university-brand">
+            <div class="university-logo">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+            <div class="university-info">
+                <h1>University Name</h1>
+                <p>Election Management System</p>
             </div>
         </div>
+    </header>
 
-        <div class="login-image-section">
-            <h2 style="font-size: 2.5rem; margin-bottom: 1.5rem; position: relative; z-index: 1;">
-                Secure Admin Portal
-            </h2>
-            <p style="font-size: 1.25rem; margin-bottom: 3rem; opacity: 0.9; position: relative; z-index: 1;">
-                Manage university elections with confidence using our advanced administrative tools.
-            </p>
-            <ul class="feature-list" style="position: relative; z-index: 1;">
-                <li>
-                    <i class="fas fa-shield-alt"></i>
-                    <span>Advanced Security</span>
-                </li>
-                <li>
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Real-time Analytics</span>
-                </li>
-                <li>
-                    <i class="fas fa-users"></i>
-                    <span>Voter Management</span>
-                </li>
-                <li>
-                    <i class="fas fa-cog"></i>
-                    <span>System Configuration</span>
-                </li>
-            </ul>
+    <!-- Main Login Container -->
+    <div class="login-container">
+        <div class="login-wrapper">
+            <!-- Form Section -->
+            <div class="form-section">
+                <div class="form-container">
+                    <div class="form-header">
+                        <h2>Admin Portal</h2>
+                        <p>Sign in to access the administrative dashboard</p>
+                    </div>
+
+                    <!-- Auth Tabs -->
+                    <div class="auth-tabs">
+                        <button class="auth-tab active" data-target="login">Sign In</button>
+                        <button class="auth-tab" data-target="register">Create Account</button>
+                    </div>
+
+                    <!-- Alerts -->
+                    <div class="alert error" id="errorAlert"></div>
+                    <div class="alert success" id="successAlert"></div>
+
+                    <!-- Login Form -->
+                    <form id="loginForm" class="auth-form" method="POST" action="">
+                        <input type="hidden" name="action" value="login">
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="loginEmail">Email Address</label>
+                            <div class="input-wrapper">
+                                <input 
+                                    type="email" 
+                                    class="form-input" 
+                                    id="loginEmail" 
+                                    name="email" 
+                                    placeholder="admin@university.edu"
+                                    required
+                                >
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="loginPassword">Password</label>
+                            <div class="input-wrapper">
+                                <input 
+                                    type="password" 
+                                    class="form-input" 
+                                    id="loginPassword" 
+                                    name="password" 
+                                    placeholder="Enter your password"
+                                    required
+                                >
+                                <button type="button" class="password-toggle" onclick="togglePassword('loginPassword')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="checkbox-group">
+                            <input type="checkbox" class="checkbox-input" id="remember" name="remember">
+                            <label class="checkbox-label" for="remember">Keep me signed in for 30 days</label>
+                        </div>
+
+                        <button type="submit" class="submit-button">
+                            <i class="fas fa-sign-in-alt"></i>
+                            Sign In
+                        </button>
+
+                        <div class="form-footer">
+                            <a href="forgot-password.php">Forgot your password?</a>
+                        </div>
+                    </form>
+
+                    <!-- Register Form -->
+                    <form id="registerForm" class="auth-form" style="display: none;" method="POST" action="">
+                        <input type="hidden" name="action" value="register">
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="fullName">Full Name</label>
+                            <div class="input-wrapper">
+                                <input 
+                                    type="text" 
+                                    class="form-input" 
+                                    id="fullName" 
+                                    name="fullname" 
+                                    placeholder="Enter your full name"
+                                    required
+                                >
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="registerEmail">Email Address</label>
+                            <div class="input-wrapper">
+                                <input 
+                                    type="email" 
+                                    class="form-input" 
+                                    id="registerEmail" 
+                                    name="email" 
+                                    placeholder="admin@university.edu"
+                                    required
+                                >
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="registerPassword">Password</label>
+                            <div class="input-wrapper">
+                                <input 
+                                    type="password" 
+                                    class="form-input" 
+                                    id="registerPassword" 
+                                    name="password" 
+                                    placeholder="Create a secure password"
+                                    required
+                                    minlength="8"
+                                >
+                                <button type="button" class="password-toggle" onclick="togglePassword('registerPassword')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="confirmPassword">Confirm Password</label>
+                            <div class="input-wrapper">
+                                <input 
+                                    type="password" 
+                                    class="form-input" 
+                                    id="confirmPassword" 
+                                    name="confirm_password" 
+                                    placeholder="Confirm your password"
+                                    required
+                                >
+                                <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="submit-button">
+                            <i class="fas fa-user-plus"></i>
+                            Create Account
+                        </button>
+
+                        <div class="form-footer">
+                            <p style="color: var(--text-secondary); font-size: 0.875rem;">
+                                Already have an account? 
+                                <a href="#" onclick="switchTab('login')">Sign in here</a>
+                            </p>
+                        </div>
+                    </form>
+
+                    <!-- Social Login Options -->
+                    <div class="divider">
+                        <span>or continue with</span>
+                    </div>
+
+                    <div class="social-login">
+                        <button type="button" class="social-button">
+                            <i class="fab fa-google"></i>
+                            Google
+                        </button>
+                        <button type="button" class="social-button">
+                            <i class="fab fa-microsoft"></i>
+                            Microsoft
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Section -->
+            <div class="info-section">
+                <div class="info-content">
+                    <div class="info-header">
+                        <h3>Secure University Election Management</h3>
+                        <p>Access powerful administrative tools to manage university elections with confidence and transparency.</p>
+                    </div>
+
+                    <ul class="features-list">
+                        <li class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <span>Advanced Security & Encryption</span>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <span>Real-time Analytics & Reporting</span>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-users-cog"></i>
+                            </div>
+                            <span>Comprehensive User Management</span>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-vote-yea"></i>
+                            </div>
+                            <span>Election Lifecycle Management</span>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-mobile-alt"></i>
+                            </div>
+                            <span>Mobile-Responsive Interface</span>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-history"></i>
+                            </div>
+                            <span>Complete Audit Trail</span>
+                        </li>
+                    </ul>
+
+                    <div style="margin-top: 2rem; padding: 1.5rem; background: rgba(255, 255, 255, 0.1); border-radius: 12px; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2);">
+                        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                            <i class="fas fa-info-circle" style="color: rgba(255, 255, 255, 0.8);"></i>
+                            <span style="font-weight: 600; font-size: 0.875rem;">System Status</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span style="font-size: 0.875rem; opacity: 0.9;">System Health</span>
+                            <span style="font-size: 0.875rem; font-weight: 600; color: #10b981;">Operational</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span style="font-size: 0.875rem; opacity: 0.9;">Security Level</span>
+                            <span style="font-size: 0.875rem; font-weight: 600; color: #10b981;">High</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="font-size: 0.875rem; opacity: 0.9;">Last Update</span>
+                            <span style="font-size: 0.875rem; font-weight: 600;">Just now</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // Tab switching
-        const tabs = document.querySelectorAll('.tab');
+        // Tab switching functionality
+        const tabs = document.querySelectorAll('.auth-tab');
         const forms = document.querySelectorAll('.auth-form');
         
         tabs.forEach(tab => {
@@ -750,23 +1034,23 @@ if(isset($_COOKIE['admin_remember']) && !isset($_SESSION['admin_id'])) {
                 });
                 
                 // Update header text
-                const header = document.querySelector('.form-header h1');
+                const header = document.querySelector('.form-header h2');
                 const subheader = document.querySelector('.form-header p');
                 
                 if (target === 'login') {
-                    header.textContent = 'Welcome Back';
-                    subheader.textContent = 'Sign in to access the admin dashboard';
+                    header.textContent = 'Admin Portal';
+                    subheader.textContent = 'Sign in to access the administrative dashboard';
                 } else {
-                    header.textContent = 'Create Account';
-                    subheader.textContent = 'Register for admin access';
+                    header.textContent = 'Create Admin Account';
+                    subheader.textContent = 'Register for administrative access';
                 }
             });
         });
 
-        // Password toggle
+        // Password toggle functionality
         function togglePassword(inputId) {
             const input = document.getElementById(inputId);
-            const icon = input.nextElementSibling.querySelector('i');
+            const icon = input.parentElement.querySelector('.password-toggle i');
             
             if (input.type === 'password') {
                 input.type = 'text';
@@ -784,11 +1068,19 @@ if(isset($_COOKIE['admin_remember']) && !isset($_SESSION['admin_id'])) {
             document.querySelector(`[data-target="${tabName}"]`).click();
         }
 
-        // Form validation
-        const loginForm = document.getElementById('loginForm');
-        const registerForm = document.getElementById('registerForm');
+        // Alert functions
         const errorAlert = document.getElementById('errorAlert');
         const successAlert = document.getElementById('successAlert');
+
+        function showAlert(type, message) {
+            const alert = type === 'error' ? errorAlert : successAlert;
+            alert.textContent = message;
+            alert.classList.add('show');
+            
+            setTimeout(() => {
+                alert.classList.remove('show');
+            }, 5000);
+        }
 
         // Show PHP errors/success messages
         <?php if(!empty($error)): ?>
@@ -796,20 +1088,30 @@ if(isset($_COOKIE['admin_remember']) && !isset($_SESSION['admin_id'])) {
         <?php elseif(!empty($success)): ?>
             showAlert('success', <?php echo json_encode($success); ?>);
         <?php endif; ?>
-        
-        function showAlert(type, message) {
-            const alert = type === 'error' ? errorAlert : successAlert;
-            alert.textContent = message;
-            alert.style.display = 'block';
+
+        // Form validation and submission
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+
+        // Enhanced form submission with loading states
+        function handleFormSubmission(form) {
+            const submitButton = form.querySelector('.submit-button');
+            const originalText = submitButton.innerHTML;
             
+            submitButton.classList.add('loading');
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            submitButton.disabled = true;
+            
+            // Reset after 3 seconds if no redirect occurs
             setTimeout(() => {
-                alert.style.display = 'none';
-            }, 5000);
+                submitButton.classList.remove('loading');
+                submitButton.innerHTML = originalText;
+                submitButton.disabled = false;
+            }, 3000);
         }
 
-        // Remove preventDefault to allow form submission
         loginForm.addEventListener('submit', (e) => {
-            // Form will be submitted to PHP
+            handleFormSubmission(loginForm);
         });
 
         registerForm.addEventListener('submit', (e) => {
@@ -828,8 +1130,128 @@ if(isset($_COOKIE['admin_remember']) && !isset($_SESSION['admin_id'])) {
                 return;
             }
             
-            // Form will be submitted to PHP
+            handleFormSubmission(registerForm);
         });
+
+        // Input focus effects
+        const inputs = document.querySelectorAll('.form-input');
+        inputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.classList.add('focused');
+            });
+            
+            input.addEventListener('blur', () => {
+                input.parentElement.classList.remove('focused');
+            });
+        });
+
+        // Social login handlers
+        document.querySelectorAll('.social-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const provider = button.textContent.trim();
+                showAlert('error', `${provider} authentication is not configured yet. Please use email/password login.`);
+            });
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Alt + L to focus login email
+            if (e.altKey && e.key === 'l') {
+                e.preventDefault();
+                if (document.getElementById('loginForm').style.display !== 'none') {
+                    document.getElementById('loginEmail').focus();
+                }
+            }
+            
+            // Alt + R to switch to register
+            if (e.altKey && e.key === 'r') {
+                e.preventDefault();
+                switchTab('register');
+            }
+            
+            // Escape to clear alerts
+            if (e.key === 'Escape') {
+                errorAlert.classList.remove('show');
+                successAlert.classList.remove('show');
+            }
+        });
+
+        // Auto-hide alerts on click
+        [errorAlert, successAlert].forEach(alert => {
+            alert.addEventListener('click', () => {
+                alert.classList.remove('show');
+            });
+        });
+
+        // Enhance checkbox styling
+        document.querySelectorAll('.checkbox-input').forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                if (checkbox.checked) {
+                    checkbox.parentElement.style.color = 'var(--primary-blue)';
+                } else {
+                    checkbox.parentElement.style.color = 'var(--text-secondary)';
+                }
+            });
+        });
+
+        // Add subtle animations on page load
+        window.addEventListener('load', () => {
+            const formSection = document.querySelector('.form-section');
+            const infoSection = document.querySelector('.info-section');
+            
+            formSection.style.opacity = '0';
+            formSection.style.transform = 'translateY(20px)';
+            
+            if (infoSection) {
+                infoSection.style.opacity = '0';
+                infoSection.style.transform = 'translateX(20px)';
+            }
+            
+            setTimeout(() => {
+                formSection.style.transition = 'all 0.6s ease';
+                formSection.style.opacity = '1';
+                formSection.style.transform = 'translateY(0)';
+                
+                if (infoSection) {
+                    infoSection.style.transition = 'all 0.6s ease 0.2s';
+                    infoSection.style.opacity = '1';
+                    infoSection.style.transform = 'translateX(0)';
+                }
+            }, 100);
+        });
+
+        // Form field validation feedback
+        inputs.forEach(input => {
+            input.addEventListener('input', () => {
+                if (input.validity.valid) {
+                    input.style.borderColor = 'var(--success)';
+                } else if (input.value.length > 0) {
+                    input.style.borderColor = 'var(--error)';
+                } else {
+                    input.style.borderColor = 'var(--border)';
+                }
+            });
+        });
+
+        // Enhanced accessibility
+        document.addEventListener('DOMContentLoaded', () => {
+            // Add ARIA labels
+            document.querySelectorAll('.form-input').forEach(input => {
+                const label = input.parentElement.parentElement.querySelector('.form-label');
+                if (label) {
+                    input.setAttribute('aria-label', label.textContent);
+                }
+            });
+            
+            // Add form validation messages
+            document.querySelectorAll('form').forEach(form => {
+                form.setAttribute('novalidate', '');
+            });
+        });
+
+        console.log('🎓 University Admin Login Portal loaded successfully');
+        console.log('🔐 Security features active');
+        console.log('📱 Responsive design enabled');
     </script>
 </body>
 </html>

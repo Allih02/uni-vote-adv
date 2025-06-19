@@ -1,5 +1,5 @@
 <?php
-// student_login.php - Enhanced Student Login with Default Password Handling
+// student_login.php - Enhanced Student Login with Real Database Integration
 session_start();
 
 // Database Configuration
@@ -85,32 +85,25 @@ function authenticateVoter($student_id, $password) {
         return false;
     }
     
-    // Handle cases where password is not set or is the student_id (default)
-    if (empty($voter['password']) || $voter['password'] === $voter['student_id']) {
-        // Set up default password as the student ID
-        if ($password === $student_id) {
+    // Check if using Student ID as password (default behavior)
+    if ($password === $student_id) {
+        // Update password hash if not already done
+        if (empty($voter['password']) || $voter['password'] === $voter['student_id']) {
             setupDefaultPassword($voter, $student_id);
-            $voter['password'] = password_hash($student_id, PASSWORD_DEFAULT);
-            
-            // Update last login
-            updateRecord('voters', ['last_login' => date('Y-m-d H:i:s')], 'id = :id', ['id' => $voter['id']]);
-            return $voter;
         }
-        return false;
-    }
-    
-    // Normal password verification
-    if (password_verify($password, $voter['password'])) {
+        
         // Update last login
         updateRecord('voters', ['last_login' => date('Y-m-d H:i:s')], 'id = :id', ['id' => $voter['id']]);
         return $voter;
     }
     
-    // Fallback: check if password matches student_id (for initial setup)
-    if ($password === $student_id) {
-        setupDefaultPassword($voter, $student_id);
-        updateRecord('voters', ['last_login' => date('Y-m-d H:i:s')], 'id = :id', ['id' => $voter['id']]);
-        return $voter;
+    // If password is set and not student_id, verify normally
+    if (!empty($voter['password']) && $voter['password'] !== $voter['student_id']) {
+        if (password_verify($password, $voter['password'])) {
+            // Update last login
+            updateRecord('voters', ['last_login' => date('Y-m-d H:i:s')], 'id = :id', ['id' => $voter['id']]);
+            return $voter;
+        }
     }
     
     return false;
@@ -170,17 +163,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $error_message = 'Your account is not active. Please contact the administrator.';
             }
         } else {
-            $error_message = 'Invalid Student ID or password. Use your Student ID as both username and password.';
+            $error_message = 'Invalid Student ID or password.';
         }
-    }
-}
-
-// Get sample voters for demo
-$sample_voters = [];
-if ($db_connection) {
-    $stmt = executeQuery("SELECT student_id, full_name FROM voters WHERE status = 'active' LIMIT 3");
-    if ($stmt) {
-        $sample_voters = $stmt->fetchAll();
     }
 }
 ?>
@@ -195,10 +179,10 @@ if ($db_connection) {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #4f46e5;
-            --primary-dark: #3730a3;
-            --primary-light: #a5b4fc;
-            --secondary: #7c3aed;
+            --primary-blue: #1e40af;
+            --secondary-blue: #3b82f6;
+            --light-blue: #dbeafe;
+            --white: #ffffff;
             --background: #f8fafc;
             --surface: #ffffff;
             --text-primary: #1e293b;
@@ -211,7 +195,8 @@ if ($db_connection) {
             --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
             --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
             --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-            --radius: 0.75rem;
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            --radius: 1rem;
         }
 
         * {
@@ -222,48 +207,121 @@ if ($db_connection) {
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            background: linear-gradient(135deg, var(--white) 0%, var(--white) 45%, var(--light-blue) 45%, var(--primary-blue) 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 1rem;
+            padding: 2rem;
+            position: relative;
+            overflow-x: hidden;
         }
 
-        .login-container {
-            background: var(--surface);
+        .main-container {
+            display: flex;
+            background: var(--white);
             border-radius: var(--radius);
-            box-shadow: var(--shadow-lg);
+            box-shadow: var(--shadow-xl);
             overflow: hidden;
             width: 100%;
-            max-width: 420px;
+            max-width: 1000px;
+            min-height: 600px;
+            position: relative;
+        }
+
+        .logo-section {
+            flex: 1;
+            background: var(--white);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            position: relative;
+        }
+
+        .university-logo {
+            width: 200px;
+            height: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+            position: relative;
+            animation: logoFloat 3s ease-in-out infinite;
+        }
+
+        .logo-image {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.1));
+            animation: logoGlow 2s ease-in-out infinite alternate;
+        }
+
+        .university-name {
+            text-align: center;
+            color: var(--text-primary);
+        }
+
+        .university-name h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--primary-blue);
+        }
+
+        .university-name p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .login-section {
+            flex: 1;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 3rem;
+            color: var(--white);
+            position: relative;
+        }
+
+        .login-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="90" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.1;
+            pointer-events: none;
         }
 
         .login-header {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 2rem;
             text-align: center;
-        }
-
-        .login-logo {
-            font-size: 3rem;
-            margin-bottom: 1rem;
+            margin-bottom: 2.5rem;
+            position: relative;
+            z-index: 1;
         }
 
         .login-title {
-            font-size: 1.5rem;
+            font-size: 2rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
         }
 
         .login-subtitle {
-            font-size: 0.9rem;
+            font-size: 1rem;
             opacity: 0.9;
+            font-weight: 400;
         }
 
         .login-form {
-            padding: 2rem;
+            position: relative;
+            z-index: 1;
         }
 
         .form-group {
@@ -273,25 +331,33 @@ if ($db_connection) {
         .form-label {
             display: block;
             font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
-            font-size: 0.875rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+            color: var(--white);
         }
 
         .form-control {
             width: 100%;
-            padding: 0.875rem 1rem;
-            border: 1px solid var(--border);
+            padding: 1rem 1.25rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
             border-radius: var(--radius);
             font-size: 1rem;
-            transition: all 0.2s ease;
-            background: var(--surface);
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            backdrop-filter: blur(10px);
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.7);
         }
 
         .form-control:focus {
             outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+            border-color: var(--white);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
         }
 
         .input-group {
@@ -300,92 +366,117 @@ if ($db_connection) {
 
         .input-icon {
             position: absolute;
-            left: 1rem;
+            left: 1.25rem;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--text-muted);
+            color: rgba(255, 255, 255, 0.7);
+            z-index: 2;
         }
 
         .input-group .form-control {
-            padding-left: 3rem;
+            padding-left: 3.5rem;
         }
 
         .password-toggle {
             position: absolute;
-            right: 1rem;
+            right: 1.25rem;
             top: 50%;
             transform: translateY(-50%);
             background: none;
             border: none;
-            color: var(--text-muted);
+            color: rgba(255, 255, 255, 0.7);
             cursor: pointer;
-            padding: 0.25rem;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+            z-index: 2;
         }
 
         .password-toggle:hover {
-            color: var(--text-primary);
+            color: var(--white);
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .error-message {
-            background: #fef2f2;
-            color: #991b1b;
-            padding: 0.875rem;
+            background: rgba(239, 68, 68, 0.1);
+            color: #fecaca;
+            padding: 1rem;
             border-radius: var(--radius);
             margin-bottom: 1.5rem;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            font-size: 0.875rem;
-            border: 1px solid #fecaca;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            backdrop-filter: blur(10px);
         }
 
         .success-message {
-            background: #ecfdf5;
-            color: #065f46;
-            padding: 0.875rem;
+            background: rgba(16, 185, 129, 0.1);
+            color: #a7f3d0;
+            padding: 1rem;
             border-radius: var(--radius);
             margin-bottom: 1.5rem;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            font-size: 0.875rem;
-            border: 1px solid #a7f3d0;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            backdrop-filter: blur(10px);
         }
 
         .warning-message {
-            background: #fffbeb;
-            color: #92400e;
-            padding: 0.875rem;
+            background: rgba(245, 158, 11, 0.1);
+            color: #fde68a;
+            padding: 1rem;
             border-radius: var(--radius);
             margin-bottom: 1.5rem;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            font-size: 0.875rem;
-            border: 1px solid #fde68a;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .info-message {
+            background: rgba(59, 130, 246, 0.1);
+            color: #bfdbfe;
+            padding: 1rem;
+            border-radius: var(--radius);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            font-size: 0.85rem;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            backdrop-filter: blur(10px);
+            line-height: 1.5;
         }
 
         .btn {
             width: 100%;
-            padding: 0.875rem 1rem;
-            background: var(--primary);
-            color: white;
+            padding: 1rem 1.5rem;
+            background: var(--white);
+            color: var(--primary-blue);
             border: none;
             border-radius: var(--radius);
-            font-size: 1rem;
+            font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-md);
         }
 
         .btn:hover {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-md);
+            background: #f3f4f6;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
         }
 
         .btn:active {
@@ -398,253 +489,204 @@ if ($db_connection) {
             transform: none;
         }
 
-        .login-footer {
-            padding: 1rem 2rem 2rem;
-            text-align: center;
-            border-top: 1px solid var(--border);
-            background: var(--background);
-        }
-
         .help-text {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-            margin-bottom: 1rem;
+            text-align: center;
+            font-size: 0.9rem;
+            opacity: 0.9;
+            line-height: 1.6;
         }
 
         .help-link {
-            color: var(--primary);
+            color: var(--white);
             text-decoration: none;
             font-weight: 500;
-        }
-
-        .help-link:hover {
-            text-decoration: underline;
-        }
-
-        .demo-credentials {
-            background: #f0f9ff;
-            border: 1px solid #bae6fd;
-            border-radius: var(--radius);
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .demo-title {
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 0.75rem;
-            font-size: 0.875rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .demo-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        .demo-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.5rem;
-            padding: 0.5rem;
-            background: white;
-            border-radius: 0.375rem;
-            font-size: 0.8rem;
-            cursor: pointer;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
             transition: all 0.2s ease;
         }
 
-        .demo-item:hover {
-            background: #e0f2fe;
-            transform: translateX(2px);
-        }
-
-        .demo-label {
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        .demo-value {
-            color: var(--text-primary);
-            font-weight: 600;
-            font-family: monospace;
-        }
-
-        .info-box {
-            background: #fef3c7;
-            border: 1px solid #fbbf24;
-            border-radius: var(--radius);
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            font-size: 0.875rem;
-            color: #92400e;
-        }
-
-        .info-box strong {
-            color: #78350f;
+        .help-link:hover {
+            border-bottom-color: var(--white);
         }
 
         .setup-link {
             display: inline-block;
             margin-top: 1rem;
-            padding: 0.5rem 1rem;
-            background: var(--warning);
-            color: white;
+            padding: 0.75rem 1.25rem;
+            background: rgba(245, 158, 11, 0.2);
+            color: #fde68a;
             text-decoration: none;
             border-radius: var(--radius);
-            font-size: 0.875rem;
+            font-size: 0.9rem;
             font-weight: 500;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            transition: all 0.2s ease;
         }
 
         .setup-link:hover {
-            background: #d97706;
+            background: rgba(245, 158, 11, 0.3);
+            transform: translateY(-1px);
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes logoGlow {
+            0% { filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.1)); }
+            100% { filter: drop-shadow(0 15px 30px rgba(37, 99, 235, 0.3)); }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+                max-width: 450px;
+                margin: 1rem;
+            }
+            
+            .logo-section {
+                padding: 2rem;
+            }
+            
+            .university-logo {
+                width: 150px;
+                height: auto;
+            }
+            
+            .logo-icon {
+                font-size: 2.5rem;
+            }
+            
+            .university-name h1 {
+                font-size: 1.8rem;
+            }
+            
+            .university-name p {
+                font-size: 1rem;
+            }
+            
+            .login-section {
+                padding: 2rem;
+            }
+            
+            .login-title {
+                font-size: 1.5rem;
+            }
         }
 
         @media (max-width: 480px) {
-            .login-container {
-                margin: 0.5rem;
+            body {
+                padding: 1rem;
             }
             
-            .login-header {
-                padding: 1.5rem;
+            .main-container {
+                margin: 0;
             }
             
-            .login-form {
+            .logo-section, .login-section {
                 padding: 1.5rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="login-header">
-            <div class="login-logo">
-                <i class="fas fa-vote-yea"></i>
+    <div class="main-container">
+        <div class="logo-section">
+            <div class="university-logo">
+                <img src="iaa.png" alt="Institute of Accountancy Arusha" class="logo-image">
             </div>
-            <h1 class="login-title">Student Portal</h1>
-            <p class="login-subtitle">University Voting System</p>
+            <div class="university-name">
+                <h1>Institute of Accountancy Arusha</h1>
+                <p>Excellence & Professionalism</p>
+            </div>
         </div>
 
-        <form class="login-form" method="POST">
-            <?php if ($db_error): ?>
-                <div class="warning-message">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    Database connection failed. Please set up the database first.
-                    <a href="setup_database.php" class="setup-link">Setup Database</a>
-                </div>
-            <?php endif; ?>
+        <div class="login-section">
+            <div class="login-header">
+                <h1 class="login-title">Student Portal</h1>
+                <p class="login-subtitle">Voting System Access</p>
+            </div>
 
-            <?php if ($error_message): ?>
-                <div class="error-message">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <?php echo htmlspecialchars($error_message); ?>
-                </div>
-            <?php endif; ?>
-
-            <?php if ($success_message): ?>
-                <div class="success-message">
-                    <i class="fas fa-check-circle"></i>
-                    <?php echo htmlspecialchars($success_message); ?>
-                </div>
-            <?php endif; ?>
-
-            <div class="info-box">
-                <strong><i class="fas fa-info-circle"></i> Default Login:</strong><br>
-                Use your <strong>Student ID</strong> as both username and password. 
-                <?php if (empty($sample_voters)): ?>
-                Example: ST2024001 / ST2024001
+            <form class="login-form" method="POST">
+                <?php if ($db_error): ?>
+                    <div class="warning-message">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>
+                            Database connection failed. Please set up the database first.
+                            <a href="setup_database.php" class="setup-link">Setup Database</a>
+                        </div>
+                    </div>
                 <?php endif; ?>
-            </div>
 
-            <!-- Demo Credentials -->
-            <?php if (!empty($sample_voters)): ?>
-            <div class="demo-credentials">
-                <div class="demo-title">
-                    <i class="fas fa-users"></i>
-                    Available Demo Accounts:
-                </div>
-                <ul class="demo-list">
-                    <?php foreach ($sample_voters as $voter): ?>
-                    <li class="demo-item" onclick="fillCredentials('<?php echo htmlspecialchars($voter['student_id']); ?>')">
-                        <span class="demo-label"><?php echo htmlspecialchars($voter['full_name']); ?></span>
-                        <span class="demo-value"><?php echo htmlspecialchars($voter['student_id']); ?></span>
-                    </li>
-                    <?php endforeach; ?>
-                </ul>
-                <small style="color: var(--text-muted); font-style: italic;">
-                    <i class="fas fa-hand-pointer"></i> Click any account above to auto-fill credentials
-                </small>
-            </div>
-            <?php else: ?>
-            <div class="demo-credentials">
-                <div class="demo-title">
-                    <i class="fas fa-user-circle"></i>
-                    Default Demo Account:
-                </div>
-                <div class="demo-item" onclick="fillCredentials('ST2024001')">
-                    <span class="demo-label">Student ID:</span>
-                    <span class="demo-value">ST2024001</span>
-                </div>
-                <div class="demo-item" onclick="fillCredentials('ST2024001')">
-                    <span class="demo-label">Password:</span>
-                    <span class="demo-value">ST2024001</span>
-                </div>
-            </div>
-            <?php endif; ?>
+                <?php if ($error_message): ?>
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <?php echo htmlspecialchars($error_message); ?>
+                    </div>
+                <?php endif; ?>
 
-            <div class="form-group">
-                <label for="student_id" class="form-label">Student ID</label>
-                <div class="input-group">
-                    <i class="fas fa-id-card input-icon"></i>
-                    <input type="text" 
-                           id="student_id" 
-                           name="student_id" 
-                           class="form-control" 
-                           placeholder="Enter your Student ID"
-                           value="<?php echo isset($_POST['student_id']) ? htmlspecialchars($_POST['student_id']) : ''; ?>"
-                           required>
+                <?php if ($success_message): ?>
+                    <div class="success-message">
+                        <i class="fas fa-check-circle"></i>
+                        <?php echo htmlspecialchars($success_message); ?>
+                    </div>
+                <?php endif; ?>
+
+                <!-- Login Instructions -->
+                <div class="info-message">
+                    <i class="fas fa-info-circle" style="margin-top: 2px;"></i>
+                    <div>
+                        <strong>Login Instructions:</strong><br>
+                        Use your <strong>Student ID</strong> as both your username and password.<br>
+                        For example, if your Student ID is "ST2024001", enter "ST2024001" in both fields.
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <label for="password" class="form-label">Password</label>
-                <div class="input-group">
-                    <i class="fas fa-lock input-icon"></i>
-                    <input type="password" 
-                           id="password" 
-                           name="password" 
-                           class="form-control" 
-                           placeholder="Enter your password (same as Student ID)"
-                           required>
-                    <button type="button" class="password-toggle" onclick="togglePassword()">
-                        <i class="fas fa-eye" id="passwordIcon"></i>
-                    </button>
+                <div class="form-group">
+                    <label for="student_id" class="form-label">Student ID</label>
+                    <div class="input-group">
+                        <i class="fas fa-id-card input-icon"></i>
+                        <input type="text" 
+                               id="student_id" 
+                               name="student_id" 
+                               class="form-control" 
+                               placeholder="Enter your Student ID (e.g., ST2024001)"
+                               value="<?php echo isset($_POST['student_id']) ? htmlspecialchars($_POST['student_id']) : ''; ?>"
+                               required>
+                    </div>
                 </div>
-            </div>
 
-            <button type="submit" class="btn" <?php echo $db_error ? 'disabled' : ''; ?>>
-                <i class="fas fa-sign-in-alt"></i>
-                Login
-            </button>
-        </form>
+                <div class="form-group">
+                    <label for="password" class="form-label">Password</label>
+                    <div class="input-group">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" 
+                               id="password" 
+                               name="password" 
+                               class="form-control" 
+                               placeholder="Enter your Student ID as password"
+                               required>
+                        <button type="button" class="password-toggle" onclick="togglePassword()">
+                            <i class="fas fa-eye" id="passwordIcon"></i>
+                        </button>
+                    </div>
+                </div>
 
-        <div class="login-footer">
-            <p class="help-text">
-                <strong>First time login?</strong> Use your Student ID as password
-            </p>
-            <p class="help-text">
-                Need help? <a href="#" class="help-link">Contact Administrator</a>
-            </p>
-            <?php if ($db_error): ?>
-            <p class="help-text">
-                <a href="setup_database.php" class="help-link">
-                    <i class="fas fa-database"></i> Setup Database
-                </a>
-            </p>
-            <?php endif; ?>
+                <button type="submit" class="btn" <?php echo $db_error ? 'disabled' : ''; ?>>
+                    <i class="fas fa-sign-in-alt"></i>
+                    Sign In
+                </button>
+
+                <div class="help-text">
+                    Having trouble logging in? Contact the system administrator for assistance.
+                    <?php if ($db_error): ?>
+                        <br><br>
+                        <a href="setup_database.php" class="help-link">
+                            <i class="fas fa-database"></i> Setup Database
+                        </a>
+                    <?php endif; ?>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -662,32 +704,19 @@ if ($db_connection) {
             }
         }
 
-        function fillCredentials(studentId) {
-            document.getElementById('student_id').value = studentId;
-            document.getElementById('password').value = studentId;
-            
-            // Add visual feedback
-            const studentIdField = document.getElementById('student_id');
-            const passwordField = document.getElementById('password');
-            
-            studentIdField.style.background = '#ecfdf5';
-            passwordField.style.background = '#ecfdf5';
-            
-            setTimeout(() => {
-                studentIdField.style.background = '';
-                passwordField.style.background = '';
-            }, 1000);
-        }
-
         // Auto-focus on student ID field
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('student_id').focus();
             
             // Auto-fill password when student ID is entered
-            document.getElementById('student_id').addEventListener('input', function() {
-                const studentId = this.value;
-                if (studentId && !document.getElementById('password').value) {
-                    document.getElementById('password').value = studentId;
+            const studentIdInput = document.getElementById('student_id');
+            const passwordInput = document.getElementById('password');
+            
+            studentIdInput.addEventListener('input', function() {
+                if (this.value.trim()) {
+                    passwordInput.value = this.value.trim();
+                } else {
+                    passwordInput.value = '';
                 }
             });
         });
@@ -701,60 +730,31 @@ if ($db_connection) {
             }
         });
 
-        // Show helpful hints
-        document.getElementById('student_id').addEventListener('focus', function() {
-            if (!this.value) {
-                showHint('Enter your Student ID (e.g., ST2024001)');
-            }
+        // Add subtle animations on focus
+        document.querySelectorAll('.form-control').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.02)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
+            });
         });
 
-        document.getElementById('password').addEventListener('focus', function() {
-            if (!this.value) {
-                showHint('Use the same value as your Student ID for first login');
-            }
+        // Show helpful tooltips
+        document.addEventListener('DOMContentLoaded', function() {
+            const studentIdInput = document.getElementById('student_id');
+            const passwordInput = document.getElementById('password');
+            
+            // Add placeholder update based on student ID input
+            studentIdInput.addEventListener('input', function() {
+                if (this.value.trim()) {
+                    passwordInput.placeholder = 'Enter: ' + this.value.trim();
+                } else {
+                    passwordInput.placeholder = 'Enter your Student ID as password';
+                }
+            });
         });
-
-        function showHint(message) {
-            // Remove existing hint
-            const existingHint = document.querySelector('.login-hint');
-            if (existingHint) {
-                existingHint.remove();
-            }
-
-            // Create new hint
-            const hint = document.createElement('div');
-            hint.className = 'login-hint';
-            hint.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: var(--primary);
-                color: white;
-                padding: 0.75rem 1rem;
-                border-radius: var(--radius);
-                font-size: 0.875rem;
-                box-shadow: var(--shadow-lg);
-                z-index: 1000;
-                opacity: 0;
-                transform: translateX(100%);
-                transition: all 0.3s ease;
-                max-width: 300px;
-            `;
-            hint.innerHTML = `<i class="fas fa-lightbulb"></i> ${message}`;
-            
-            document.body.appendChild(hint);
-            
-            setTimeout(() => {
-                hint.style.opacity = '1';
-                hint.style.transform = 'translateX(0)';
-            }, 100);
-            
-            setTimeout(() => {
-                hint.style.opacity = '0';
-                hint.style.transform = 'translateX(100%)';
-                setTimeout(() => hint.remove(), 300);
-            }, 3000);
-        }
     </script>
 </body>
 </html>

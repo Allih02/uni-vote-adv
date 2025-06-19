@@ -486,6 +486,9 @@ $total_pages = ceil($total_elections / $limit);
 // Get distinct values for filters
 $years = fetchAll("SELECT DISTINCT year FROM voters ORDER BY year");
 $faculties = fetchAll("SELECT DISTINCT faculty FROM voters ORDER BY faculty");
+
+// Get admin user info (you might need to adjust this based on your admin_users table structure)
+$admin_user = fetchOne("SELECT * FROM admin_users WHERE id = ?", [$_SESSION['admin_id']]) ?? ['fullname' => 'Admin User', 'role' => 'Administrator'];
 ?>
 
 <!DOCTYPE html>
@@ -537,28 +540,200 @@ $faculties = fetchAll("SELECT DISTINCT faculty FROM voters ORDER BY faculty");
             background: var(--background);
             color: var(--text-primary);
             line-height: 1.6;
-        }
-
-        /* Layout */
-        .dashboard {
-            display: flex;
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
+        /* Modern Sidebar Styles */
         .sidebar {
-            width: 280px;
-            background: var(--surface);
-            border-right: 1px solid var(--border);
-            padding: 2rem 0;
             position: fixed;
+            top: 0;
+            left: 0;
             height: 100vh;
+            width: 280px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
             overflow-y: auto;
         }
 
+        .sidebar.hidden {
+            transform: translateX(-100%);
+        }
+
+        /* Sidebar Header */
+        .sidebar-header {
+            padding: 2rem 2rem 1.5rem 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            margin-bottom: 1rem;
+        }
+
+        .logo i {
+            font-size: 1.75rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .admin-info {
+            text-align: left;
+        }
+
+        .admin-name {
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .admin-role {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar-nav {
+            padding: 0 1rem 2rem 1rem;
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-section-title {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 0 1rem 0.75rem 1rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.875rem 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            transform: translateX(4px);
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item i {
+            width: 20px;
+            height: 20px;
+            margin-right: 0.75rem;
+            font-size: 1rem;
+        }
+
+        .nav-item span {
+            font-weight: 500;
+            letter-spacing: -0.01em;
+        }
+
+        /* Mobile Header */
+        .mobile-header {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            z-index: 1001;
+            padding: 0 1rem;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .mobile-logo {
+            color: white;
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .hamburger {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+
+        .hamburger:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .hamburger-icon {
+            width: 24px;
+            height: 24px;
+            fill: white;
+            transition: transform 0.3s ease;
+        }
+
+        .hamburger.active .hamburger-icon {
+            transform: rotate(90deg);
+        }
+
+        /* Overlay for mobile */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .overlay.active {
+            opacity: 1;
+        }
+
+        /* Main Content */
         .main-content {
-            flex: 1;
             margin-left: 280px;
             padding: 2rem;
+            min-height: 100vh;
+            transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         /* Header */
@@ -569,8 +744,9 @@ $faculties = fetchAll("SELECT DISTINCT faculty FROM voters ORDER BY faculty");
             box-shadow: var(--shadow-sm);
             margin-bottom: 2rem;
             display: flex;
-            justify-content: between;
+            justify-content: space-between;
             align-items: center;
+            border: 1px solid var(--border);
         }
 
         .header h1 {
@@ -598,6 +774,12 @@ $faculties = fetchAll("SELECT DISTINCT faculty FROM voters ORDER BY faculty");
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--border);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
         }
 
         .stat-card .icon {
@@ -659,6 +841,12 @@ $faculties = fetchAll("SELECT DISTINCT faculty FROM voters ORDER BY faculty");
             border-radius: var(--radius-md);
             font-size: 0.875rem;
             transition: all 0.2s ease;
+            background: var(--surface);
+            color: var(--text-primary);
+        }
+
+        .form-control::placeholder {
+            color: var(--text-muted);
         }
 
         .form-control:focus {
@@ -689,6 +877,8 @@ $faculties = fetchAll("SELECT DISTINCT faculty FROM voters ORDER BY faculty");
 
         .btn-primary:hover {
             background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
         }
 
         .btn-secondary {
@@ -715,6 +905,11 @@ $faculties = fetchAll("SELECT DISTINCT faculty FROM voters ORDER BY faculty");
             background: transparent;
             border: 1px solid var(--border);
             color: var(--text-primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--surface-hover);
+            border-color: var(--border-dark);
         }
 
         .btn-sm {
@@ -749,6 +944,10 @@ $faculties = fetchAll("SELECT DISTINCT faculty FROM voters ORDER BY faculty");
             color: var(--text-primary);
         }
 
+        .table tbody tr {
+            color: var(--text-primary);
+        }
+
         .table tbody tr:hover {
             background: var(--surface-hover);
         }
@@ -764,10 +963,26 @@ $faculties = fetchAll("SELECT DISTINCT faculty FROM voters ORDER BY faculty");
             font-weight: 500;
         }
 
-        .status-draft { background: rgb(107 114 128 / 0.1); color: #374151; }
-        .status-active { background: rgb(16 185 129 / 0.1); color: #059669; }
-        .status-completed { background: rgb(59 130 246 / 0.1); color: #2563eb; }
-        .status-cancelled { background: rgb(239 68 68 / 0.1); color: #dc2626; }
+        .status-draft { 
+            background: rgb(107 114 128 / 0.1); 
+            color: #374151; 
+            border: 1px solid rgb(107 114 128 / 0.2);
+        }
+        .status-active { 
+            background: rgb(16 185 129 / 0.1); 
+            color: #059669; 
+            border: 1px solid rgb(16 185 129 / 0.2);
+        }
+        .status-completed { 
+            background: rgb(59 130 246 / 0.1); 
+            color: #2563eb; 
+            border: 1px solid rgb(59 130 246 / 0.2);
+        }
+        .status-cancelled { 
+            background: rgb(239 68 68 / 0.1); 
+            color: #dc2626; 
+            border: 1px solid rgb(239 68 68 / 0.2);
+        }
 
         /* Modal */
         .modal {
@@ -777,6 +992,7 @@ $faculties = fetchAll("SELECT DISTINCT faculty FROM voters ORDER BY faculty");
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
             display: none;
             align-items: center;
             justify-content: center;
@@ -795,6 +1011,7 @@ $faculties = fetchAll("SELECT DISTINCT faculty FROM voters ORDER BY faculty");
             max-height: 90vh;
             overflow-y: auto;
             box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
         }
 
         .modal-header {
@@ -808,6 +1025,7 @@ $faculties = fetchAll("SELECT DISTINCT faculty FROM voters ORDER BY faculty");
         .modal-title {
             font-size: 1.25rem;
             font-weight: 600;
+            color: var(--text-primary);
         }
 
         .modal-body {
@@ -858,6 +1076,16 @@ $faculties = fetchAll("SELECT DISTINCT faculty FROM voters ORDER BY faculty");
             gap: 0.5rem;
         }
 
+        .checkbox-item input[type="checkbox"] {
+            accent-color: var(--primary);
+        }
+
+        .checkbox-item label {
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            margin: 0;
+        }
+
         /* Pagination */
         .pagination {
             display: flex;
@@ -873,6 +1101,13 @@ $faculties = fetchAll("SELECT DISTINCT faculty FROM voters ORDER BY faculty");
             border-radius: var(--radius-md);
             text-decoration: none;
             color: var(--text-primary);
+            background: var(--surface);
+            transition: all 0.2s ease;
+        }
+
+        .pagination a:hover {
+            background: var(--surface-hover);
+            border-color: var(--border-dark);
         }
 
         .pagination .current {
@@ -887,6 +1122,7 @@ $faculties = fetchAll("SELECT DISTINCT faculty FROM voters ORDER BY faculty");
             border-radius: var(--radius-md);
             margin-bottom: 1rem;
             border: 1px solid transparent;
+            backdrop-filter: blur(10px);
         }
 
         .alert-success {
@@ -909,14 +1145,30 @@ $faculties = fetchAll("SELECT DISTINCT faculty FROM voters ORDER BY faculty");
 
         /* Responsive */
         @media (max-width: 768px) {
+            .mobile-header {
+                display: flex;
+            }
+
             .sidebar {
+                top: 70px;
+                height: calc(100vh - 70px);
                 transform: translateX(-100%);
-                transition: transform 0.3s ease;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .overlay {
+                display: block;
+                top: 70px;
+                height: calc(100vh - 70px);
             }
 
             .main-content {
                 margin-left: 0;
-                padding: 1rem;
+                margin-top: 70px;
+                padding: 1.5rem;
             }
 
             .stats-grid {
@@ -936,12 +1188,36 @@ $faculties = fetchAll("SELECT DISTINCT faculty FROM voters ORDER BY faculty");
                 width: 95%;
                 margin: 1rem;
             }
+
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 1rem;
+            }
+
+            .header {
+                padding: 1rem;
+            }
+
+            .stat-card {
+                padding: 1rem;
+            }
+
+            .filters {
+                padding: 1rem;
+            }
         }
 
         /* Loading spinner */
         .spinner {
-            border: 2px solid var(--border);
-            border-top: 2px solid var(--primary);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
             border-radius: 50%;
             width: 1rem;
             height: 1rem;
@@ -957,6 +1233,7 @@ $faculties = fetchAll("SELECT DISTINCT faculty FROM voters ORDER BY faculty");
         .action-buttons {
             display: flex;
             gap: 0.5rem;
+            flex-wrap: wrap;
         }
 
         .close-btn {
@@ -972,6 +1249,7 @@ $faculties = fetchAll("SELECT DISTINCT faculty FROM voters ORDER BY faculty");
             align-items: center;
             justify-content: center;
             border-radius: var(--radius-sm);
+            transition: all 0.2s ease;
         }
 
         .close-btn:hover {
@@ -991,333 +1269,438 @@ $faculties = fetchAll("SELECT DISTINCT faculty FROM voters ORDER BY faculty");
             margin-bottom: 1rem;
             color: var(--text-muted);
         }
+
+        .empty-state h3 {
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Smooth scrollbar for webkit browsers */
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Status menu styling */
+        .status-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            z-index: 100;
+            min-width: 150px;
+        }
+
+        .status-menu button {
+            width: 100%;
+            text-align: left;
+            padding: 0.75rem 1rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            transition: background-color 0.2s ease;
+        }
+
+        .status-menu button:hover {
+            background: var(--surface-hover);
+        }
+
+        .status-menu button:last-child {
+            border-bottom: none;
+        }
+
+        .status-menu button i {
+            margin-right: 0.5rem;
+            color: var(--text-secondary);
+        }
     </style>
 </head>
 <body>
-    <div class="dashboard">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div style="padding: 0 2rem; margin-bottom: 2rem;">
-                <h2 style="color: var(--primary); font-size: 1.25rem;">
-                    <i class="fas fa-vote-yea"></i> Voting Admin
-                </h2>
+    <!-- Mobile Header -->
+    <header class="mobile-header">
+        <div class="mobile-logo">
+            <i class="fas fa-shield-alt"></i>
+            VoteAdmin
+        </div>
+        <button class="hamburger" id="hamburgerBtn">
+            <svg class="hamburger-icon" viewBox="0 0 24 24">
+                <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+            </svg>
+        </button>
+    </header>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="admin_dashboard.php" class="logo">
+                <i class="fas fa-shield-alt"></i>
+                <span>VoteAdmin</span>
+            </a>
+            <div class="admin-info">
+                <div class="admin-name"><?php echo htmlspecialchars($admin_user['fullname'] ?? 'Admin User'); ?></div>
+                <div class="admin-role"><?php echo htmlspecialchars($admin_user['role'] ?? 'Administrator'); ?></div>
+            </div>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Main</div>
+                <a href="admin_dashboard.php" class="nav-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="admin_elections.php" class="nav-item active">
+                    <i class="fas fa-poll"></i>
+                    <span>Elections</span>
+                </a>
+                <a href="admin_candidates.php" class="nav-item">
+                    <i class="fas fa-user-tie"></i>
+                    <span>Candidates</span>
+                </a>
+                <a href="admin_voters.php" class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Voters</span>
+                </a>
             </div>
             
-            <nav style="padding: 0 1rem;">
-                <a href="admin_dashboard.php" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; color: var(--text-secondary); text-decoration: none; border-radius: var(--radius-md); margin-bottom: 0.25rem;">
-                    <i class="fas fa-home"></i> Dashboard
+            <div class="nav-section">
+                <div class="nav-section-title">Reports & Analytics</div>
+                <a href="admin_results.php" class="nav-item">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Results</span>
                 </a>
-                <a href="admin_elections.php" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; color: var(--primary); text-decoration: none; border-radius: var(--radius-md); margin-bottom: 0.25rem; background: var(--primary-light);">
-                    <i class="fas fa-poll"></i> Elections
+                <a href="admin_analytics.php" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Analytics</span>
                 </a>
-                <a href="admin_voters.php" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; color: var(--text-secondary); text-decoration: none; border-radius: var(--radius-md); margin-bottom: 0.25rem;">
-                    <i class="fas fa-users"></i> Voters
+                <a href="admin_reports.php" class="nav-item">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Reports</span>
                 </a>
-                <a href="candidates.php" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; color: var(--text-secondary); text-decoration: none; border-radius: var(--radius-md); margin-bottom: 0.25rem;">
-                    <i class="fas fa-user-tie"></i> Candidates
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-section-title">System</div>
+                <a href="admin_settings.php" class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
                 </a>
-                <a href="results.php" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; color: var(--text-secondary); text-decoration: none; border-radius: var(--radius-md); margin-bottom: 0.25rem;">
-                    <i class="fas fa-chart-bar"></i> Results
+                <a href="admin_audit.php" class="nav-item">
+                    <i class="fas fa-history"></i>
+                    <span>Audit Log</span>
                 </a>
-                <a href="settings.php" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; color: var(--text-secondary); text-decoration: none; border-radius: var(--radius-md); margin-bottom: 0.25rem;">
-                    <i class="fas fa-cog"></i> Settings
+                <a href="logout.php" class="nav-item">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
                 </a>
-                <a href="logout.php" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; color: var(--error); text-decoration: none; border-radius: var(--radius-md); margin-top: 2rem;">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </a>
-            </nav>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1>Elections Management</h1>
+                <p class="subtitle">Create and manage voting elections</p>
+            </div>
+            <button class="btn btn-primary" onclick="openCreateModal()">
+                <i class="fas fa-plus"></i> New Election
+            </button>
         </div>
 
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Header -->
-            <div class="header">
-                <div>
-                    <h1>Elections Management</h1>
-                    <p class="subtitle">Create and manage voting elections</p>
+        <!-- Alerts -->
+        <?php if (isset($_GET['success'])): ?>
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <?php
+                switch ($_GET['success']) {
+                    case 'created': echo 'Election created successfully!'; break;
+                    case 'updated': echo 'Election updated successfully!'; break;
+                    case 'deleted': echo 'Election deleted successfully!'; break;
+                    case 'status_updated': echo 'Election status updated successfully!'; break;
+                    default: echo 'Operation completed successfully!';
+                }
+                ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if (isset($_GET['error'])): ?>
+            <div class="alert alert-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <?php
+                switch ($_GET['error']) {
+                    case 'create_failed': echo 'Failed to create election. Please try again.'; break;
+                    case 'update_failed': echo 'Failed to update election. Please try again.'; break;
+                    case 'delete_failed': echo 'Failed to delete election. Please try again.'; break;
+                    case 'status_update_failed': echo 'Failed to update election status. Please try again.'; break;
+                    default: echo 'An error occurred. Please try again.';
+                }
+                ?>
+            </div>
+        <?php endif; ?>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="icon" style="background: rgba(99, 102, 241, 0.2); color: #a5b4fc;">
+                    <i class="fas fa-poll"></i>
                 </div>
-                <button class="btn btn-primary" onclick="openCreateModal()">
-                    <i class="fas fa-plus"></i> New Election
-                </button>
+                <div class="value"><?= number_format($stats['total_elections']) ?></div>
+                <div class="label">Total Elections</div>
             </div>
 
-            <!-- Alerts -->
-            <?php if (isset($_GET['success'])): ?>
-                <div class="alert alert-success">
+            <div class="stat-card">
+                <div class="icon" style="background: rgba(16, 185, 129, 0.2); color: #6ee7b7;">
+                    <i class="fas fa-play-circle"></i>
+                </div>
+                <div class="value"><?= number_format($stats['active_elections']) ?></div>
+                <div class="label">Active Elections</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="icon" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24;">
+                    <i class="fas fa-edit"></i>
+                </div>
+                <div class="value"><?= number_format($stats['draft_elections']) ?></div>
+                <div class="label">Draft Elections</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="icon" style="background: rgba(59, 130, 246, 0.2); color: #93c5fd;">
                     <i class="fas fa-check-circle"></i>
-                    <?php
-                    switch ($_GET['success']) {
-                        case 'created': echo 'Election created successfully!'; break;
-                        case 'updated': echo 'Election updated successfully!'; break;
-                        case 'deleted': echo 'Election deleted successfully!'; break;
-                        case 'status_updated': echo 'Election status updated successfully!'; break;
-                        default: echo 'Operation completed successfully!';
-                    }
-                    ?>
                 </div>
-            <?php endif; ?>
-
-            <?php if (isset($_GET['error'])): ?>
-                <div class="alert alert-error">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <?php
-                    switch ($_GET['error']) {
-                        case 'create_failed': echo 'Failed to create election. Please try again.'; break;
-                        case 'update_failed': echo 'Failed to update election. Please try again.'; break;
-                        case 'delete_failed': echo 'Failed to delete election. Please try again.'; break;
-                        case 'status_update_failed': echo 'Failed to update election status. Please try again.'; break;
-                        default: echo 'An error occurred. Please try again.';
-                    }
-                    ?>
-                </div>
-            <?php endif; ?>
-
-            <!-- Stats -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="icon" style="background: rgb(99 102 241 / 0.1); color: var(--primary);">
-                        <i class="fas fa-poll"></i>
-                    </div>
-                    <div class="value"><?= number_format($stats['total_elections']) ?></div>
-                    <div class="label">Total Elections</div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="icon" style="background: rgb(16 185 129 / 0.1); color: var(--success);">
-                        <i class="fas fa-play-circle"></i>
-                    </div>
-                    <div class="value"><?= number_format($stats['active_elections']) ?></div>
-                    <div class="label">Active Elections</div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="icon" style="background: rgb(245 158 11 / 0.1); color: var(--warning);">
-                        <i class="fas fa-edit"></i>
-                    </div>
-                    <div class="value"><?= number_format($stats['draft_elections']) ?></div>
-                    <div class="label">Draft Elections</div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="icon" style="background: rgb(59 130 246 / 0.1); color: var(--info);">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                    <div class="value"><?= number_format($stats['completed_elections']) ?></div>
-                    <div class="label">Completed Elections</div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="icon" style="background: rgb(139 92 246 / 0.1); color: var(--secondary);">
-                        <i class="fas fa-user-tie"></i>
-                    </div>
-                    <div class="value"><?= number_format($stats['total_candidates']) ?></div>
-                    <div class="label">Total Candidates</div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="icon" style="background: rgb(244 63 94 / 0.1); color: var(--accent);">
-                        <i class="fas fa-vote-yea"></i>
-                    </div>
-                    <div class="value"><?= number_format($stats['total_votes']) ?></div>
-                    <div class="label">Total Votes</div>
-                </div>
+                <div class="value"><?= number_format($stats['completed_elections']) ?></div>
+                <div class="label">Completed Elections</div>
             </div>
 
-            <!-- Filters -->
-            <div class="filters">
-                <form method="GET" action="">
-                    <div class="filters-row">
-                        <div class="filter-group">
-                            <label for="search">Search Elections</label>
-                            <input type="text" id="search" name="search" class="form-control" 
-                                   placeholder="Search by title or description..." 
-                                   value="<?= htmlspecialchars($_GET['search'] ?? '') ?>">
-                        </div>
-
-                        <div class="filter-group">
-                            <label for="status">Status</label>
-                            <select id="status" name="status" class="form-control">
-                                <option value="">All Statuses</option>
-                                <option value="draft" <?= ($_GET['status'] ?? '') === 'draft' ? 'selected' : '' ?>>Draft</option>
-                                <option value="active" <?= ($_GET['status'] ?? '') === 'active' ? 'selected' : '' ?>>Active</option>
-                                <option value="completed" <?= ($_GET['status'] ?? '') === 'completed' ? 'selected' : '' ?>>Completed</option>
-                                <option value="cancelled" <?= ($_GET['status'] ?? '') === 'cancelled' ? 'selected' : '' ?>>Cancelled</option>
-                            </select>
-                        </div>
-
-                        <div class="filter-group">
-                            <label for="type">Election Type</label>
-                            <select id="type" name="type" class="form-control">
-                                <option value="">All Types</option>
-                                <option value="general" <?= ($_GET['type'] ?? '') === 'general' ? 'selected' : '' ?>>General</option>
-                                <option value="faculty" <?= ($_GET['type'] ?? '') === 'faculty' ? 'selected' : '' ?>>Faculty</option>
-                                <option value="departmental" <?= ($_GET['type'] ?? '') === 'departmental' ? 'selected' : '' ?>>Departmental</option>
-                                <option value="class" <?= ($_GET['type'] ?? '') === 'class' ? 'selected' : '' ?>>Class</option>
-                            </select>
-                        </div>
-
-                        <div class="filter-group">
-                            <label>&nbsp;</label>
-                            <div style="display: flex; gap: 0.5rem;">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-search"></i> Filter
-                                </button>
-                                <a href="admin_elections.php" class="btn btn-outline">
-                                    <i class="fas fa-times"></i> Clear
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </form>
+            <div class="stat-card">
+                <div class="icon" style="background: rgba(139, 92, 246, 0.2); color: #c4b5fd;">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <div class="value"><?= number_format($stats['total_candidates']) ?></div>
+                <div class="label">Total Candidates</div>
             </div>
 
-            <!-- Elections Table -->
-            <div class="table-container">
-                <?php if (empty($elections)): ?>
-                    <div class="empty-state">
-                        <i class="fas fa-poll"></i>
-                        <h3>No Elections Found</h3>
-                        <p>No elections match your current filters. Try adjusting your search criteria or create a new election.</p>
-                        <button class="btn btn-primary" onclick="openCreateModal()" style="margin-top: 1rem;">
-                            <i class="fas fa-plus"></i> Create First Election
-                        </button>
+            <div class="stat-card">
+                <div class="icon" style="background: rgba(244, 63, 94, 0.2); color: #fb7185;">
+                    <i class="fas fa-vote-yea"></i>
+                </div>
+                <div class="value"><?= number_format($stats['total_votes']) ?></div>
+                <div class="label">Total Votes</div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters">
+            <form method="GET" action="">
+                <div class="filters-row">
+                    <div class="filter-group">
+                        <label for="search">Search Elections</label>
+                        <input type="text" id="search" name="search" class="form-control" 
+                               placeholder="Search by title or description..." 
+                               value="<?= htmlspecialchars($_GET['search'] ?? '') ?>">
                     </div>
-                <?php else: ?>
-                    <table class="table">
-                        <thead>
+
+                    <div class="filter-group">
+                        <label for="status">Status</label>
+                        <select id="status" name="status" class="form-control">
+                            <option value="">All Statuses</option>
+                            <option value="draft" <?= ($_GET['status'] ?? '') === 'draft' ? 'selected' : '' ?>>Draft</option>
+                            <option value="active" <?= ($_GET['status'] ?? '') === 'active' ? 'selected' : '' ?>>Active</option>
+                            <option value="completed" <?= ($_GET['status'] ?? '') === 'completed' ? 'selected' : '' ?>>Completed</option>
+                            <option value="cancelled" <?= ($_GET['status'] ?? '') === 'cancelled' ? 'selected' : '' ?>>Cancelled</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="type">Election Type</label>
+                        <select id="type" name="type" class="form-control">
+                            <option value="">All Types</option>
+                            <option value="general" <?= ($_GET['type'] ?? '') === 'general' ? 'selected' : '' ?>>General</option>
+                            <option value="faculty" <?= ($_GET['type'] ?? '') === 'faculty' ? 'selected' : '' ?>>Faculty</option>
+                            <option value="departmental" <?= ($_GET['type'] ?? '') === 'departmental' ? 'selected' : '' ?>>Departmental</option>
+                            <option value="class" <?= ($_GET['type'] ?? '') === 'class' ? 'selected' : '' ?>>Class</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label>&nbsp;</label>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search"></i> Filter
+                            </button>
+                            <a href="admin_elections.php" class="btn btn-outline">
+                                <i class="fas fa-times"></i> Clear
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Elections Table -->
+        <div class="table-container">
+            <?php if (empty($elections)): ?>
+                <div class="empty-state">
+                    <i class="fas fa-poll"></i>
+                    <h3>No Elections Found</h3>
+                    <p>No elections match your current filters. Try adjusting your search criteria or create a new election.</p>
+                    <button class="btn btn-primary" onclick="openCreateModal()" style="margin-top: 1rem;">
+                        <i class="fas fa-plus"></i> Create First Election
+                    </button>
+                </div>
+            <?php else: ?>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Election Details</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Duration</th>
+                            <th>Candidates</th>
+                            <th>Votes</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($elections as $election): ?>
                             <tr>
-                                <th>Election Details</th>
-                                <th>Type</th>
-                                <th>Status</th>
-                                <th>Duration</th>
-                                <th>Candidates</th>
-                                <th>Votes</th>
-                                <th>Actions</th>
+                                <td>
+                                    <div>
+                                        <div style="font-weight: 600; margin-bottom: 0.25rem; color: white;">
+                                            <?= htmlspecialchars($election['title']) ?>
+                                        </div>
+                                        <div style="font-size: 0.875rem; color: var(--text-secondary);">
+                                            <?= htmlspecialchars(substr($election['description'], 0, 100)) ?>
+                                            <?= strlen($election['description']) > 100 ? '...' : '' ?>
+                                        </div>
+                                        <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">
+                                            Created by: <?= htmlspecialchars($election['created_by_name'] ?? 'Unknown') ?>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span style="text-transform: capitalize; color: var(--text-primary);">
+                                        <?= htmlspecialchars($election['election_type']) ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="status-badge status-<?= $election['status'] ?>">
+                                        <i class="fas fa-circle" style="font-size: 0.5rem;"></i>
+                                        <?= ucfirst($election['status']) ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div style="font-size: 0.875rem; color: var(--text-primary);">
+                                        <div>Start: <?= date('M j, Y g:i A', strtotime($election['start_date'])) ?></div>
+                                        <div>End: <?= date('M j, Y g:i A', strtotime($election['end_date'])) ?></div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span style="font-weight: 600; font-size: 1.125rem; color: var(--text-primary);">
+                                        <?= number_format($election['candidate_count']) ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span style="font-weight: 600; font-size: 1.125rem; color: var(--text-primary);">
+                                        <?= number_format($election['vote_count']) ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-sm btn-outline" 
+                                                onclick="viewElection(<?= $election['id'] ?>)"
+                                                title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-primary" 
+                                                onclick="editElection(<?= $election['id'] ?>)"
+                                                title="Edit Election">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <div style="position: relative; display: inline-block;">
+                                            <button class="btn btn-sm btn-secondary" 
+                                                    onclick="toggleStatusMenu(<?= $election['id'] ?>)"
+                                                    title="Change Status">
+                                                <i class="fas fa-exchange-alt"></i>
+                                            </button>
+                                            <div id="status-menu-<?= $election['id'] ?>" class="status-menu" style="display: none;">
+                                                <form method="POST" style="margin: 0;">
+                                                    <input type="hidden" name="action" value="update_status">
+                                                    <input type="hidden" name="election_id" value="<?= $election['id'] ?>">
+                                                    <button type="submit" name="status" value="draft">
+                                                        <i class="fas fa-edit"></i> Draft
+                                                    </button>
+                                                    <button type="submit" name="status" value="active">
+                                                        <i class="fas fa-play"></i> Active
+                                                    </button>
+                                                    <button type="submit" name="status" value="completed">
+                                                        <i class="fas fa-check"></i> Completed
+                                                    </button>
+                                                    <button type="submit" name="status" value="cancelled">
+                                                        <i class="fas fa-times"></i> Cancelled
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                        <?php if ($election['vote_count'] == 0): ?>
+                                            <button class="btn btn-sm btn-danger" 
+                                                    onclick="deleteElection(<?= $election['id'] ?>)"
+                                                    title="Delete Election">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        <?php endif; ?>
+                                    </div>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($elections as $election): ?>
-                                <tr>
-                                    <td>
-                                        <div>
-                                            <div style="font-weight: 600; margin-bottom: 0.25rem;">
-                                                <?= htmlspecialchars($election['title']) ?>
-                                            </div>
-                                            <div style="font-size: 0.875rem; color: var(--text-secondary);">
-                                                <?= htmlspecialchars(substr($election['description'], 0, 100)) ?>
-                                                <?= strlen($election['description']) > 100 ? '...' : '' ?>
-                                            </div>
-                                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">
-                                                Created by: <?= htmlspecialchars($election['created_by_name'] ?? 'Unknown') ?>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span style="text-transform: capitalize;">
-                                            <?= htmlspecialchars($election['election_type']) ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="status-badge status-<?= $election['status'] ?>">
-                                            <i class="fas fa-circle" style="font-size: 0.5rem;"></i>
-                                            <?= ucfirst($election['status']) ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div style="font-size: 0.875rem;">
-                                            <div>Start: <?= date('M j, Y g:i A', strtotime($election['start_date'])) ?></div>
-                                            <div>End: <?= date('M j, Y g:i A', strtotime($election['end_date'])) ?></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span style="font-weight: 600; font-size: 1.125rem;">
-                                            <?= number_format($election['candidate_count']) ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span style="font-weight: 600; font-size: 1.125rem;">
-                                            <?= number_format($election['vote_count']) ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="action-buttons">
-                                            <button class="btn btn-sm btn-outline" 
-                                                    onclick="viewElection(<?= $election['id'] ?>)"
-                                                    title="View Details">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                            <button class="btn btn-sm btn-primary" 
-                                                    onclick="editElection(<?= $election['id'] ?>)"
-                                                    title="Edit Election">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <div style="position: relative; display: inline-block;">
-                                                <button class="btn btn-sm btn-secondary" 
-                                                        onclick="toggleStatusMenu(<?= $election['id'] ?>)"
-                                                        title="Change Status">
-                                                    <i class="fas fa-exchange-alt"></i>
-                                                </button>
-                                                <div id="status-menu-<?= $election['id'] ?>" 
-                                                     style="display: none; position: absolute; top: 100%; right: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); z-index: 100; min-width: 150px;">
-                                                    <form method="POST" style="margin: 0;">
-                                                        <input type="hidden" name="action" value="update_status">
-                                                        <input type="hidden" name="election_id" value="<?= $election['id'] ?>">
-                                                        <button type="submit" name="status" value="draft" 
-                                                                style="width: 100%; text-align: left; padding: 0.5rem 1rem; border: none; background: none; cursor: pointer; border-bottom: 1px solid var(--border);">
-                                                            <i class="fas fa-edit"></i> Draft
-                                                        </button>
-                                                        <button type="submit" name="status" value="active" 
-                                                                style="width: 100%; text-align: left; padding: 0.5rem 1rem; border: none; background: none; cursor: pointer; border-bottom: 1px solid var(--border);">
-                                                            <i class="fas fa-play"></i> Active
-                                                        </button>
-                                                        <button type="submit" name="status" value="completed" 
-                                                                style="width: 100%; text-align: left; padding: 0.5rem 1rem; border: none; background: none; cursor: pointer; border-bottom: 1px solid var(--border);">
-                                                            <i class="fas fa-check"></i> Completed
-                                                        </button>
-                                                        <button type="submit" name="status" value="cancelled" 
-                                                                style="width: 100%; text-align: left; padding: 0.5rem 1rem; border: none; background: none; cursor: pointer;">
-                                                            <i class="fas fa-times"></i> Cancelled
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                            <?php if ($election['vote_count'] == 0): ?>
-                                                <button class="btn btn-sm btn-danger" 
-                                                        onclick="deleteElection(<?= $election['id'] ?>)"
-                                                        title="Delete Election">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            <?php endif; ?>
-                                        </div>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php endif; ?>
+        </div>
+
+        <!-- Pagination -->
+        <?php if ($total_pages > 1): ?>
+            <div class="pagination">
+                <?php if ($page > 1): ?>
+                    <a href="?<?= http_build_query(array_merge($_GET, ['page' => $page - 1])) ?>">&laquo; Previous</a>
+                <?php endif; ?>
+
+                <?php for ($i = max(1, $page - 2); $i <= min($total_pages, $page + 2); $i++): ?>
+                    <?php if ($i == $page): ?>
+                        <span class="current"><?= $i ?></span>
+                    <?php else: ?>
+                        <a href="?<?= http_build_query(array_merge($_GET, ['page' => $i])) ?>"><?= $i ?></a>
+                    <?php endif; ?>
+                <?php endfor; ?>
+
+                <?php if ($page < $total_pages): ?>
+                    <a href="?<?= http_build_query(array_merge($_GET, ['page' => $page + 1])) ?>">Next &raquo;</a>
                 <?php endif; ?>
             </div>
-
-            <!-- Pagination -->
-            <?php if ($total_pages > 1): ?>
-                <div class="pagination">
-                    <?php if ($page > 1): ?>
-                        <a href="?<?= http_build_query(array_merge($_GET, ['page' => $page - 1])) ?>">&laquo; Previous</a>
-                    <?php endif; ?>
-
-                    <?php for ($i = max(1, $page - 2); $i <= min($total_pages, $page + 2); $i++): ?>
-                        <?php if ($i == $page): ?>
-                            <span class="current"><?= $i ?></span>
-                        <?php else: ?>
-                            <a href="?<?= http_build_query(array_merge($_GET, ['page' => $i])) ?>"><?= $i ?></a>
-                        <?php endif; ?>
-                    <?php endfor; ?>
-
-                    <?php if ($page < $total_pages): ?>
-                        <a href="?<?= http_build_query(array_merge($_GET, ['page' => $page + 1])) ?>">Next &raquo;</a>
-                    <?php endif; ?>
-                </div>
-            <?php endif; ?>
-        </div>
+        <?php endif; ?>
     </div>
 
     <!-- Create/Edit Election Modal -->
@@ -1451,6 +1834,34 @@ $faculties = fetchAll("SELECT DISTINCT faculty FROM voters ORDER BY faculty");
         // Global variables
         let statusMenus = {};
 
+        // Mobile navigation functions
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+
+        // Toggle mobile menu
+        hamburgerBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+            hamburgerBtn.classList.toggle('active');
+        });
+
+        // Close menu when overlay is clicked
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+            hamburgerBtn.classList.remove('active');
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+                hamburgerBtn.classList.remove('active');
+            }
+        });
+
         // Modal functions
         function openCreateModal() {
             document.getElementById('modalTitle').textContent = 'Create New Election';
@@ -1525,7 +1936,7 @@ $faculties = fetchAll("SELECT DISTINCT faculty FROM voters ORDER BY faculty");
 
                 const modalBody = document.getElementById('viewModalBody');
                 modalBody.innerHTML = `
-                    <div style="display: grid; gap: 1.5rem;">
+                    <div style="display: grid; gap: 1.5rem; color: var(--text-primary);">
                         <div>
                             <h4 style="margin-bottom: 0.5rem; color: var(--text-primary);">${election.title}</h4>
                             <p style="color: var(--text-secondary); margin-bottom: 1rem;">${election.description || 'No description provided'}</p>
@@ -1730,7 +2141,7 @@ $faculties = fetchAll("SELECT DISTINCT faculty FROM voters ORDER BY faculty");
             }
         });
 
-        // Initialize tooltips (if using a tooltip library)
+        // Initialize tooltips and setup
         document.addEventListener('DOMContentLoaded', function() {
             // Set minimum date to current date for new elections
             const now = new Date();
@@ -1748,25 +2159,19 @@ $faculties = fetchAll("SELECT DISTINCT faculty FROM voters ORDER BY faculty");
             document.getElementById('start_date').addEventListener('change', function() {
                 document.getElementById('end_date').min = this.value;
             });
+
+            // Auto-hide alerts after 5 seconds
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.opacity = '0';
+                    alert.style.transform = 'translateY(-10px)';
+                    setTimeout(() => {
+                        alert.remove();
+                    }, 300);
+                }, 5000);
+            });
         });
-
-        // Print function for election details
-        function printElection(id) {
-            // This could be implemented to generate a printable view
-            window.print();
-        }
-
-        // Export functions (could be implemented)
-        function exportElections() {
-            // Implementation for exporting elections data to CSV/Excel
-            console.log('Export functionality to be implemented');
-        }
-
-        // Bulk operations (could be implemented)
-        function bulkStatusUpdate() {
-            // Implementation for bulk status updates
-            console.log('Bulk operations to be implemented');
-        }
 
         // Search functionality enhancement
         let searchTimeout;
@@ -1778,66 +2183,7 @@ $faculties = fetchAll("SELECT DISTINCT faculty FROM voters ORDER BY faculty");
             }, 500);
         });
 
-        // Status color coding
-        function getStatusColor(status) {
-            const colors = {
-                'draft': '#6b7280',
-                'active': '#10b981',
-                'completed': '#3b82f6',
-                'cancelled': '#ef4444'
-            };
-            return colors[status] || '#6b7280';
-        }
-
-        // Election duration calculation
-        function calculateDuration(startDate, endDate) {
-            const start = new Date(startDate);
-            const end = new Date(endDate);
-            const diffTime = Math.abs(end - start);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            
-            if (diffDays === 1) {
-                return '1 day';
-            } else if (diffDays < 7) {
-                return `${diffDays} days`;
-            } else if (diffDays < 30) {
-                const weeks = Math.floor(diffDays / 7);
-                return `${weeks} week${weeks > 1 ? 's' : ''}`;
-            } else {
-                const months = Math.floor(diffDays / 30);
-                return `${months} month${months > 1 ? 's' : ''}`;
-            }
-        }
-
-        // Real-time election status
-        function getElectionStatus(startDate, endDate, status) {
-            const now = new Date();
-            const start = new Date(startDate);
-            const end = new Date(endDate);
-
-            if (status === 'cancelled') return 'Cancelled';
-            if (status === 'draft') return 'Draft';
-            if (now < start) return 'Upcoming';
-            if (now >= start && now <= end) return 'Active';
-            if (now > end) return 'Ended';
-            
-            return status;
-        }
-
-        // Success/Error message auto-hide
-        document.addEventListener('DOMContentLoaded', function() {
-            const alerts = document.querySelectorAll('.alert');
-            alerts.forEach(alert => {
-                setTimeout(() => {
-                    alert.style.opacity = '0';
-                    setTimeout(() => {
-                        alert.remove();
-                    }, 300);
-                }, 5000);
-            });
-        });
-
-        console.log('Elections Management System Initialized');
+        console.log('Elections Management System with Modern Sidebar Initialized');
         console.log('Available functions:', {
             'openCreateModal': 'Create new election',
             'editElection': 'Edit existing election',

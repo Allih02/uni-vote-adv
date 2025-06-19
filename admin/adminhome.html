@@ -3,17 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Portal - University Voting System</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>VoteAdmin Pro - University Voting System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        
         :root {
-            --primary-color: #4f46e5;
-            --secondary-color: #7c3aed;
-            --accent-color: #06b6d4;
-            --text-color: #1e293b;
-            --light-text: #64748b;
-            --light-bg: #f8fafc;
-            --card-bg: #ffffff;
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --accent: #06b6d4;
+            --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            --gradient-secondary: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --text-light: #94a3b8;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #f1f5f9;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
         }
 
         * {
@@ -23,216 +35,429 @@
         }
 
         body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            color: var(--text-color);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             line-height: 1.6;
+            color: var(--text-primary);
+            background: var(--bg-primary);
             overflow-x: hidden;
         }
 
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Navigation */
         .navbar {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 1rem 2rem;
             position: fixed;
-            width: 100%;
             top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
             z-index: 1000;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .navbar.scrolled {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: var(--shadow-md);
         }
 
         .nav-container {
             max-width: 1400px;
             margin: 0 auto;
+            padding: 0 2rem;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
+            height: 80px;
         }
 
         .logo {
-            font-size: 1.8rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 1.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            transition: all 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: translateY(-2px);
         }
 
         .logo i {
-            -webkit-text-fill-color: var(--primary-color);
+            color: var(--primary);
+            font-size: 2rem;
+            filter: drop-shadow(0 2px 4px rgba(99, 102, 241, 0.2));
         }
 
-        .nav-right {
+        .nav-menu {
             display: flex;
             align-items: center;
-            gap: 2rem;
+            gap: 2.5rem;
+            list-style: none;
         }
 
         .nav-link {
-            color: var(--text-color);
+            color: var(--text-secondary);
             text-decoration: none;
             font-weight: 500;
-            transition: color 0.3s ease;
+            font-size: 0.95rem;
+            position: relative;
+            transition: all 0.3s ease;
         }
 
         .nav-link:hover {
-            color: var(--primary-color);
+            color: var(--primary);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-primary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
         }
 
         .btn-login {
-            background: var(--primary-color);
+            background: var(--gradient-primary);
             color: white;
             padding: 0.75rem 2rem;
             border-radius: 50px;
             text-decoration: none;
             font-weight: 600;
-            transition: all 0.3s ease;
-            display: inline-flex;
+            font-size: 0.95rem;
+            display: flex;
             align-items: center;
             gap: 0.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-md);
         }
 
         .btn-login:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.2);
+            box-shadow: 0 12px 20px rgba(99, 102, 241, 0.3);
         }
 
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        /* Hero Section */
         .hero {
-            padding: 8rem 2rem 4rem;
-            background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
             position: relative;
+            background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 50%, #f0f9ff 100%);
             overflow: hidden;
+            padding-top: 80px; /* Account for fixed navbar */
         }
 
+        /* Animated background elements */
         .hero::before {
             content: '';
             position: absolute;
-            top: 0;
-            right: 0;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, var(--primary-color) 0%, transparent 70%);
-            opacity: 0.1;
+            top: -50%;
+            right: -20%;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
             border-radius: 50%;
-            transform: translate(25%, -25%);
+            animation: float 20s ease-in-out infinite;
         }
 
-        .hero-content {
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float 25s ease-in-out infinite reverse;
+        }
+
+        .hero-container {
             max-width: 1400px;
             margin: 0 auto;
+            padding: 0 2rem;
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 4rem;
             align-items: center;
+            position: relative;
+            z-index: 2;
         }
 
-        .hero-text h1 {
-            font-size: 4rem;
+        .hero-content {
+            animation: slideInLeft 1s ease-out;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+            padding: 0.5rem 1.25rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+
+        .hero-title {
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            font-weight: 900;
             line-height: 1.1;
             margin-bottom: 1.5rem;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary) 50%, var(--secondary) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 1s ease-out 0.4s both;
         }
 
-        .hero-text p {
+        .hero-subtitle {
             font-size: 1.25rem;
-            color: var(--light-text);
+            color: var(--text-secondary);
             margin-bottom: 2.5rem;
+            line-height: 1.7;
             max-width: 600px;
+            animation: fadeInUp 1s ease-out 0.6s both;
         }
 
         .hero-buttons {
             display: flex;
             gap: 1.5rem;
+            flex-wrap: wrap;
+            animation: fadeInUp 1s ease-out 0.8s both;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background: var(--gradient-primary);
             color: white;
             padding: 1rem 2.5rem;
             border-radius: 50px;
             text-decoration: none;
             font-weight: 600;
             font-size: 1.1rem;
-            transition: all 0.3s ease;
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
         }
 
         .btn-primary:hover {
             transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(79, 70, 229, 0.3);
+            box-shadow: 0 15px 30px rgba(99, 102, 241, 0.4);
         }
 
         .btn-secondary {
-            background: transparent;
-            color: var(--primary-color);
-            border: 2px solid var(--primary-color);
+            background: var(--bg-primary);
+            color: var(--primary);
+            border: 2px solid var(--primary);
             padding: 1rem 2.5rem;
             border-radius: 50px;
             text-decoration: none;
             font-weight: 600;
             font-size: 1.1rem;
-            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-md);
         }
 
         .btn-secondary:hover {
-            background: var(--primary-color);
+            background: var(--primary);
             color: white;
             transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
         }
 
-        .hero-image {
+        .hero-visual {
+            position: relative;
+            animation: slideInRight 1s ease-out;
+        }
+
+        .hero-dashboard {
+            background: var(--bg-primary);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: var(--shadow-xl);
             position: relative;
             animation: float 6s ease-in-out infinite;
+            border: 1px solid var(--border);
         }
 
-        .hero-image img {
-            width: 100%;
-            max-width: 600px;
-            filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.1));
+        .dashboard-header {
+            display: flex;
+            align-items: center;
+            justify-content: between;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
         }
 
+        .dashboard-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .status-badge {
+            background: #10b981;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: auto;
+        }
+
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 16px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .chart-placeholder {
+            height: 200px;
+            background: var(--gradient-secondary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            opacity: 0.9;
+        }
+
+        /* Features Section */
         .features {
-            padding: 6rem 2rem;
-            background: white;
+            padding: 8rem 2rem;
+            background: var(--bg-primary);
+            scroll-margin-top: 80px; /* Account for fixed navbar */
+        }
+
+        .features-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+
+        .section-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+            padding: 0.5rem 1.25rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
         }
 
         .section-title {
-            text-align: center;
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            color: var(--text-color);
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
         }
 
         .section-subtitle {
-            text-align: center;
-            color: var(--light-text);
             font-size: 1.2rem;
-            margin-bottom: 4rem;
+            color: var(--text-secondary);
             max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
+            margin: 0 auto;
+            line-height: 1.7;
         }
 
         .features-grid {
-            max-width: 1400px;
-            margin: 0 auto;
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2.5rem;
         }
 
         .feature-card {
-            background: var(--card-bg);
+            background: var(--bg-primary);
             padding: 2.5rem;
-            border-radius: 20px;
-            transition: all 0.3s ease;
-            border: 1px solid #e2e8f0;
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
         }
@@ -243,223 +468,217 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 5px;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            height: 4px;
+            background: var(--gradient-primary);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+            border-color: rgba(99, 102, 241, 0.2);
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            background: var(--gradient-primary);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .feature-icon i {
+            font-size: 2rem;
+            color: white;
+        }
+
+        .feature-icon::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: var(--gradient-primary);
+            border-radius: 20px;
+            z-index: -1;
             opacity: 0;
             transition: opacity 0.3s ease;
         }
 
-        .feature-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        }
-
-        .feature-card:hover::before {
-            opacity: 1;
-        }
-
-        .feature-icon {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .feature-icon i {
-            font-size: 1.8rem;
-            color: white;
+        .feature-card:hover .feature-icon::after {
+            opacity: 0.2;
         }
 
         .feature-title {
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             font-weight: 700;
             margin-bottom: 1rem;
-            color: var(--text-color);
+            color: var(--text-primary);
         }
 
         .feature-description {
-            color: var(--light-text);
-            line-height: 1.8;
-        }
-
-        .why-choose {
-            padding: 6rem 2rem;
-            background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
-        }
-
-        .why-choose-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-            align-items: center;
-        }
-
-        .why-choose-image {
-            position: relative;
-        }
-
-        .why-choose-image img {
-            width: 100%;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        }
-
-        .why-choose-list {
-            list-style: none;
-        }
-
-        .why-choose-item {
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 2rem;
-        }
-
-        .why-choose-icon {
-            width: 40px;
-            height: 40px;
-            background: var(--primary-color);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 1.5rem;
-            flex-shrink: 0;
-        }
-
-        .why-choose-icon i {
-            color: white;
-            font-size: 1.2rem;
-        }
-
-        .why-choose-text h3 {
-            font-size: 1.2rem;
-            margin-bottom: 0.5rem;
-            color: var(--text-color);
-        }
-
-        .why-choose-text p {
-            color: var(--light-text);
+            color: var(--text-secondary);
             line-height: 1.7;
+            font-size: 1rem;
         }
 
+        /* Stats Section */
         .stats {
             padding: 6rem 2rem;
-            background: var(--primary-color);
+            background: var(--gradient-primary);
             color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.1;
+        }
+
+        .stats-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
         }
 
         .stats-grid {
-            max-width: 1400px;
-            margin: 0 auto;
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
         }
 
-        .stat-card {
+        .stat-item {
             text-align: center;
             padding: 2rem;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
+            border-radius: 24px;
             backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             transition: all 0.3s ease;
         }
 
-        .stat-card:hover {
+        .stat-item:hover {
             transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.15);
         }
 
-        .stat-number {
-            font-size: 3rem;
-            font-weight: 800;
+        .stat-item .stat-number {
+            font-size: 3.5rem;
+            font-weight: 900;
             margin-bottom: 0.5rem;
+            color: white;
         }
 
-        .stat-label {
+        .stat-item .stat-label {
             font-size: 1.1rem;
             opacity: 0.9;
+            font-weight: 500;
         }
 
+        /* CTA Section */
         .cta {
-            padding: 6rem 2rem;
-            background: white;
+            padding: 8rem 2rem;
+            background: var(--bg-secondary);
             text-align: center;
         }
 
-        .cta-content {
+        .cta-container {
             max-width: 800px;
             margin: 0 auto;
         }
 
-        .cta h2 {
-            font-size: 2.5rem;
+        .cta-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
             margin-bottom: 1.5rem;
-            color: var(--text-color);
+            color: var(--text-primary);
         }
 
-        .cta p {
+        .cta-subtitle {
             font-size: 1.2rem;
-            color: var(--light-text);
-            margin-bottom: 2.5rem;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            line-height: 1.7;
         }
 
+        /* Footer */
         .footer {
-            background: var(--text-color);
+            background: var(--text-primary);
             color: white;
-            padding: 4rem 2rem 2rem;
+            padding: 5rem 2rem 2rem;
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
         .footer-content {
-            max-width: 1400px;
-            margin: 0 auto;
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr;
+            grid-template-columns: 2fr repeat(3, 1fr);
             gap: 4rem;
+            margin-bottom: 3rem;
         }
 
         .footer-brand h3 {
-            font-size: 1.8rem;
+            font-size: 2rem;
+            font-weight: 800;
             margin-bottom: 1rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .footer-brand p {
             color: #94a3b8;
-            line-height: 1.8;
+            line-height: 1.7;
             margin-bottom: 2rem;
+            max-width: 400px;
         }
 
-        .footer-social {
+        .social-links {
             display: flex;
             gap: 1rem;
         }
 
         .social-link {
-            width: 40px;
-            height: 40px;
+            width: 48px;
+            height: 48px;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             text-decoration: none;
             transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
         }
 
         .social-link:hover {
-            background: var(--primary-color);
-            transform: translateY(-3px);
+            background: var(--primary);
+            transform: translateY(-2px);
         }
 
         .footer-section h4 {
             font-size: 1.2rem;
+            font-weight: 700;
             margin-bottom: 1.5rem;
         }
 
@@ -482,45 +701,61 @@
         }
 
         .footer-bottom {
-            margin-top: 4rem;
             padding-top: 2rem;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             text-align: center;
             color: #94a3b8;
         }
 
+        /* Animations */
         @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(2deg); }
+        }
+
+        @keyframes slideInLeft {
             0% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-20px);
+                opacity: 0;
+                transform: translateX(-50px);
             }
             100% {
-                transform: translateY(0px);
+                opacity: 1;
+                transform: translateX(0);
             }
         }
 
+        @keyframes slideInRight {
+            0% {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Design */
         @media (max-width: 1024px) {
-            .hero-content {
+            .hero-container {
                 grid-template-columns: 1fr;
+                gap: 3rem;
                 text-align: center;
             }
 
-            .hero-text h1 {
-                font-size: 3rem;
-            }
-
-            .hero-buttons {
-                justify-content: center;
-            }
-
-            .features-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .why-choose-content {
-                grid-template-columns: 1fr;
+            .hero-visual {
+                order: -1;
             }
 
             .stats-grid {
@@ -529,12 +764,28 @@
         }
 
         @media (max-width: 768px) {
-            .nav-right {
+            .nav-menu {
                 display: none;
             }
 
-            .hero-text h1 {
-                font-size: 2.5rem;
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .hero {
+                padding-top: 6rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn-primary,
+            .btn-secondary {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
             }
 
             .features-grid {
@@ -543,6 +794,7 @@
 
             .stats-grid {
                 grid-template-columns: 1fr;
+                gap: 2rem;
             }
 
             .footer-content {
@@ -551,223 +803,450 @@
                 text-align: center;
             }
 
-            .footer-social {
+            .social-links {
                 justify-content: center;
             }
+
+            .dashboard-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-container {
+                padding: 0 1rem;
+            }
+
+            .hero,
+            .features,
+            .stats,
+            .cta,
+            .footer {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+
+            .hero-dashboard {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Scroll animations */
+        .scroll-animate {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .scroll-animate.animate {
+            opacity: 1;
+            transform: translateY(0);
         }
     </style>
 </head>
 <body>
-    <nav class="navbar">
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
         <div class="nav-container">
-            <a href="index.html" class="logo">
+            <a href="#" class="logo">
                 <i class="fas fa-vote-yea"></i>
-                VoteAdmin
+                VoteAdmin Pro
             </a>
-            <div class="nav-right">
-                <a href="#features" class="nav-link">Features</a>
-                <a href="#why-us" class="nav-link">Why Us</a>
-                <a href="#contact" class="nav-link">Contact</a>
-                <a href="login.php" class="btn-login">
-                    <i class="fas fa-sign-in-alt"></i>
-                    Admin Login
-                </a>
-            </div>
+            <ul class="nav-menu">
+                <li><a href="#features" class="nav-link">Features</a></li>
+                <li><a href="#stats" class="nav-link">Analytics</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
+                <li><a href="#" class="btn-login">
+                    <i class="fas fa-shield-alt"></i>
+                    Admin Portal
+                </a></li>
+            </ul>
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
         </div>
     </nav>
 
+    <!-- Hero Section -->
     <section class="hero">
-        <div class="hero-content">
-            <div class="hero-text">
-                <h1>Secure University Voting Management</h1>
-                <p>Transform your university elections with our powerful admin platform. Manage candidates, monitor real-time results, and ensure transparent democratic processes.</p>
+        <div class="hero-container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <i class="fas fa-star"></i>
+                    Trusted by 100+ Universities
+                </div>
+                <h1 class="hero-title">Secure University Elections Made Simple</h1>
+                <p class="hero-subtitle">
+                    Transform your university's democratic processes with our cutting-edge voting platform. 
+                    Advanced security, real-time analytics, and seamless user experience all in one place.
+                </p>
                 <div class="hero-buttons">
-                    <a href="login.php" class="btn-primary">
-                        <i class="fas fa-lock"></i>
-                        Access Admin Portal
+                    <a href="#" class="btn-primary">
+                        <i class="fas fa-rocket"></i>
+                        Launch Admin Portal
                     </a>
-                    <a href="#features" class="btn-secondary">Learn More</a>
+                    <a href="#features" class="btn-secondary">
+                        <i class="fas fa-play"></i>
+                        Watch Demo
+                    </a>
                 </div>
             </div>
-            <div class="hero-image">
-                <img src="/api/placeholder/600/400" alt="Admin Dashboard Preview">
+            <div class="hero-visual">
+                <div class="hero-dashboard">
+                    <div class="dashboard-header">
+                        <h3 class="dashboard-title">Live Election Dashboard</h3>
+                        <span class="status-badge">Active</span>
+                    </div>
+                    <div class="dashboard-stats">
+                        <div class="stat-card">
+                            <div class="stat-number">2,847</div>
+                            <div class="stat-label">Votes Cast</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">87%</div>
+                            <div class="stat-label">Turnout</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">12</div>
+                            <div class="stat-label">Candidates</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">5</div>
+                            <div class="stat-label">Positions</div>
+                        </div>
+                    </div>
+                    <div class="chart-placeholder">
+                        <i class="fas fa-chart-line" style="font-size: 2rem; margin-right: 1rem;"></i>
+                        Real-time Voting Analytics
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
+    <!-- Features Section -->
     <section id="features" class="features">
-        <h2 class="section-title">Powerful Admin Features</h2>
-        <p class="section-subtitle">Everything you need to manage university elections efficiently and securely</p>
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-shield-alt"></i>
+        <div class="features-container">
+            <div class="section-header scroll-animate">
+                <div class="section-badge">
+                    <i class="fas fa-cogs"></i>
+                    Powerful Features
                 </div>
-                <h3 class="feature-title">Advanced Security</h3>
-                <p class="feature-description">Multi-layer authentication, encrypted votes, and comprehensive audit trails ensure election integrity.</p>
+                <h2 class="section-title">Everything You Need for Successful Elections</h2>
+                <p class="section-subtitle">
+                    Our comprehensive platform provides all the tools necessary to conduct secure, transparent, 
+                    and efficient university elections with confidence.
+                </p>
             </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-chart-line"></i>
+            <div class="features-grid">
+                <div class="feature-card scroll-animate">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3 class="feature-title">Bank-Level Security</h3>
+                    <p class="feature-description">
+                        Multi-factor authentication, end-to-end encryption, and blockchain verification 
+                        ensure every vote is secure and tamper-proof.
+                    </p>
                 </div>
-                <h3 class="feature-title">Real-time Analytics</h3>
-                <p class="feature-description">Monitor voting trends, participation rates, and results in real-time with interactive dashboards.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-users-cog"></i>
+                <div class="feature-card scroll-animate">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="feature-title">Real-Time Analytics</h3>
+                    <p class="feature-description">
+                        Monitor voting trends, participation rates, and results instantly with 
+                        interactive dashboards and comprehensive reporting tools.
+                    </p>
                 </div>
-                <h3 class="feature-title">User Management</h3>
-                <p class="feature-description">Efficiently manage student voters, candidates, and admin roles with granular permission controls.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-calendar-check"></i>
+                <div class="feature-card scroll-animate">
+                    <div class="feature-icon">
+                        <i class="fas fa-users-cog"></i>
+                    </div>
+                    <h3 class="feature-title">Smart User Management</h3>
+                    <p class="feature-description">
+                        Effortlessly manage voters, candidates, and administrators with automated 
+                        registration, role-based permissions, and bulk operations.
+                    </p>
                 </div>
-                <h3 class="feature-title">Election Scheduling</h3>
-                <p class="feature-description">Plan and automate election cycles with precise timing controls and notification systems.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-file-export"></i>
+                <div class="feature-card scroll-animate">
+                    <div class="feature-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <h3 class="feature-title">Election Automation</h3>
+                    <p class="feature-description">
+                        Schedule elections, automate notifications, and manage voting periods 
+                        with precision timing and customizable workflows.
+                    </p>
                 </div>
-                <h3 class="feature-title">Comprehensive Reports</h3>
-                <p class="feature-description">Generate detailed election reports, voter statistics, and audit documents with one click.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-mobile-alt"></i>
+                <div class="feature-card scroll-animate">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3 class="feature-title">Mobile-First Design</h3>
+                    <p class="feature-description">
+                        Fully responsive interface ensures seamless access across all devices, 
+                        from desktop computers to smartphones and tablets.
+                    </p>
                 </div>
-                <h3 class="feature-title">Mobile Responsive</h3>
-                <p class="feature-description">Access the admin portal from any device with our fully responsive interface design.</p>
+                <div class="feature-card scroll-animate">
+                    <div class="feature-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <h3 class="feature-title">Comprehensive Reporting</h3>
+                    <p class="feature-description">
+                        Generate detailed audit trails, compliance reports, and election summaries 
+                        with exportable data and customizable formats.
+                    </p>
+                </div>
             </div>
         </div>
     </section>
 
-    <section id="why-us" class="why-choose">
-        <div class="why-choose-content">
-            <div class="why-choose-image">
-                <img src="/api/placeholder/600/400" alt="Why Choose Us">
-            </div>
-            <div class="why-choose-text">
-                <h2 class="section-title">Why Choose Our Platform?</h2>
-                <ul class="why-choose-list">
-                    <li class="why-choose-item">
-                        <div class="why-choose-icon">
-                            <i class="fas fa-check"></i>
-                        </div>
-                        <div class="why-choose-text">
-                            <h3>Proven Reliability</h3>
-                            <p>99.9% uptime guarantee with backup systems ensuring uninterrupted elections.</p>
-                        </div>
-                    </li>
-                    <li class="why-choose-item">
-                        <div class="why-choose-icon">
-                            <i class="fas fa-check"></i>
-                        </div>
-                        <div class="why-choose-text">
-                            <h3>Easy Integration</h3>
-                            <p>Seamlessly integrate with existing university systems and student databases.</p>
-                        </div>
-                    </li>
-                    <li class="why-choose-item">
-                        <div class="why-choose-icon">
-                            <i class="fas fa-check"></i>
-                        </div>
-                        <div class="why-choose-text">
-                            <h3>24/7 Support</h3>
-                            <p>Round-the-clock technical support to ensure smooth election operations.</p>
-                        </div>
-                    </li>
-                    <li class="why-choose-item">
-                        <div class="why-choose-icon">
-                            <i class="fas fa-check"></i>
-                        </div>
-                        <div class="why-choose-text">
-                            <h3>Compliance Ready</h3>
-                            <p>Built to meet university governance and electoral compliance requirements.</p>
-                        </div>
-                    </li>
-                </ul>
+    <!-- Stats Section -->
+    <section id="stats" class="stats">
+        <div class="stats-container">
+            <div class="stats-grid">
+                <div class="stat-item scroll-animate">
+                    <div class="stat-number">150+</div>
+                    <div class="stat-label">Universities Worldwide</div>
+                </div>
+                <div class="stat-item scroll-animate">
+                    <div class="stat-number">2.5M+</div>
+                    <div class="stat-label">Votes Processed</div>
+                </div>
+                <div class="stat-item scroll-animate">
+                    <div class="stat-number">99.99%</div>
+                    <div class="stat-label">System Uptime</div>
+                </div>
+                <div class="stat-item scroll-animate">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Expert Support</div>
+                </div>
             </div>
         </div>
     </section>
 
-    <section class="stats">
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-number">50+</div>
-                <div class="stat-label">Universities Trust Us</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">500K+</div>
-                <div class="stat-label">Votes Processed</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">99.9%</div>
-                <div class="stat-label">System Uptime</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">24/7</div>
-                <div class="stat-label">Support Available</div>
-            </div>
-        </div>
-    </section>
-
+    <!-- CTA Section -->
     <section class="cta">
-        <div class="cta-content">
-            <h2>Ready to Transform Your University Elections?</h2>
-            <p>Join leading universities in providing secure, transparent, and efficient voting experiences.</p>
-            <a href="/admin/login.php" class="btn-primary">
+        <div class="cta-container scroll-animate">
+            <h2 class="cta-title">Ready to Revolutionize Your Elections?</h2>
+            <p class="cta-subtitle">
+                Join the leading universities already using VoteAdmin Pro to conduct secure, 
+                transparent, and efficient democratic processes.
+            </p>
+            <a href="#" class="btn-primary">
                 <i class="fas fa-arrow-right"></i>
-                Access Admin Portal
+                Start Your Free Trial
             </a>
         </div>
     </section>
 
+    <!-- Footer -->
     <footer id="contact" class="footer">
-        <div class="footer-content">
-            <div class="footer-brand">
-                <h3>VoteAdmin</h3>
-                <p>Empowering universities with secure, efficient, and transparent online voting solutions.</p>
-                <div class="footer-social">
-                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
-                    <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
-                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h3>VoteAdmin Pro</h3>
+                    <p>
+                        Empowering universities worldwide with secure, transparent, and efficient 
+                        online voting solutions that strengthen democratic participation.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="social-link">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>Platform</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Admin Portal</a></li>
+                        <li><a href="#">Features</a></li>
+                        <li><a href="#">Security</a></li>
+                        <li><a href="#">Integrations</a></li>
+                        <li><a href="#">API</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Best Practices</a></li>
+                        <li><a href="#">Case Studies</a></li>
+                        <li><a href="#">Webinars</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <ul class="footer-links">
+                        <li><a href="mailto:support@voteadmin.edu">support@voteadmin.edu</a></li>
+                        <li><a href="tel:+1-555-VOTE-PRO">+1 (555) VOTE-PRO</a></li>
+                        <li><a href="#">Live Chat</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
                 </div>
             </div>
-            <div class="footer-section">
-                <h4>Quick Links</h4>
-                <ul class="footer-links">
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="#features">Features</a></li>
-                    <li><a href="#why-us">Why Us</a></li>
-                    <li><a href="login.php">Admin Login</a></li>
-                </ul>
+            <div class="footer-bottom">
+                <p>&copy; 2025 VoteAdmin Pro. All rights reserved. | Securing democracy through technology.</p>
             </div>
-            <div class="footer-section">
-                <h4>Resources</h4>
-                <ul class="footer-links">
-                    <li><a href="documentation.php">Documentation</a></li>
-                    <li><a href="support.php">Support Center</a></li>
-                    <li><a href="privacy.php">Privacy Policy</a></li>
-                    <li><a href="terms.php">Terms of Service</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h4>Contact</h4>
-                <ul class="footer-links">
-                    <li><a href="mailto:admin@university.edu">admin@university.edu</a></li>
-                    <li><a href="tel:+1234567890">+1 (234) 567-890</a></li>
-                    <li><a href="#">University Campus</a></li>
-                    <li><a href="#">Monday - Friday: 9AM - 5PM</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2024 University Voting System. All rights reserved.</p>
         </div>
     </footer>
+
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const offsetTop = target.offsetTop - 80;
+                    window.scrollTo({
+                        top: offsetTop,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all scroll-animate elements
+        document.querySelectorAll('.scroll-animate').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Counter animation for stats
+        function animateCounter(element, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const current = Math.floor(progress * (end - start) + start);
+                element.textContent = current.toLocaleString();
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // Animate stats when in view
+        const statsObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const number = entry.target.querySelector('.stat-number');
+                    const text = number.textContent.replace(/[^\d]/g, '');
+                    const value = parseInt(text);
+                    if (value) {
+                        animateCounter(number, 0, value, 2000);
+                    }
+                    statsObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        document.querySelectorAll('.stat-item').forEach(stat => {
+            statsObserver.observe(stat);
+        });
+
+        // Button hover effects
+        document.querySelectorAll('.btn-primary, .btn-secondary').forEach(button => {
+            button.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-3px)';
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Add loading animation
+        window.addEventListener('load', function() {
+            document.body.style.opacity = '1';
+        });
+
+        // Parallax effect for hero background elements
+        window.addEventListener('scroll', function() {
+            const scrolled = window.pageYOffset;
+            const parallax = document.querySelector('.hero::before');
+            if (parallax) {
+                const speed = scrolled * 0.5;
+                parallax.style.transform = `translateY(${speed}px)`;
+            }
+        });
+
+        // Mobile menu functionality (basic implementation)
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const navMenu = document.querySelector('.nav-menu');
+
+        if (mobileMenuBtn && navMenu) {
+            mobileMenuBtn.addEventListener('click', function() {
+                navMenu.style.display = navMenu.style.display === 'flex' ? 'none' : 'flex';
+            });
+        }
+
+        // Add entrance animations with stagger effect
+        function staggerAnimation(elements, delay = 100) {
+            elements.forEach((element, index) => {
+                setTimeout(() => {
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0)';
+                }, index * delay);
+            });
+        }
+
+        // Initialize stagger animations on load
+        window.addEventListener('load', function() {
+            const featureCards = document.querySelectorAll('.feature-card');
+            const statItems = document.querySelectorAll('.stat-item');
+            
+            setTimeout(() => {
+                staggerAnimation(featureCards, 150);
+            }, 500);
+        });
+
+        // Add dynamic background color change on scroll
+        window.addEventListener('scroll', function() {
+            const scrollPercentage = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+            const hue = Math.floor(scrollPercentage * 3.6); // 360 degrees over full scroll
+            
+            // Subtle background color shift
+            document.documentElement.style.setProperty('--bg-primary', `hsl(${220 + hue * 0.1}, 15%, 98%)`);
+        });
+    </script>
 </body>
 </html>

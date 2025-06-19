@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Mission - University Voting System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            scroll-behavior: smooth;
+        }
+        
+        .hero-gradient {
+            background-image: linear-gradient(135deg, #6366F1 0%, #3B82F6 50%, #2563EB 100%);
+        }
+        
+        .section-heading:after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 3px;
+            background-color: #3B82F6;
+            margin: 15px auto 0;
+        }
+        
+        .mission-card {
+            transition: all 0.3s ease;
+        }
+        
+        .mission-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .quote {
+            position: relative;
+        }
+        
+        .quote:before {
+            content: '\201C';
+            font-size: 6rem;
+            font-family: Georgia, serif;
+            position: absolute;
+            top: -2rem;
+            left: -2rem;
+            color: rgba(99, 102, 241, 0.2);
+        }
+        
+        .timeline-dot {
+            position: relative;
+        }
+        
+        .timeline-dot:before {
+            content: '';
+            position: absolute;
+            left: -38px;
+            top: 8px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: #3B82F6;
+            z-index: 1;
+        }
+        
+        .timeline-dot:after {
+            content: '';
+            position: absolute;
+            left: -30px;
+            top: 24px;
+            width: 2px;
+            height: calc(100% + 32px);
+            background-color: #3B82F6;
+            z-index: 0;
+        }
+        
+        .timeline-dot:last-child:after {
+            display: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-indigo-900 via-blue-800 to-blue-700 text-white">
+    <!-- Navigation Bar -->
+    <nav class="bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg fixed w-full z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <a href="home.html">
+                            <i class="fas fa-vote-yea text-2xl text-white"></i>
+                        </a>
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-4">
+                            <a href="home.html" class="px-3 py-2 rounded-md text-sm font-medium text-gray-200 hover:text-white hover:bg-blue-600">Home</a>
+                            <a href="learn-more.html" class="px-3 py-2 rounded-md text-sm font-medium text-gray-200 hover:text-white hover:bg-blue-600">Learn More</a>
+                            <a href="mission.html" class="px-3 py-2 rounded-md text-sm font-medium text-white bg-blue-600">Our Mission</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-4 flex items-center md:ml-6">
+                        <a href="student/register.php" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-blue-600 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Log In / Register
+                        </a>
+                    </div>
+                </div>
+                <div class="-mr-2 flex md:hidden">
+                    <button type="button" class="bg-blue-800 inline-flex items-center justify-center p-2 rounded-md text-gray-200 hover:text-white hover:bg-blue-700 focus:outline-none">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="pt-24 pb-16 hero-gradient">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-4 animate__animated animate__fadeInDown">
+                Our <span class="text-blue-200">Mission</span>
+            </h1>
+            <p class="mt-3 text-xl text-blue-100 sm:mt-5 max-w-3xl mx-auto animate__animated animate__fadeIn" style="animation-delay: 0.2s">
+                Transforming university democracy through technology, transparency, and trust
+            </p>
+        </div>
+    </div>
+
+    <!-- Mission Statement Section -->
+    <section class="py-20 bg-gradient-to-b from-indigo-900 to-blue-900">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl mb-4 section-heading">
+                    Our <span class="text-blue-400">Mission Statement</span>
+                </h2>
+                <div class="mt-8 max-w-3xl mx-auto">
+                    <div class="quote p-8 bg-white bg-opacity-10 rounded-xl backdrop-filter backdrop-blur-sm">
+                        <p class="text-xl italic text-blue-100">
+                            "To provide universities with the most secure, accessible, and transparent electoral system, empowering student voices and strengthening democratic participation in educational institutions worldwide."
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10 mt-16">
+                <div class="mission-card bg-white bg-opacity-10 rounded-xl p-8 backdrop-filter backdrop-blur-sm">
+                    <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mb-6 mx-auto">
+                        <i class="fas fa-lightbulb text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4 text-center">Our Vision</h3>
+                    <p class="text-blue-100 text-center">
+                        We envision a future where every student's voice matters, where campus elections are models of democratic excellence, and where technology enhances rather than hinders participation.
+                    </p>
+                </div>
+                
+                <div class="mission-card bg-white bg-opacity-10 rounded-xl p-8 backdrop-filter backdrop-blur-sm">
+                    <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mb-6 mx-auto">
+                        <i class="fas fa-bullseye text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4 text-center">Our Purpose</h3>
+                    <p class="text-blue-100 text-center">
+                        We exist to break down barriers to student participation in university governance, ensuring that leadership positions reflect the diverse perspectives of the student body.
+                    </p>
+                </div>
+                
+                <div class="mission-card bg-white bg-opacity-10 rounded-xl p-8 backdrop-filter backdrop-blur-sm">
+                    <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mb-6 mx-auto">
+                        <i class="fas fa-compass text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4 text-center">Our Promise</h3>
+                    <p class="text-blue-100 text-center">
+                        We commit to providing election systems that are unfailingly secure, completely accessible to all students, and transparent at every stage of the electoral process.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Core Values Section -->
+    <section class="py-20 bg-gradient-to-b from-blue-900 to-indigo-900">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl mb-4 section-heading">
+                    Our Core <span class="text-blue-400">Values</span>
+                </h2>
+                <p class="mt-4 max-w-3xl mx-auto text-lg text-blue-100">
+                    These principles guide every aspect of our work and shape the technologies we develop
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <div class="bg-white bg-opacity-10 rounded-xl p-8 backdrop-filter backdrop-blur-sm mission-card">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+                                <i class="fas fa-shield-alt text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="ml-5">
+                            <h3 class="text-xl font-bold mb-3">Security & Integrity</h3>
+                            <p class="text-blue-100">
+                                We believe that trust in democratic processes begins with absolute security. We maintain the highest standards of cybersecurity to ensure that every vote is protected from tampering and that election results accurately reflect student choices. We pursue technological excellence not as an end in itself, but as a means to safeguard democratic integrity.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white bg-opacity-10 rounded-xl p-8 backdrop-filter backdrop-blur-sm mission-card">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+                                <i class="fas fa-universal-access text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="ml-5">
+                            <h3 class="text-xl font-bold mb-3">Accessibility & Inclusion</h3>
+                            <p class="text-blue-100">
+                                We are committed to ensuring that every eligible student, regardless of physical ability, technical expertise, or personal circumstances, can easily participate in campus elections. We design our systems with accessibility at the forefront, not as an afterthought, because true democracy requires the inclusion of all voices.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white bg-opacity-10 rounded-xl p-8 backdrop-filter backdrop-blur-sm mission-card">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+                                <i class="fas fa-glasses text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="ml-5">
+                            <h3 class="text-xl font-bold mb-3">Transparency & Accountability</h3>
+                            <p class="text-blue-100">
+                                We believe in creating systems where every aspect of the electoral process can be verified and understood. We use technologies like blockchain not to obscure, but to illuminate the path of each vote, creating auditability without compromising privacy. Our commitment to transparency extends to our own operations, as we hold ourselves accountable to the students and institutions we serve.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white bg-opacity-10 rounded-xl p-8 backdrop-filter backdrop-blur-sm mission-card">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+                                <i class="fas fa-lock text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="ml-5">
+                            <h3 class="text-xl font-bold mb-3">Privacy & Anonymity</h3>
+                            <p class="text-blue-100">
+                                We honor the sanctity of the secret ballot by ensuring that while votes are verifiable, they can never be traced back to individual voters. Our dedication to privacy goes beyond technical requirements to embrace the philosophical underpinnings of free and fair elections, where students can express their true preferences without fear of consequence or coercion.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white bg-opacity-10 rounded-xl p-8 backdrop-filter backdrop-blur-sm mission-card">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+                                <i class="fas fa-users text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="ml-5">
+                            <h3 class="text-xl font-bold mb-3">Empowerment & Education</h3>
+                            <p class="text-blue-100">
+                                We believe that technology should empower students not just to vote, but to become informed participants in campus governance. We design our platforms to educate users about candidates and issues, fostering a democratic culture that extends beyond election day. By helping students understand the impact of their choices, we help develop the engaged citizens of tomorrow.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white bg-opacity-10 rounded-xl p-8 backdrop-filter backdrop-blur-sm mission-card">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+                                <i class="fas fa-seedling text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="ml-5">
+                            <h3 class="text-xl font-bold mb-3">Innovation & Adaptation</h3>
+                            <p class="text-blue-100">
+                                We embrace change as a constant, continuously evolving our platforms to address emerging challenges and opportunities. We believe that the best systems grow and adapt with their users, incorporating feedback and new technologies to better serve democratic processes. Our commitment to innovation is tempered by rigorous testing and validation, ensuring that new features enhance rather than disrupt the electoral experience.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Our Story Section -->
+    <section class="py-20 bg-gradient-to-b from-indigo-900 to-blue-900">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl mb-4 section-heading">
+                    Our <span class="text-blue-400">Story</span>
+                </h2>
+                <p class="mt-4 max-w-3xl mx-auto text-lg text-blue-100">
+                    From a campus challenge to a global mission
+                </p>
+            </div>
+            
+            <div class="flex flex-col md:flex-row">
+                <div class="md:w-1/2 md:pr-10">
+                    <img src="/api/placeholder/600/400" alt="Founders working together" class="rounded-xl shadow-lg mb-10">
+                    
+                    <div class="bg-white bg-opacity-10 rounded-xl p-8 backdrop-filter backdrop-blur-sm">
+                        <h3 class="text-xl font-bold mb-4">From Our Founder</h3>
+                        <p class="text-blue-100 italic mb-4">
+                            "As student government leaders, we experienced firsthand the challenges of running fair elections with limited resources. Paper ballots were inefficient and error-prone, while existing digital solutions lacked security and accessibility features. We knew there had to be a better way to ensure every student's voice could be heard."
+                        </p>
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <div class="w-12 h-12 rounded-full bg-gradient-to-r from-blue-400 to-indigo-500 flex items-center justify-center text-xl font-bold">
+                                    JD
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <p class="font-semibold">Dr. James Davis</p>
+                                <p class="text-blue-300 text-sm">Founder & CEO</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="md:w-1/2 md:pl-10 mt-10 md:mt-0 relative">
+                    <!-- Timeline connector -->
+                    <div class="absolute left-0 top-0 bottom-0 hidden md:block"></div>
+                    
+                    <div class="pl-12 mb-12 timeline-dot">
+                        <h3 class="text-xl font-bold">2020: The Beginning</h3>
+                        <p class="text-blue-100 mt-2">
+                            Founded by a team of computer science graduate students and former student government leaders who experienced firsthand the challenges of campus elections. The initial prototype was developed for their university's student council elections.
+                        </p>
+                    </div>
+                    
+                    <div class="pl-12 mb-12 timeline-dot">
+                        <h3 class="text-xl font-bold">2021: First Deployment</h3>
+                        <p class="text-blue-100 mt-2">
+                            Successfully implemented at three pilot universities, with record turnout numbers and positive feedback. Received seed funding to expand development team and enhance security features.
+                        </p>
+                    </div>
+                    
+                    <div class="pl-12 mb-12 timeline-dot">
+                        <h3 class="text-xl font-bold">2022: Expansion & Recognition</h3>
+                        <p class="text-blue-100 mt-2">
+                            Expanded to 25 universities across North America. Recognized with the National Student Democracy Innovation Award for our contributions to campus governance.
+                        </p>
+                    </div>
+                    
+                    <div class="pl-12 mb-12 timeline-dot">
+                        <h3 class="text-xl font-bold">2023: Blockchain Integration</h3>
+                        <p class="text-blue-100 mt-2">
+                            Introduced our proprietary blockchain verification system, setting new standards for election security and transparency in educational institutions.
+                        </p>
+                    </div>
+                    
+                    <div class="pl-12 timeline-dot">
+                        <h3 class="text-xl font-bold">2024-2025: Global Impact</h3>
+                        <p class="text-blue-100 mt-2">
+                            Now serving over 200 universities worldwide, with implementations on every continent. Launched advanced analytics platform to help universities understand and improve democratic engagement on campus.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="py-20 bg-gradient-to-b from-blue-900 to-indigo-900">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl mb-4 section-heading">
+                    Our <span class="text-blue-400">Team</span>
+                </h2>
+                <p class="mt-4 max-w-3xl mx-auto text-lg text-blue-100">
+                    Meet the dedicated individuals working to transform campus democracy
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-white bg-opacity-10 rounded-xl overflow-hidden backdrop-filter backdrop-blur-sm mission-card">
+                    <div class="p-6">
+                        <div class="w-24 h-24 rounded-full bg-gradient-to-r from-blue-400 to-indigo-500 flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                            JD
+                        </div>
+                        <h3 class="text-xl font-bold text-center">Dr. James Davis</h3>
+                        <p class="text-blue-300 text-center mb-4">Founder & CEO</p>
+                        <p class="text-blue-100 text-center">
+                            Former student body president with a PhD in Computer Science specializing in distributed systems. James leads our strategic vision and organizational growth.
+                        </p>
+                        <div class="flex justify-center mt-4 space-x-3">
+                            <a href="#" class="text-blue-300 hover:text-white">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="#" class="text-blue-300 hover:text-white">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white bg-opacity-10 rounded-xl overflow-hidden backdrop-filter backdrop-blur-sm mission-card">
+                    <div class="p-6">
+                        <div class="w-24 h-24 rounded-full bg-gradient-to-r from-blue-400 to-indigo-500 flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                            MP
+                        </div>
+                        <h3 class="text-xl font-bold text-center">Dr. Maya Patel</h3>
+                        <p class="text-blue-300 text-center mb-4">CTO</p>
+                        <p class="text-blue-100 text-center">
+                            Cryptography expert with extensive experience in blockchain technology. Maya oversees our technical architecture and security protocols.
+                        </p>
+                        <div class="flex justify-center mt-4 space-x-3">
+                            <a href="#" class="text-blue-300 hover:text-white">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="#" class="text-blue-300 hover:text-white">
+                                <i class="fab fa-github"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white bg-opacity-10 rounded-xl overflow-hidden backdrop-filter backdrop-blur-sm mission-card">
+                    <div class="p-6">
+                        <div class="w-24 h-24 rounded-full bg-gradient-to-r from-blue-400 to-indigo-500 flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                            AK
+                        </div>
+                        <h3 class="text-xl font-bold text-center">Alex Kim</h3>
+                        <p class="text-blue-300 text-center mb-4">Head of Accessibility</p>
+                        <p class="text-blue-100 text-center">
+                            With a background in UI/UX and a passion for inclusive design, Alex ensures our platform is accessible to all users regardless of ability.
+                        </p>
+                        <div class="flex justify-center mt-4 space-x-3">
+                            <a href="#" class="text-blue-300 hover:text-white">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="#" class="text-blue-300 hover:text-white">
+                                <i class="fab fa-dribbble"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white bg-opacity-10 rounded-xl overflow-hidden backdrop-filter backdrop-blur-sm mission-card">
+                    <div class="p-6">
+                        <div class="w-24 h-24 rounded-full bg-gradient-to-r from-blue-400 to-indigo-500 flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                            LW
+                        </div>
+                        <h3 class="text-xl font-bold text-center">Dr. Liam Wilson</h3>
+                        <p class="text-blue-300 text-center mb-4">Director of Democracy Research</p>
+                        <p class="text-blue-100 text-center">
+                            Political scientist specializing in democratic theory and voter behavior. Liam leads our research initiatives on improving campus electoral systems.
+                        </p>
+                        <div class="flex justify-center mt-4 space-x-3">
+                            <a href="#" class="text-blue-300 hover:text-white">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="#" class="text-blue-300 hover:text-white">
+                                <i class="fas fa-book"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white bg-opacity-10 rounded-xl overflow-hidden backdrop-filter backdrop-blur-sm mission-card">
+                    <div class="p-6">
+                        <div class="w-24 h-24 rounded-full bg-gradient-to-r from-blue-400 to-indigo-500 flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                            SO
+                        </div>
+                        <h3 class="text-xl font-bold text-center">Sophia Okafor</h3>
+                        <p class="text-blue-300 text-center mb-4">University Partnerships Director</p>
+                        <p class="text-blue-100 text-center">
+                            Former university administrator with extensive experience in student affairs. Sophia builds and maintains relationships with our institutional partners.
+                        </p>
+                        <div class="flex justify-center mt-4 space-x-3">
+                            <a href="#" class="text-blue-300 hover:text-white">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="#" class="text-blue-300 hover:text-white">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white bg-opacity-10 rounded-xl overflow-hidden backdrop-filter backdrop-blur-sm mission-card">
+                    <div class="p-6">
+                        <div class="w-24 h-24 rounded-full bg-gradient-to-r from-blue-400 to-indigo-500 flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                            RN
+                        </div>
+                        <h3 class="text-xl font-bold text-center">Raj Nair</h3>
+                        <p class="text-blue-300 text-center mb-4">Head of Security</p>
+                        <p class="text-blue-100 text-center">
+                            Cybersecurity expert with a background in protecting critical infrastructure. Raj ensures our platform remains resilient against evolving threats.
+                        </p>
+                        <div class="flex justify-center mt-4 space-x-3">
+                            <a href="#" class="text-blue-300 hover:text-white">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="#" class="text-blue-300 hover:text-white">
+                                <i class="fab fa-github"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-16 text-center">
+                <a href="careers.html" class="inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md text-lg font-medium text-blue-700 bg-white shadow-sm hover:bg-blue-50 transition">
+                    Join Our Team <i class="fas fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Commitment Section -->
+    <section class="py-20 bg-gradient-to-b from-indigo-900 to-blue-900">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl mb-4 section-heading">
+                    Our <span class="text-blue-400">Commitments</span>
+                </h2>
+                <p class="mt-4 max-w-3xl mx-auto text-lg text-blue-100">
+                    How we're working to strengthen democracy beyond campus borders
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <div class="bg-white bg-opacity-10 rounded-xl p-8 backdrop-filter backdrop-blur-sm mission-card">
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-graduation-cap text-blue-400 mr-3"></i>
+                        Education Access Initiative
+                    </h3>
+                    <p class="text-blue-100 mb-4">
+                        We believe that democratic technology should be available to all institutions, regardless of resources. Through our Education Access Initiative, we:
+                    </p>
+                    <ul class="list-disc pl-5 text-blue-100 space-y-2">
+                        <li>Provide our platform at reduced or no cost to under-resourced institutions</li>
+                        <li>Offer technical support and training to student governments</li>
+                        <li>Partner with educational NGOs to expand democratic technology globally</li>
+                    </ul>
+                    <p class="text-blue-100 mt-4">
+                        To date, we've supported over 50 institutions through this program, empowering tens of thousands of students to participate in campus governance.
+                    </p>
+                </div>
+                
+                <div class="bg-white bg-opacity-10 rounded-xl p-8 backdrop-filter backdrop-blur-sm mission-card">
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-flask text-blue-400 mr-3"></i>
+                        Democracy Innovation Lab
+                    </h3>
+                    <p class="text-blue-100 mb-4">
+                        Our Democracy Innovation Lab conducts research and develops new technologies to address emerging challenges in electoral systems. Current projects include:
+                    </p>
+                    <ul class="list-disc pl-5 text-blue-100 space-y-2">
+                        <li>Developing advanced authentication protocols that balance security and accessibility</li>
+                        <li>Creating visualization tools to help students understand complex voting systems</li>
+                        <li>Researching the impact of different electoral systems on representation outcomes</li>
+                        <li>Building open-source tools for election administration and analysis</li>
+                    </ul>
+                    <p class="text-blue-100 mt-4">
+                        We publish our research findings openly and collaborate with academic partners worldwide.
+                    </p>
+                </div>
+                
+                <div class="bg-white bg-opacity-10 rounded-xl p-8 backdrop-filter backdrop-blur-sm mission-card">
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-globe-americas text-blue-400 mr-3"></i>
+                        Environmental Responsibility
+                    </h3>
+                    <p class="text-blue-100 mb-4">
+                        We recognize that digital democracy must be environmentally sustainable. Our commitment includes:
+                    </p>
+                    <ul class="list-disc pl-5 text-blue-100 space-y-2">
+                        <li>Using energy-efficient blockchain technology that minimizes environmental impact</li>
+                        <li>Partnering with carbon-neutral hosting providers for all our services</li>
+                        <li>Offsetting our carbon footprint through verified environmental projects</li>
+                        <li>Reducing paper waste by eliminating the need for physical ballots</li>
+                    </ul>
+                    <p class="text-blue-100 mt-4">
+                        Our platform has helped universities eliminate over 2 million paper ballots, saving approximately 200 trees annually.
+                    </p>
+                </div>
+                
+                <div class="bg-white bg-opacity-10 rounded-xl p-8 backdrop-filter backdrop-blur-sm mission-card">
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-handshake text-blue-400 mr-3"></i>
+                        Civic Engagement Partnership
+                    </h3>
+                    <p class="text-blue-100 mb-4">
+                        We partner with civic organizations to connect campus engagement with broader democratic participation:
+                    </p>
+                    <ul class="list-disc pl-5 text-blue-100 space-y-2">
+                        <li>Developing modules that connect students with local and national elections</li>
+                        <li>Creating educational resources about electoral processes and voter rights</li>
+                        <li>Supporting student-led voter registration and education campaigns</li>
+                        <li>Building bridges between campus governance and municipal decision-making</li>
+                    </ul>
+                    <p class="text-blue-100 mt-4">
+                        Our research shows that students who participate in campus elections are 37% more likely to vote in national elections.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Join Us Section -->
+    <section class="py-20 bg-gradient-to-b from-blue-900 to-indigo-900">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl mb-4 section-heading">
+                    Join Our <span class="text-blue-400">Mission</span>
+                </h2>
+                <p class="mt-4 max-w-3xl mx-auto text-lg text-blue-100">
+                    There are many ways to support and participate in our work
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white bg-opacity-10 rounded-xl p-8 backdrop-filter backdrop-blur-sm text-center mission-card">
+                    <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mb-6 mx-auto">
+                        <i class="fas fa-school text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">For Universities</h3>
+                    <p class="text-blue-100 mb-6">
+                        Bring secure, accessible voting to your campus. We offer customized solutions for institutions of all sizes.
+                    </p>
+                    <a href="contact.html" class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md text-sm font-medium text-blue-700 bg-white hover:bg-blue-50 transition">
+                        Request Information
+                    </a>
+                </div>
+                
+                <div class="bg-white bg-opacity-10 rounded-xl p-8 backdrop-filter backdrop-blur-sm text-center mission-card">
+                    <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mb-6 mx-auto">
+                        <i class="fas fa-briefcase text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">For Professionals</h3>
+                    <p class="text-blue-100 mb-6">
+                        Join our team of dedicated professionals working to transform democracy through technology.
+                    </p>
+                    <a href="careers.html" class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md text-sm font-medium text-blue-700 bg-white hover:bg-blue-50 transition">
+                        View Careers
+                    </a>
+                </div>
+                
+                <div class="bg-white bg-opacity-10 rounded-xl p-8 backdrop-filter backdrop-blur-sm text-center mission-card">
+                    <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mb-6 mx-auto">
+                        <i class="fas fa-hands-helping text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">For Partners</h3>
+                    <p class="text-blue-100 mb-6">
+                        Collaborate with us on research, development, or educational initiatives to advance democratic technology.
+                    </p>
+                    <a href="partnerships.html" class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md text-sm font-medium text-blue-700 bg-white hover:bg-blue-50 transition">
+                        Explore Partnerships
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Testimonial -->
+            <div class="mt-20">
+                <div class="bg-white bg-opacity-5 p-8 rounded-xl border border-blue-400 border-opacity-20">
+                    <div class="quote">
+                        <p class="text-xl italic text-blue-100 mb-6">
+                            "Working with this team has been transformative for our campus. Not only did they provide a secure and accessible voting platform, but they also helped us understand how to better engage our students in the democratic process. Their mission goes far beyond technology—they're truly committed to strengthening student voices."
+                        </p>
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <div class="w-12 h-12 rounded-full bg-gradient-to-r from-blue-400 to-indigo-500 flex items-center justify-center text-xl font-bold">
+                                    DR
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <p class="font-semibold">Dr. Rebecca Martinez</p>
+                                <p class="text-blue-300">Dean of Student Affairs, University of Washington</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="py-16 bg-gradient-to-r from-blue-600 to-indigo-700">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-2xl font-bold mb-6">Stay Connected with Our Mission</h2>
+            <p class="text-blue-100 mb-8">
+                Join our newsletter to receive updates on our work, research findings, and democratic innovations
+            </p>
+            <div class="max-w-md mx-auto">
+                <form class="flex flex-col sm:flex-row gap-2">
+                    <input type="email" placeholder="Enter your email address" class="px-4 py-3 rounded-lg sm:rounded-r-none flex-grow focus:outline-none text-gray-800">
+                    <button type="submit" class="bg-white text-blue-700 font-medium px-6 py-3 rounded-lg sm:rounded-l-none hover:bg-blue-50 transition">
+                        Subscribe
+                    </button>
+                </form>
+                <p class="text-sm text-blue-200 mt-3">
+                    We respect your privacy and will never share your information
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-indigo-900 pt-12 pb-6">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">About</h3>
+                    <ul class="space-y-2">
+                        <li><a href="mission.html" class="text-white hover:text-blue-300">Our Mission</a></li>
+                        <li><a href="security.html" class="text-blue-200 hover:text-white">Security</a></li>
+                        <li><a href="privacy.html" class="text-blue-200 hover:text-white">Privacy Policy</a></li>
+                        <li><a href="terms.html" class="text-blue-200 hover:text-white">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Resources</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-blue-200 hover:text-white">Help Center</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">User Guide</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">API Documentation</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">Developer Resources</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Features</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-blue-200 hover:text-white">Candidate Profiles</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">Real-time Results</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">Voter Statistics</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">Election Archives</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Connect</h3>
+                    <div class="flex space-x-4 mb-4">
+                        <a href="#" class="text-blue-200 hover:text-white"><i class="fab fa-twitter text-xl"></i></a>
+                        <a href="#" class="text-blue-200 hover:text-white"><i class="fab fa-facebook text-xl"></i></a>
+                        <a href="#" class="text-blue-200 hover:text-white"><i class="fab fa-instagram text-xl"></i></a>
+                        <a href="#" class="text-blue-200 hover:text-white"><i class="fab fa-linkedin text-xl"></i></a>
+                    </div>
+                    <p class="text-blue-200">Email us: <a href="mailto:contact@universityvoter.com" class="hover:text-white">contact@universityvoter.com</a></p>
+                </div>
+            </div>
+            <div class="border-t border-blue-800 pt-6 text-center text-sm text-blue-300">
+                <p>© 2025 University Voting System. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Animation on Scroll -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js"></script>
+    <script>
+        // Initialize animations
+        new WOW().init();
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

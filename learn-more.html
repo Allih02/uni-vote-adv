@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learn More - University Voting System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            scroll-behavior: smooth;
+        }
+        
+        .hero-gradient {
+            background-image: linear-gradient(135deg, #6366F1 0%, #3B82F6 50%, #2563EB 100%);
+        }
+        
+        .section-heading:after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 3px;
+            background-color: #3B82F6;
+            margin: 15px auto 0;
+        }
+        
+        .timeline-item {
+            position: relative;
+        }
+        
+        .timeline-item:before {
+            content: '';
+            position: absolute;
+            left: -38px;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #3B82F6;
+            z-index: 1;
+        }
+        
+        .timeline-item:after {
+            content: '';
+            position: absolute;
+            left: -29px;
+            top: 20px;
+            width: 2px;
+            height: calc(100% + 20px);
+            background-color: #3B82F6;
+            z-index: 0;
+        }
+        
+        .timeline-item:last-child:after {
+            display: none;
+        }
+        
+        .feature-card {
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-indigo-900 via-blue-800 to-blue-700 text-white">
+    <!-- Navigation Bar -->
+    <nav class="bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg fixed w-full z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <a href="home.html">
+                            <i class="fas fa-vote-yea text-2xl text-white"></i>
+                        </a>
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-4">
+                            <a href="home.html" class="px-3 py-2 rounded-md text-sm font-medium text-gray-200 hover:text-white hover:bg-blue-600">Home</a>
+                            <a href="learn-more.html" class="px-3 py-2 rounded-md text-sm font-medium text-white bg-blue-600">Learn More</a>
+                            <a href="#technology" class="px-3 py-2 rounded-md text-sm font-medium text-gray-200 hover:text-white hover:bg-blue-600">Technology</a>
+                            <a href="#benefits" class="px-3 py-2 rounded-md text-sm font-medium text-gray-200 hover:text-white hover:bg-blue-600">Benefits</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-4 flex items-center md:ml-6">
+                        <a href="student/student_login.php" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-blue-600 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Log In <i class="fas fa-sign-in-alt ml-1"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="-mr-2 flex md:hidden">
+                    <button type="button" class="bg-blue-800 inline-flex items-center justify-center p-2 rounded-md text-gray-200 hover:text-white hover:bg-blue-700 focus:outline-none">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="pt-24 pb-16 hero-gradient">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-4 animate__animated animate__fadeInDown">
+                Everything You Need to Know About Our <span class="text-blue-200">Voting System</span>
+            </h1>
+            <p class="mt-3 text-xl text-blue-100 sm:mt-5 max-w-3xl mx-auto animate__animated animate__fadeIn" style="animation-delay: 0.2s">
+                A comprehensive guide to understanding how our secure and transparent election platform works
+            </p>
+        </div>
+    </div>
+
+    <!-- Detailed Process Section -->
+    <section id="detailed-process" class="py-20 bg-gradient-to-b from-indigo-900 to-blue-900">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-extrabold tracking-tight text-center sm:text-4xl mb-16 section-heading">
+                Detailed <span class="text-blue-400">Process</span>
+            </h2>
+            
+            <div class="flex flex-col md:flex-row">
+                <div class="md:w-1/3">
+                    <div class="sticky top-20">
+                        <ul class="space-y-4 text-lg">
+                            <li>
+                                <a href="#registration" class="flex items-center text-blue-300 hover:text-white">
+                                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 mr-3 text-sm">1</span>
+                                    <span>Registration</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#verification" class="flex items-center text-blue-300 hover:text-white">
+                                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 mr-3 text-sm">2</span>
+                                    <span>Verification</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#candidate-review" class="flex items-center text-blue-300 hover:text-white">
+                                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 mr-3 text-sm">3</span>
+                                    <span>Candidate Review</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#voting" class="flex items-center text-blue-300 hover:text-white">
+                                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 mr-3 text-sm">4</span>
+                                    <span>Voting</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#confirmation" class="flex items-center text-blue-300 hover:text-white">
+                                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 mr-3 text-sm">5</span>
+                                    <span>Confirmation</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#results" class="flex items-center text-blue-300 hover:text-white">
+                                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 mr-3 text-sm">6</span>
+                                    <span>Results</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="md:w-2/3 mt-10 md:mt-0 md:pl-16 relative">
+                    <!-- Timeline connector -->
+                    <div class="absolute left-0 top-0 bottom-0 border-l-2 border-blue-500 ml-4 hidden md:block"></div>
+                    
+                    <div id="registration" class="mb-20 timeline-item pl-10">
+                        <h3 class="text-2xl font-bold mb-5">Registration</h3>
+                        <div class="bg-white bg-opacity-10 p-6 rounded-lg">
+                            <p class="text-blue-100 mb-4">
+                                The first step is to create your account using your university email address. Our system verifies that you are an eligible voter by confirming your email domain matches the university's official domain.
+                            </p>
+                            <p class="text-blue-100 mb-4">
+                                During registration, you'll need to provide:
+                            </p>
+                            <ul class="list-disc pl-5 mb-4 text-blue-100 space-y-2">
+                                <li>Your full name (as it appears in university records)</li>
+                                <li>Student ID number</li>
+                                <li>University email address</li>
+                                <li>Department or faculty</li>
+                                <li>Year of study</li>
+                            </ul>
+                            <p class="text-blue-100">
+                                This information is encrypted and stored securely, and is only used to verify your eligibility to vote.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div id="verification" class="mb-20 timeline-item pl-10">
+                        <h3 class="text-2xl font-bold mb-5">Verification</h3>
+                        <div class="bg-white bg-opacity-10 p-6 rounded-lg">
+                            <p class="text-blue-100 mb-4">
+                                After registration, we implement a two-step verification process to ensure your identity:
+                            </p>
+                            <ol class="list-decimal pl-5 mb-4 text-blue-100 space-y-3">
+                                <li>
+                                    <strong class="text-white">Email Verification:</strong> A confirmation link is sent to your university email. Clicking this link confirms you have access to the email account.
+                                </li>
+                                <li>
+                                    <strong class="text-white">Identity Verification:</strong> You'll need to provide a unique token that is either:
+                                    <ul class="list-disc pl-5 mt-2 space-y-1">
+                                        <li>Sent directly to your student portal</li>
+                                        <li>Provided by your department administrator</li>
+                                        <li>Generated based on your student ID and a university-specific algorithm</li>
+                                    </ul>
+                                </li>
+                            </ol>
+                            <p class="text-blue-100">
+                                This multi-factor authentication ensures that only eligible students can participate in the election, preventing impersonation and fraud.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div id="candidate-review" class="mb-20 timeline-item pl-10">
+                        <h3 class="text-2xl font-bold mb-5">Candidate Review</h3>
+                        <div class="bg-white bg-opacity-10 p-6 rounded-lg">
+                            <p class="text-blue-100 mb-4">
+                                Once verified, you gain access to the candidate profiles section. Here, you can:
+                            </p>
+                            <ul class="list-disc pl-5 mb-4 text-blue-100 space-y-2">
+                                <li>View detailed profiles of all candidates running for various positions</li>
+                                <li>Read candidate manifestos and policy positions</li>
+                                <li>Watch video presentations from candidates (where available)</li>
+                                <li>Review candidates' past experience and qualifications</li>
+                                <li>Compare candidates side-by-side on key issues</li>
+                            </ul>
+                            <p class="text-blue-100">
+                                The platform presents information in a neutral, unbiased manner, giving equal prominence to all candidates. This helps you make an informed decision based on candidates' merits and platforms.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div id="voting" class="mb-20 timeline-item pl-10">
+                        <h3 class="text-2xl font-bold mb-5">Voting</h3>
+                        <div class="bg-white bg-opacity-10 p-6 rounded-lg">
+                            <p class="text-blue-100 mb-4">
+                                The voting interface is designed to be intuitive and accessible:
+                            </p>
+                            <ol class="list-decimal pl-5 mb-4 text-blue-100 space-y-3">
+                                <li>
+                                    <strong class="text-white">Ballot Access:</strong> During the active election period, you'll see a prominent "Vote Now" button on your dashboard.
+                                </li>
+                                <li>
+                                    <strong class="text-white">Position Selection:</strong> Elections are organized by position. Select a position to see all candidates running for that role.
+                                </li>
+                                <li>
+                                    <strong class="text-white">Candidate Selection:</strong> Choose your preferred candidate by selecting the radio button next to their name. Some elections may use ranked-choice voting, allowing you to rank candidates in order of preference.
+                                </li>
+                                <li>
+                                    <strong class="text-white">Review Choices:</strong> Before final submission, you'll see a summary of all your selections for review.
+                                </li>
+                            </ol>
+                            <p class="text-blue-100">
+                                The system is designed to prevent common voting errors, such as accidentally skipping positions or submitting incomplete ballots. You'll receive clear warnings if any part of your ballot is incomplete.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div id="confirmation" class="mb-20 timeline-item pl-10">
+                        <h3 class="text-2xl font-bold mb-5">Confirmation</h3>
+                        <div class="bg-white bg-opacity-10 p-6 rounded-lg">
+                            <p class="text-blue-100 mb-4">
+                                After submitting your vote:
+                            </p>
+                            <ul class="list-disc pl-5 mb-4 text-blue-100 space-y-2">
+                                <li>You'll receive an immediate on-screen confirmation that your vote was recorded</li>
+                                <li>A unique vote receipt code will be generated (keep this for verification purposes)</li>
+                                <li>A confirmation email will be sent to your university email address</li>
+                                <li>Your vote is encrypted and anonymized before being added to the blockchain</li>
+                            </ul>
+                            <p class="text-blue-100 mb-4">
+                                The confirmation process ensures that:
+                            </p>
+                            <ul class="list-disc pl-5 mb-4 text-blue-100 space-y-2">
+                                <li>You have proof that you voted</li>
+                                <li>Your vote was properly recorded</li>
+                                <li>Your vote remains anonymous</li>
+                                <li>Your vote cannot be altered or deleted</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div id="results" class="mb-20 timeline-item pl-10">
+                        <h3 class="text-2xl font-bold mb-5">Results</h3>
+                        <div class="bg-white bg-opacity-10 p-6 rounded-lg">
+                            <p class="text-blue-100 mb-4">
+                                Once the election period closes:
+                            </p>
+                            <ul class="list-disc pl-5 mb-4 text-blue-100 space-y-2">
+                                <li>Results are tallied automatically by the system</li>
+                                <li>Verification checks are performed to ensure accuracy</li>
+                                <li>Results are published on the platform, including:
+                                    <ul class="list-disc pl-5 mt-2 space-y-1">
+                                        <li>Total votes cast</li>
+                                        <li>Votes per candidate</li>
+                                        <li>Percentage of eligible voters who participated</li>
+                                        <li>Breakdown by department/faculty (where applicable)</li>
+                                    </ul>
+                                </li>
+                                <li>Interactive visualizations show voting patterns and trends</li>
+                                <li>Historical comparisons with previous elections</li>
+                            </ul>
+                            <p class="text-blue-100">
+                                All results are verifiable against the blockchain record, ensuring complete transparency. External auditors can also verify the integrity of the election results using our public verification tool.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technology Section -->
+    <section id="technology" class="py-20 bg-gradient-to-b from-blue-900 to-indigo-900">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-extrabold tracking-tight text-center sm:text-4xl mb-16 section-heading">
+                Our <span class="text-blue-400">Technology</span>
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div>
+                    <h3 class="text-2xl font-bold mb-6">Security Architecture</h3>
+                    <div class="bg-white bg-opacity-10 p-6 rounded-lg">
+                        <p class="text-blue-100 mb-4">
+                            Our system employs multiple layers of security to protect the integrity of the voting process:
+                        </p>
+                        <ul class="list-disc pl-5 mb-4 text-blue-100 space-y-2">
+                            <li><strong class="text-white">End-to-End Encryption:</strong> All data is encrypted from the moment it leaves your browser until it's stored in our secure databases</li>
+                            <li><strong class="text-white">Blockchain Verification:</strong> Each vote is recorded on a private blockchain, creating an immutable record that cannot be altered</li>
+                            <li><strong class="text-white">Anonymization Layer:</strong> Your identity is separated from your vote using zero-knowledge proofs, ensuring complete anonymity</li>
+                            <li><strong class="text-white">DDoS Protection:</strong> Advanced traffic filtering prevents denial-of-service attacks during election periods</li>
+                            <li><strong class="text-white">Regular Security Audits:</strong> Independent cybersecurity firms audit our system before each election cycle</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-2xl font-bold mb-6">Verification System</h3>
+                    <div class="bg-white bg-opacity-10 p-6 rounded-lg">
+                        <p class="text-blue-100 mb-4">
+                            Our verification system ensures election integrity while maintaining voter privacy:
+                        </p>
+                        <ul class="list-disc pl-5 mb-4 text-blue-100 space-y-2">
+                            <li><strong class="text-white">Vote Receipts:</strong> Each voter receives a unique, anonymous receipt code</li>
+                            <li><strong class="text-white">Public Bulletin Board:</strong> All encrypted votes are published on a public bulletin board</li>
+                            <li><strong class="text-white">Cryptographic Proofs:</strong> Mathematical proofs verify votes without revealing voter identities</li>
+                            <li><strong class="text-white">Open Source Components:</strong> Critical security components are open source for public review</li>
+                            <li><strong class="text-white">Third-Party Validators:</strong> Independent election observers can verify results without compromising privacy</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-2xl font-bold mb-6">Accessibility Features</h3>
+                    <div class="bg-white bg-opacity-10 p-6 rounded-lg">
+                        <p class="text-blue-100 mb-4">
+                            We've designed our system to be accessible to all eligible voters:
+                        </p>
+                        <ul class="list-disc pl-5 mb-4 text-blue-100 space-y-2">
+                            <li><strong class="text-white">Screen Reader Compatibility:</strong> Full support for JAWS, NVDA, and VoiceOver</li>
+                            <li><strong class="text-white">Keyboard Navigation:</strong> Complete functionality without requiring mouse input</li>
+                            <li><strong class="text-white">High Contrast Mode:</strong> Enhanced visibility option for visually impaired users</li>
+                            <li><strong class="text-white">Text-to-Speech:</strong> Built-in option to have candidate information read aloud</li>
+                            <li><strong class="text-white">Responsive Design:</strong> Works on all devices, from desktops to mobile phones</li>
+                            <li><strong class="text-white">Low Bandwidth Mode:</strong> Operates efficiently on slow internet connections</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-2xl font-bold mb-6">Analytics Dashboard</h3>
+                    <div class="bg-white bg-opacity-10 p-6 rounded-lg">
+                        <p class="text-blue-100 mb-4">
+                            After the election, our analytics dashboard provides insights without compromising voter privacy:
+                        </p>
+                        <ul class="list-disc pl-5 mb-4 text-blue-100 space-y-2">
+                            <li><strong class="text-white">Participation Metrics:</strong> Track voter turnout across departments and years</li>
+                            <li><strong class="text-white">Trend Analysis:</strong> Compare current election results with historical data</li>
+                            <li><strong class="text-white">Demographic Insights:</strong> Analyze voting patterns by academic year and faculty (where permitted)</li>
+                            <li><strong class="text-white">Time-Based Analysis:</strong> See voting activity throughout the election period</li>
+                            <li><strong class="text-white">Interactive Visualizations:</strong> Explore results through intuitive charts and graphs</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section id="benefits" class="py-20 bg-gradient-to-b from-indigo-900 to-blue-900">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-extrabold tracking-tight text-center sm:text-4xl mb-16 section-heading">
+                Key <span class="text-blue-400">Benefits</span>
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="feature-card bg-white bg-opacity-10 p-8 rounded-xl">
+                    <div class="flex items-center justify-center h-16 w-16 rounded-full bg-blue-600 mb-6">
+                        <i class="fas fa-shield-alt text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Enhanced Security</h3>
+                    <ul class="text-blue-100 space-y-2">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-400 mt-1 mr-2"></i>
+                            <span>Prevents unauthorized voting and fraud</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-400 mt-1 mr-2"></i>
+                            <span>Eliminates ballot tampering</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-400 mt-1 mr-2"></i>
+                            <span>Secures voter identity information</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-400 mt-1 mr-2"></i>
+                            <span>Creates immutable vote records</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-400 mt-1 mr-2"></i>
+                            <span>Resists cyber attacks</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card bg-white bg-opacity-10 p-8 rounded-xl">
+                    <div class="flex items-center justify-center h-16 w-16 rounded-full bg-blue-600 mb-6">
+                        <i class="fas fa-users text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Increased Participation</h3>
+                    <ul class="text-blue-100 space-y-2">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-400 mt-1 mr-2"></i>
+                            <span>24/7 voting throughout election period</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-400 mt-1 mr-2"></i>
+                            <span>Vote from anywhere with internet access</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-400 mt-1 mr-2"></i>
+                            <span>Accessible for students with disabilities</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-400 mt-1 mr-2"></i>
+                            <span>Available on all devices</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-400 mt-1 mr-2"></i>
+                            <span>Automated reminders increase turnout</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card bg-white bg-opacity-10 p-8 rounded-xl">
+                    <div class="flex items-center justify-center h-16 w-16 rounded-full bg-blue-600 mb-6">
+                        <i class="fas fa-chart-line text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Efficiency & Transparency</h3>
+                    <ul class="text-blue-100 space-y-2">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-400 mt-1 mr-2"></i>
+                            <span>Immediate results when polls close</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-400 mt-1 mr-2"></i>
+                            <span>No manual counting or human error</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-400 mt-1 mr-2"></i>
+                            <span>Comprehensive audit trail</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-400 mt-1 mr-2"></i>
+                            <span>Public verification of results</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-400 mt-1 mr-2"></i>
+                            <span>Reduced administrative costs</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Testimonials -->
+            <div class="mt-20">
+                <h3 class="text-2xl font-bold text-center mb-12">What Universities Say</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-white bg-opacity-5 p-6 rounded-lg border border-blue-400 border-opacity-20">
+                        <div class="flex items-start mb-4">
+                            <div class="flex-shrink-0">
+                                <div class="w-12 h-12 rounded-full bg-gradient-to-r from-blue-400 to-indigo-500 flex items-center justify-center text-xl font-bold">
+                                    UC
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="text-lg font-semibold">Dr. Sarah Johnson</h4>
+                                <p class="text-blue-300">Student Affairs Director, University of California</p>
+                            </div>
+                        </div>
+                        <p class="text-blue-100 italic">
+                            "Since implementing this system, we've seen voter turnout increase by 34%. The security features give everyone confidence in the results, and the analytics help us understand student engagement patterns."
+                        </p>
+                    </div><div class="bg-white bg-opacity-5 p-6 rounded-lg border border-blue-400 border-opacity-20">
+                        <div class="flex items-start mb-4">
+                            <div class="flex-shrink-0">
+                                <div class="w-12 h-12 rounded-full bg-gradient-to-r from-blue-400 to-indigo-500 flex items-center justify-center text-xl font-bold">
+                                    MT
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="text-lg font-semibold">Professor Thomas Reed</h4>
+                                <p class="text-blue-300">Election Committee Chair, MIT</p>
+                            </div>
+                        </div>
+                        <p class="text-blue-100 italic">
+                            "The transparency and security features have completely transformed our student government elections. We've eliminated disputes about vote counting and dramatically increased participation rates."
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- CTA Section -->
+            <div class="mt-20 text-center">
+                <h3 class="text-2xl font-bold mb-6">Ready to experience secure and transparent voting?</h3>
+                <a href="student/student_login.php" class="inline-flex items-center justify-center px-8 py-4 border border-transparent rounded-full text-lg font-medium text-blue-700 bg-white shadow-lg hover:bg-blue-50 transform transition duration-300 hover:scale-105">
+                    <i class="fas fa-user-graduate mr-2"></i> Get Started Now
+                </a>
+                <p class="mt-4 text-blue-200">
+                    Join thousands of students across top universities who trust our platform
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Case Studies Section -->
+    <section class="py-20 bg-gradient-to-b from-blue-900 to-indigo-900">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-extrabold tracking-tight text-center sm:text-4xl mb-16 section-heading">
+                Success <span class="text-blue-400">Stories</span>
+            </h2>
+            
+            <div class="space-y-16">
+                <!-- Case Study 1 -->
+                <div class="bg-white bg-opacity-10 rounded-xl overflow-hidden backdrop-filter backdrop-blur-sm">
+                    <div class="md:flex">
+                        <div class="md:w-1/3 bg-gradient-to-br from-blue-500 to-indigo-600 p-8 flex items-center justify-center">
+                            <div class="text-center">
+                                <div class="text-5xl font-bold mb-2">89%</div>
+                                <div class="text-blue-100">Voter Turnout</div>
+                                <div class="mt-4 text-sm text-blue-200">Up from 42% previous year</div>
+                            </div>
+                        </div>
+                        <div class="md:w-2/3 p-8">
+                            <h3 class="text-2xl font-bold mb-4">Stanford University Student Union</h3>
+                            <p class="text-blue-100 mb-4">
+                                Stanford University implemented our voting platform for their annual Student Union elections in 2024. The results were unprecedented:
+                            </p>
+                            <ul class="list-disc pl-5 mb-4 text-blue-100 space-y-2">
+                                <li>Voter turnout increased from 42% to 89% in a single year</li>
+                                <li>The election process time was reduced from two weeks to three days</li>
+                                <li>Administrative costs were cut by 64%</li>
+                                <li>Zero disputes about vote counting or election integrity</li>
+                            </ul>
+                            <div class="mt-6">
+                                <a href="#" class="text-blue-400 hover:text-blue-300 font-medium">Read full case study <i class="fas fa-arrow-right ml-1"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Case Study 2 -->
+                <div class="bg-white bg-opacity-10 rounded-xl overflow-hidden backdrop-filter backdrop-blur-sm">
+                    <div class="md:flex flex-row-reverse">
+                        <div class="md:w-1/3 bg-gradient-to-br from-indigo-500 to-purple-600 p-8 flex items-center justify-center">
+                            <div class="text-center">
+                                <div class="text-5xl font-bold mb-2">100%</div>
+                                <div class="text-blue-100">Accessibility Rating</div>
+                                <div class="mt-4 text-sm text-blue-200">WCAG AAA Compliant</div>
+                            </div>
+                        </div>
+                        <div class="md:w-2/3 p-8">
+                            <h3 class="text-2xl font-bold mb-4">University of Michigan Inclusive Democracy Initiative</h3>
+                            <p class="text-blue-100 mb-4">
+                                The University of Michigan selected our platform specifically for its accessibility features, ensuring all students could participate equally:
+                            </p>
+                            <ul class="list-disc pl-5 mb-4 text-blue-100 space-y-2">
+                                <li>First 100% accessible student election system in the university's history</li>
+                                <li>Participation from students with disabilities increased by 300%</li>
+                                <li>Multilingual support enabled international student participation</li>
+                                <li>Mobile-first approach allowed students to vote anywhere</li>
+                            </ul>
+                            <div class="mt-6">
+                                <a href="#" class="text-blue-400 hover:text-blue-300 font-medium">Read full case study <i class="fas fa-arrow-right ml-1"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technical Documentation Section -->
+    <section class="py-20 bg-gradient-to-b from-indigo-900 to-blue-900">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-extrabold tracking-tight text-center sm:text-4xl mb-16 section-heading">
+                Technical <span class="text-blue-400">Documentation</span>
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="feature-card bg-white bg-opacity-10 p-8 rounded-xl text-center">
+                    <div class="flex items-center justify-center h-16 w-16 rounded-full bg-blue-600 mx-auto mb-6">
+                        <i class="fas fa-book text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Developer Documentation</h3>
+                    <p class="text-blue-100 mb-6">
+                        Comprehensive API documentation, integration guides, and technical specifications for system administrators and developers.
+                    </p>
+                    <a href="#" class="px-6 py-2 bg-blue-600 rounded-full text-sm font-medium hover:bg-blue-500 transition">
+                        View Documentation
+                    </a>
+                </div>
+                
+                <div class="feature-card bg-white bg-opacity-10 p-8 rounded-xl text-center">
+                    <div class="flex items-center justify-center h-16 w-16 rounded-full bg-blue-600 mx-auto mb-6">
+                        <i class="fas fa-users-cog text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Administrator Guide</h3>
+                    <p class="text-blue-100 mb-6">
+                        Step-by-step instructions for setting up elections, managing candidates, configuring voting periods, and analyzing results.
+                    </p>
+                    <a href="#" class="px-6 py-2 bg-blue-600 rounded-full text-sm font-medium hover:bg-blue-500 transition">
+                        Download Guide
+                    </a>
+                </div>
+                
+                <div class="feature-card bg-white bg-opacity-10 p-8 rounded-xl text-center">
+                    <div class="flex items-center justify-center h-16 w-16 rounded-full bg-blue-600 mx-auto mb-6">
+                        <i class="fas fa-shield-alt text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Security Whitepaper</h3>
+                    <p class="text-blue-100 mb-6">
+                        Detailed information about our security architecture, cryptographic protocols, and verification mechanisms.
+                    </p>
+                    <a href="#" class="px-6 py-2 bg-blue-600 rounded-full text-sm font-medium hover:bg-blue-500 transition">
+                        Read Whitepaper
+                    </a>
+                </div>
+            </div>
+            
+            <!-- FAQ Section -->
+            <div class="mt-20">
+                <h3 class="text-2xl font-bold text-center mb-12">Frequently Asked Technical Questions</h3>
+                
+                <div class="space-y-6">
+                    <div class="bg-white bg-opacity-10 rounded-xl p-6 backdrop-filter backdrop-blur-sm">
+                        <button class="flex w-full text-left">
+                            <div class="flex-1">
+                                <h4 class="text-lg font-medium">How does the blockchain verification system work?</h4>
+                                <div class="mt-2 text-blue-200">
+                                    <p>
+                                        Our system uses a private, permissioned blockchain based on Hyperledger Fabric. Each vote is hashed and added as a transaction to the blockchain, creating an immutable record. The voter's identity is separated from their vote using a cryptographic mixing technique, ensuring anonymity while maintaining verifiability. Independent auditors can verify the integrity of the blockchain without accessing individual vote data.
+                                    </p>
+                                </div>
+                            </div>
+                            <i class="fas fa-chevron-down text-blue-400"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="bg-white bg-opacity-10 rounded-xl p-6 backdrop-filter backdrop-blur-sm">
+                        <button class="flex w-full text-left">
+                            <div class="flex-1">
+                                <h4 class="text-lg font-medium">What authentication methods are supported?</h4>
+                                <div class="mt-2 text-blue-200">
+                                    <p>
+                                        We support multiple authentication methods that can be configured based on your university's requirements. These include: SAML/Shibboleth integration for single sign-on with existing university credentials, multi-factor authentication via SMS or authenticator apps, biometric verification on compatible devices, and OAuth2 integration with university identity providers. Our system is designed to work seamlessly with most university authentication systems.
+                                    </p>
+                                </div>
+                            </div>
+                            <i class="fas fa-chevron-down text-blue-400"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="bg-white bg-opacity-10 rounded-xl p-6 backdrop-filter backdrop-blur-sm">
+                        <button class="flex w-full text-left">
+                            <div class="flex-1">
+                                <h4 class="text-lg font-medium">How is voter anonymity guaranteed?</h4>
+                                <div class="mt-2 text-blue-200">
+                                    <p>
+                                        We employ a cryptographic mixing network similar to those used in high-security financial systems. When a vote is cast, it passes through a series of cryptographic "mixers" that break the connection between the voter and their ballot. The system maintains two separate databases: one that records who has voted (but not their choices), and another that records the votes themselves (but not who cast them). These databases use different encryption keys and are stored on separate servers, making it mathematically impossible to link a specific ballot back to an individual voter.
+                                    </p>
+                                </div>
+                            </div>
+                            <i class="fas fa-chevron-down text-blue-400"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="py-16 bg-gradient-to-r from-blue-600 to-indigo-700">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl mb-6">
+                Ready to transform your university's electoral process?
+            </h2>
+            <p class="text-xl text-blue-100 mb-8">
+                Join the growing number of universities using our advanced voting platform
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="student/student_login.php" class="inline-flex items-center justify-center px-8 py-4 border border-transparent rounded-full text-lg font-medium text-blue-700 bg-white shadow-lg hover:bg-blue-50 transform transition duration-300 hover:scale-105">
+                    <i class="fas fa-user-graduate mr-2"></i> Student Login
+                </a>
+                <a href="contact.html" class="inline-flex items-center justify-center px-8 py-4 border border-transparent rounded-full text-lg font-medium text-white bg-blue-600 bg-opacity-30 backdrop-filter backdrop-blur-sm hover:bg-opacity-50 transform transition duration-300 hover:scale-105">
+                    Contact Us <i class="fas fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-indigo-900 pt-12 pb-6">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">About</h3>
+                    <ul class="space-y-2">
+                        <li><a href="mission.html" class="text-blue-200 hover:text-white">Our Mission</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">Security</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">Privacy Policy</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Resources</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-blue-200 hover:text-white">Help Center</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">User Guide</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">API Documentation</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">Developer Resources</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Features</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-blue-200 hover:text-white">Candidate Profiles</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">Real-time Results</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">Voter Statistics</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">Election Archives</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Connect</h3>
+                    <div class="flex space-x-4 mb-4">
+                        <a href="#" class="text-blue-200 hover:text-white"><i class="fab fa-twitter text-xl"></i></a>
+                        <a href="#" class="text-blue-200 hover:text-white"><i class="fab fa-facebook text-xl"></i></a>
+                        <a href="#" class="text-blue-200 hover:text-white"><i class="fab fa-instagram text-xl"></i></a>
+                        <a href="#" class="text-blue-200 hover:text-white"><i class="fab fa-linkedin text-xl"></i></a>
+                    </div>
+                    <p class="text-blue-200">Subscribe to our newsletter for updates</p>
+                    <div class="mt-2 flex">
+                        <input type="email" placeholder="Email address" class="px-4 py-2 rounded-l-md w-full focus:outline-none text-gray-800">
+                        <button class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-r-md">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-blue-800 pt-6 text-center text-sm text-blue-300">
+                <p>© 2025 University Voting System. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Animation on Scroll -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js"></script>
+    <script>
+        // Initialize animations
+        new WOW().init();
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+        
+        // Highlight active section in sidebar
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('nav a');
+            
+            let current = '';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('bg-blue-600');
+                link.classList.add('hover:bg-blue-600');
+                if (link.getAttribute('href').includes(current)) {
+                    link.classList.add('bg-blue-600');
+                    link.classList.remove('hover:bg-blue-600');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,37 +1,59 @@
 <?php
+// voting_history.php - Student Voting History
 session_start();
-if (!isset($_SESSION['studentId'])) {
-    header('Location: index.php');
-    exit;
+
+// Database Configuration
+class Database {
+    private $host = 'localhost';
+    private $db_name = 'voting_system';
+    private $username = 'root';
+    private $password = '';
+    private $conn;
+
+    public function getConnection() {
+        $this->conn = null;
+        try {
+            $this->conn = new PDO(
+                "mysql:host=" . $this->host . ";dbname=" . $this->db_name,
+                $this->username,
+                $this->password,
+                array(
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"
+                )
+            );
+        } catch(PDOException $exception) {
+            echo "Connection error: " . $exception->getMessage();
+        }
+        return $this->conn;
+    }
 }
 
-// Mock data - replace with actual database query
-$votingHistory = [
-    [
-        'election' => 'Student Council Presidential Election 2025',
-        'date' => '2025-03-15',
-        'candidate' => 'Sarah Johnson',
-        'status' => 'Active',
-        'turnout' => '75%',
-        'category' => 'Executive Board'
-    ],
-    [
-        'election' => 'Class Representative Election 2024 - 2025',
-        'date' => '2024-11-05',
-        'candidate' => 'Class Representatives',
-        'status' => 'Completed',
-        'turnout' => '100%',
-        'category' => 'Students Government'
-    ],
-    [
-        'election' => 'Student Council Presidential Election 2024',
-        'date' => '2024-06-10',
-        'candidate' => 'Edwin A. Andrea',
-        'status' => 'Completed',
-        'turnout' => '82%',
-        'category' => 'Executive Board'
-    ]
-];
+// Check if user is logged in
+if (!isset($_SESSION['voter_id'])) {
+    header("Location: student_login.php");
+    exit();
+}
+
+$database = new Database();
+$db = $database->getConnection();
+
+// Get voter's voting history
+$stmt = $db->prepare("
+    SELECT e.*, v.voted_at, v.id as vote_id
+    FROM elections e
+    INNER JOIN votes v ON e.id = v.election_id
+    WHERE v.voter_id = :voter_id
+    ORDER BY v.voted_at DESC
+");
+$stmt->execute(['voter_id' => $_SESSION['voter_id']]);
+$voting_history = $stmt->fetchAll();
+
+// Get voter info
+$stmt = $db->prepare("SELECT * FROM voters WHERE id = :id");
+$stmt->execute(['id' => $_SESSION['voter_id']]);
+$voter = $stmt->fetch();
 ?>
 
 <!DOCTYPE html>
@@ -39,88 +61,191 @@ $votingHistory = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voting History - Student Portal</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>Voting History - University Voting System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #3730a3;
+            --secondary: #7c3aed;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --info: #3b82f6;
+            --radius: 0.75rem;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #f6f9fc 0%, #edf2f7 100%);
-            min-height: 100vh;
-            padding: 2rem;
+            font-family: 'Inter', sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
         }
 
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
         }
 
         .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            background: var(--surface);
+            padding: 2rem;
+            border-radius: var(--radius);
             margin-bottom: 2rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
         }
 
-        .page-title {
-            color: #2d3748;
-        }
-
-        .page-title h1 {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .page-title p {
-            color: #718096;
-        }
-
-        .back-btn {
+        .back-link {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            color: #718096;
+            color: var(--primary);
             text-decoration: none;
-            transition: all 0.3s ease;
+            margin-bottom: 1rem;
         }
 
-        .back-btn:hover {
-            background: #f8fafc;
-            color: #2d3748;
-            transform: translateY(-2px);
+        .back-link:hover {
+            text-decoration: underline;
         }
 
-        .history-container {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            overflow: hidden;
+        .history-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .history-item {
+            background: var(--surface);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 4px rgb(0 0 0 / 0.05);
+            transition: all 0.2s;
+        }
+
+        .history-item:hover {
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            transform: translateY(-1px);
         }
 
         .history-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 1.5rem;
-            color: white;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            justify-content: between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            gap: 1rem;
         }
 
-        .history-stats {
+        .history-title {
+            font-weight: 600;
+            font-size: 1.125rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .history-meta {
             display: flex;
-            gap: 2rem;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .meta-item {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            background: #ecfdf5;
+            color: #065f46;
+        }
+
+        .description {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .actions {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            font-weight: 500;
+            font-size: 0.875rem;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: #f1f5f9;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .stats-summary {
+            background: var(--surface);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
         }
 
         .stat-item {
@@ -128,158 +253,123 @@ $votingHistory = [
         }
 
         .stat-value {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 0.25rem;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
         }
 
         .stat-label {
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-
-        .history-list {
-            padding: 1rem;
-        }
-
-        .history-item {
-            display: grid;
-            grid-template-columns: 1fr 2fr 1fr 1fr;
-            gap: 1rem;
-            padding: 1.5rem;
-            border-bottom: 1px solid #e2e8f0;
-            transition: transform 0.3s ease;
-        }
-
-        .history-item:hover {
-            background: #f8fafc;
-            transform: translateX(10px);
-        }
-
-        .history-item:last-child {
-            border-bottom: none;
-        }
-
-        .date-badge {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: #718096;
-        }
-
-        .election-info h3 {
-            color: #2d3748;
-            margin-bottom: 0.25rem;
-        }
-
-        .election-info p {
-            color: #718096;
-            font-size: 0.9rem;
-        }
-
-        .category-badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            background: #ebf8ff;
-            color: #3182ce;
-        }
-
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
-        }
-
-        .status-active {
-            background: #e6fffa;
-            color: #319795;
-        }
-
-        .status-completed {
-            background: #f0fff4;
-            color: #38a169;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
         }
 
         @media (max-width: 768px) {
-            body {
-                padding: 1rem;
+            .container {
+                padding: 0 0.5rem;
             }
 
-            .header {
+            .history-header {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 1rem;
             }
 
-            .history-item {
-                grid-template-columns: 1fr;
-                gap: 0.5rem;
-            }
-
-            .history-stats {
+            .actions {
                 flex-direction: column;
-                gap: 1rem;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <a href="dashboard.php" class="back-link">
+            <i class="fas fa-arrow-left"></i>
+            Back to Dashboard
+        </a>
+
         <div class="header">
-            <div class="page-title">
-                <h1>Voting History</h1>
-                <p>Track your participation in student elections and polls</p>
-            </div>
-            <a href="dashboard.php" class="back-btn">
-                <i class="fas fa-arrow-left"></i>
-                Back to Dashboard
-            </a>
+            <h1><i class="fas fa-history"></i> Voting History</h1>
+            <p>Complete record of your participation in university elections</p>
         </div>
 
-        <div class="history-container">
-            <div class="history-header">
-                <div class="history-stats">
-                    <div class="stat-item">
-                        <div class="stat-value"><?php echo count($votingHistory); ?></div>
-                        <div class="stat-label">Total Votes</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value">75%</div>
-                        <div class="stat-label">Participation Rate</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value">2024</div>
-                        <div class="stat-label">Latest Election</div>
-                    </div>
+        <div class="stats-summary">
+            <h3 style="margin-bottom: 1rem;">Participation Summary</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value"><?php echo count($voting_history); ?></div>
+                    <div class="stat-label">Total Votes</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value"><?php echo date('Y'); ?></div>
+                    <div class="stat-label">Active Year</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value"><?php echo count($voting_history) > 0 ? '100%' : '0%'; ?></div>
+                    <div class="stat-label">Completion Rate</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value"><?php echo $voter['faculty']; ?></div>
+                    <div class="stat-label">Faculty</div>
                 </div>
             </div>
+        </div>
 
-            <div class="history-list">
-                <?php foreach ($votingHistory as $vote): ?>
-                    <div class="history-item">
-                        <div class="date-badge">
-                            <i class="far fa-calendar"></i>
-                            <?php echo date('M d, Y', strtotime($vote['date'])); ?>
-                        </div>
-                        <div class="election-info">
-                            <h3><?php echo htmlspecialchars($vote['election']); ?></h3>
-                            <p>Voted for: <?php echo htmlspecialchars($vote['candidate']); ?></p>
-                        </div>
-                        <div class="category-badge">
-                            <?php echo htmlspecialchars($vote['category']); ?>
-                        </div>
-                        <div class="status-badge status-<?php echo strtolower($vote['status']); ?>">
-                            <i class="fas fa-circle"></i>
-                            <?php echo htmlspecialchars($vote['status']); ?>
-                        </div>
+        <div class="history-grid">
+            <?php if (empty($voting_history)): ?>
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-vote-yea"></i>
                     </div>
+                    <h3>No Voting History</h3>
+                    <p>You haven't participated in any elections yet.</p>
+                    <a href="dashboard.php" class="btn btn-primary" style="margin-top: 1rem;">
+                        <i class="fas fa-poll"></i>
+                        View Available Elections
+                    </a>
+                </div>
+            <?php else: ?>
+                <?php foreach ($voting_history as $history): ?>
+                <div class="history-item">
+                    <div class="history-header">
+                        <div style="flex: 1;">
+                            <h3 class="history-title"><?php echo htmlspecialchars($history['title']); ?></h3>
+                            <div class="history-meta">
+                                <div class="meta-item">
+                                    <i class="fas fa-calendar"></i>
+                                    Voted: <?php echo date('M d, Y H:i', strtotime($history['voted_at'])); ?>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-clock"></i>
+                                    Election Period: <?php echo date('M d', strtotime($history['start_date'])); ?> - <?php echo date('M d, Y', strtotime($history['end_date'])); ?>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-building"></i>
+                                    <?php echo htmlspecialchars($history['type']); ?>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="status-badge">Completed</span>
+                    </div>
+                    
+                    <p class="description"><?php echo htmlspecialchars($history['description']); ?></p>
+                    
+                    <div class="actions">
+                        <a href="election_results.php?id=<?php echo $history['id']; ?>" class="btn btn-secondary">
+                            <i class="fas fa-chart-bar"></i>
+                            View Results
+                        </a>
+                        <a href="election_details.php?id=<?php echo $history['id']; ?>" class="btn btn-secondary">
+                            <i class="fas fa-info-circle"></i>
+                            Election Details
+                        </a>
+                    </div>
+                </div>
                 <?php endforeach; ?>
-            </div>
+            <?php endif; ?>
         </div>
     </div>
 </body>

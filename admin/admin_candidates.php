@@ -1,170 +1,321 @@
 <?php
-// Candidates Management - No authentication required for demo
-// session_start();
-// if (!isset($_SESSION["admin_id"]) || $_SESSION["role"] !== "admin") {
-//     header("Location: admin_login.php");
-//     exit();
-// }
+// Start session and check authentication
+session_start();
 
-// Mock admin data
-$admin_user = [
-    "admin_id" => 1,
-    "fullname" => "Dr. Sarah Johnson",
-    "email" => "admin@university.edu",
-    "role" => "Administrator"
-];
+// Database connection
+$host = 'localhost';
+$dbname = 'voting_system';
+$username = 'root';
+$password = '';
 
-// Handle form submissions (simplified without database)
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['action'])) {
-        switch ($_POST['action']) {
-            case 'create':
-                header("Location: admin_candidates.php?success=created");
-                exit();
-                break;
-            case 'approve':
-                header("Location: admin_candidates.php?success=approved");
-                exit();
-                break;
-            case 'reject':
-                header("Location: admin_candidates.php?success=rejected");
-                exit();
-                break;
-            case 'delete':
-                header("Location: admin_candidates.php?success=deleted");
-                exit();
-                break;
-        }
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $database_connected = true;
+} catch(PDOException $e) {
+    die("Connection failed: " . $e->getMessage());
+}
+
+// Get admin user data from database (remove mock data)
+$admin_user = null;
+if (isset($_SESSION["admin_id"])) {
+    $stmt = $pdo->prepare("SELECT * FROM admin_users WHERE id = ?");
+    $stmt->execute([$_SESSION["admin_id"]]);
+    $admin_user = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$admin_user) {
+        session_destroy();
+        header("Location: admin_login.php?error=session_expired");
+        exit();
+    }
+} else {
+    // For demo purposes, use the first admin from database
+    $stmt = $pdo->prepare("SELECT * FROM admin_users WHERE status = 'active' LIMIT 1");
+    $stmt->execute();
+    $admin_user = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if ($admin_user) {
+        $_SESSION["admin_id"] = $admin_user['id'];
+        $_SESSION["admin_name"] = $admin_user['fullname'];
+        $_SESSION["role"] = $admin_user['role'];
     }
 }
 
-// Mock candidates data
-$candidates = [
-    [
-        "id" => 1,
-        "name" => "Allih A. Abubakar",
-        "email" => "allih.abubakar@university.edu",
-        "student_id" => "ST2024001",
-        "position" => "Student Body President",
-        "election_id" => 1,
-        "election_title" => "Student Council Elections 2025",
-        "platform" => "Campus Sustainability & Student Wellness - Focusing on mental health resources, environmental initiatives, and inclusive campus activities.",
-        "status" => "approved",
-        "image" => "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
-        "created_at" => "2025-05-20 10:30:00",
-        "approved_at" => "2025-05-21 14:15:00",
-        "approved_by" => "Dr. Sarah Johnson",
-        "vote_count" => 156,
-        "qualifications" => "3rd Year Computer Science, Former Class Representative, Volunteer Coordinator",
-        "contact_phone" => "+255 123 456 789"
-    ],
-    [
-        "id" => 2,
-        "name" => "Sarah Chen",
-        "email" => "sarah.chen@university.edu",
-        "student_id" => "ST2024002",
-        "position" => "Student Body President",
-        "election_id" => 1,
-        "election_title" => "Student Council Elections 2025",
-        "platform" => "Academic Excellence & Campus Unity - Promoting collaborative learning environments and bridging gaps between different student communities.",
-        "status" => "approved",
-        "image" => "https://images.unsplash.com/photo-1494790108755-2616b169b9c0?w=400&h=400&fit=crop&crop=face",
-        "created_at" => "2025-05-18 09:45:00",
-        "approved_at" => "2025-05-19 11:20:00",
-        "approved_by" => "Prof. Michael Davis",
-        "vote_count" => 142,
-        "qualifications" => "4th Year Business Administration, Student Senate Member, Debate Club President",
-        "contact_phone" => "+255 987 654 321"
-    ],
-    [
-        "id" => 3,
-        "name" => "Michael Thompson",
-        "email" => "michael.thompson@university.edu",
-        "student_id" => "ST2024003",
-        "position" => "Vice President",
-        "election_id" => 1,
-        "election_title" => "Student Council Elections 2025",
-        "platform" => "Student Support Services - Enhancing academic support, career counseling, and financial aid accessibility for all students.",
-        "status" => "pending",
-        "image" => "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face",
-        "created_at" => "2025-05-25 16:20:00",
-        "approved_at" => null,
-        "approved_by" => null,
-        "vote_count" => 0,
-        "qualifications" => "3rd Year Engineering, Peer Tutor, Community Service Leader",
-        "contact_phone" => "+255 555 123 456"
-    ],
-    [
-        "id" => 4,
-        "name" => "Emily Rodriguez",
-        "email" => "emily.rodriguez@university.edu",
-        "student_id" => "ST2024004",
-        "position" => "Secretary",
-        "election_id" => 1,
-        "election_title" => "Student Council Elections 2025",
-        "platform" => "Communication & Transparency - Improving information flow between administration and students through better communication channels.",
-        "status" => "pending",
-        "image" => "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face",
-        "created_at" => "2025-05-26 11:30:00",
-        "approved_at" => null,
-        "approved_by" => null,
-        "vote_count" => 0,
-        "qualifications" => "2nd Year Communications, Newsletter Editor, Event Coordinator",
-        "contact_phone" => "+255 777 888 999"
-    ],
-    [
-        "id" => 5,
-        "name" => "James Wilson",
-        "email" => "james.wilson@university.edu",
-        "student_id" => "ST2024005",
-        "position" => "Sports Representative",
-        "election_id" => 4,
-        "election_title" => "Sports Committee Elections",
-        "platform" => "Athletic Excellence & Inclusion - Promoting sports participation across all skill levels and improving athletic facilities.",
-        "status" => "rejected",
-        "image" => "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
-        "created_at" => "2025-05-22 14:45:00",
-        "approved_at" => null,
-        "approved_by" => null,
-        "vote_count" => 0,
-        "qualifications" => "4th Year Sports Science, Team Captain, Fitness Instructor",
-        "contact_phone" => "+255 444 555 666",
-        "rejection_reason" => "Incomplete documentation - missing academic transcripts"
-    ],
-    [
-        "id" => 6,
-        "name" => "Lisa Park",
-        "email" => "lisa.park@university.edu",
-        "student_id" => "ST2024006",
-        "position" => "Cultural Representative",
-        "election_id" => 1,
-        "election_title" => "Student Council Elections 2025",
-        "platform" => "Cultural Diversity & Arts - Celebrating multicultural heritage and expanding arts programs on campus.",
-        "status" => "approved",
-        "image" => "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop&crop=face",
-        "created_at" => "2025-05-19 13:15:00",
-        "approved_at" => "2025-05-20 09:30:00",
-        "approved_by" => "Dr. Sarah Johnson",
-        "vote_count" => 89,
-        "qualifications" => "3rd Year Arts & Culture, International Student Ambassador, Event Organizer",
-        "contact_phone" => "+255 333 222 111"
-    ]
-];
+// Handle image upload function
+function uploadCandidateImage($file, $candidate_name) {
+    if (empty($file['name'])) {
+        return null; // No file uploaded
+    }
+    
+    // Create images directory if it doesn't exist
+    $upload_dir = 'images/candidates/';
+    if (!file_exists($upload_dir)) {
+        mkdir($upload_dir, 0755, true);
+    }
+    
+    // Validate file type
+    $allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+    $file_type = $file['type'];
+    
+    if (!in_array($file_type, $allowed_types)) {
+        throw new Exception("Invalid file type. Only JPEG, PNG, and GIF files are allowed.");
+    }
+    
+    // Validate file size (5MB max)
+    if ($file['size'] > 5 * 1024 * 1024) {
+        throw new Exception("File size too large. Maximum 5MB allowed.");
+    }
+    
+    // Generate unique filename
+    $file_extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+    $safe_name = preg_replace('/[^a-zA-Z0-9_-]/', '_', $candidate_name);
+    $filename = $safe_name . '_' . time() . '.' . $file_extension;
+    $filepath = $upload_dir . $filename;
+    
+    // Move uploaded file
+    if (move_uploaded_file($file['tmp_name'], $filepath)) {
+        return $filepath;
+    } else {
+        throw new Exception("Failed to upload image file.");
+    }
+}
 
-// Calculate statistics
+// Handle form submissions
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    try {
+        if (isset($_POST['action'])) {
+            switch ($_POST['action']) {
+                case 'create':
+                    // Handle image upload
+                    $profile_image = null;
+                    if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === UPLOAD_ERR_OK) {
+                        try {
+                            $profile_image = uploadCandidateImage($_FILES['profile_image'], $_POST['name']);
+                        } catch (Exception $e) {
+                            $error_message = "Image upload error: " . $e->getMessage();
+                            break;
+                        }
+                    }
+                    
+                    // Check if voter exists and get voter_id
+                    $voter_id = null;
+                    if (!empty($_POST['student_id'])) {
+                        $stmt = $pdo->prepare("SELECT id FROM voters WHERE student_id = ?");
+                        $stmt->execute([$_POST['student_id']]);
+                        $voter = $stmt->fetch();
+                        $voter_id = $voter ? $voter['id'] : null;
+                    }
+                    
+                    $stmt = $pdo->prepare("INSERT INTO candidates (election_id, voter_id, full_name, student_id, email, program, year, faculty, position, manifesto, profile_image, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', NOW())");
+                    $stmt->execute([
+                        $_POST['election_id'],
+                        $voter_id,
+                        $_POST['name'],
+                        $_POST['student_id'],
+                        $_POST['email'],
+                        $_POST['program'] ?? '',
+                        $_POST['year'] ?? '',
+                        $_POST['faculty'] ?? '',
+                        $_POST['position'],
+                        $_POST['platform'],
+                        $profile_image
+                    ]);
+                    
+                    // Log the action
+                    $audit_data = $_POST;
+                    $audit_data['profile_image'] = $profile_image;
+                    $stmt = $pdo->prepare("INSERT INTO audit_logs (user_type, user_id, action, entity_type, entity_id, new_values, ip_address, created_at) VALUES ('admin', ?, 'CREATE', 'candidate', LAST_INSERT_ID(), ?, ?, NOW())");
+                    $stmt->execute([$admin_user['id'], json_encode($audit_data), $_SERVER['REMOTE_ADDR']]);
+                    
+                    header("Location: admin_candidates.php?success=created");
+                    exit();
+                    break;
+                    
+                case 'approve':
+                    $stmt = $pdo->prepare("UPDATE candidates SET status = 'active', updated_at = NOW() WHERE id = ?");
+                    $stmt->execute([$_POST['candidate_id']]);
+                    
+                    // Log the action
+                    $stmt = $pdo->prepare("INSERT INTO audit_logs (user_type, user_id, action, entity_type, entity_id, new_values, ip_address, created_at) VALUES ('admin', ?, 'APPROVE', 'candidate', ?, ?, ?, NOW())");
+                    $stmt->execute([$admin_user['id'], $_POST['candidate_id'], json_encode(['status' => 'active']), $_SERVER['REMOTE_ADDR']]);
+                    
+                    header("Location: admin_candidates.php?success=approved");
+                    exit();
+                    break;
+                    
+                case 'reject':
+                    $stmt = $pdo->prepare("UPDATE candidates SET status = 'inactive', updated_at = NOW() WHERE id = ?");
+                    $stmt->execute([$_POST['candidate_id']]);
+                    
+                    // Log the action
+                    $stmt = $pdo->prepare("INSERT INTO audit_logs (user_type, user_id, action, entity_type, entity_id, new_values, ip_address, created_at) VALUES ('admin', ?, 'REJECT', 'candidate', ?, ?, ?, NOW())");
+                    $stmt->execute([$admin_user['id'], $_POST['candidate_id'], json_encode(['status' => 'inactive', 'rejection_reason' => $_POST['rejection_reason'] ?? '']), $_SERVER['REMOTE_ADDR']]);
+                    
+                    header("Location: admin_candidates.php?success=rejected");
+                    exit();
+                    break;
+                    
+                case 'delete':
+                    // Get candidate data before deletion to remove image file
+                    $stmt = $pdo->prepare("SELECT profile_image FROM candidates WHERE id = ?");
+                    $stmt->execute([$_POST['candidate_id']]);
+                    $candidate_data = $stmt->fetch();
+                    
+                    // First delete related votes
+                    $stmt = $pdo->prepare("DELETE FROM votes WHERE candidate_id = ?");
+                    $stmt->execute([$_POST['candidate_id']]);
+                    
+                    // Then delete the candidate
+                    $stmt = $pdo->prepare("DELETE FROM candidates WHERE id = ?");
+                    $stmt->execute([$_POST['candidate_id']]);
+                    
+                    // Delete image file if exists
+                    if ($candidate_data && $candidate_data['profile_image'] && file_exists($candidate_data['profile_image'])) {
+                        unlink($candidate_data['profile_image']);
+                    }
+                    
+                    // Log the action
+                    $stmt = $pdo->prepare("INSERT INTO audit_logs (user_type, user_id, action, entity_type, entity_id, new_values, ip_address, created_at) VALUES ('admin', ?, 'DELETE', 'candidate', ?, ?, ?, NOW())");
+                    $stmt->execute([$admin_user['id'], $_POST['candidate_id'], json_encode(['deleted' => true, 'image_deleted' => $candidate_data['profile_image']]), $_SERVER['REMOTE_ADDR']]);
+                    
+                    header("Location: admin_candidates.php?success=deleted");
+                    exit();
+                    break;
+                    
+                case 'update':
+                    // Handle image upload for updates
+                    $profile_image = $_POST['existing_image'] ?? null; // Keep existing image by default
+                    
+                    if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === UPLOAD_ERR_OK) {
+                        try {
+                            $new_image = uploadCandidateImage($_FILES['profile_image'], $_POST['name']);
+                            
+                            // Delete old image if exists and upload was successful
+                            if ($profile_image && file_exists($profile_image)) {
+                                unlink($profile_image);
+                            }
+                            
+                            $profile_image = $new_image;
+                        } catch (Exception $e) {
+                            $error_message = "Image upload error: " . $e->getMessage();
+                            break;
+                        }
+                    }
+                    
+                    // Check if voter exists and get voter_id
+                    $voter_id = null;
+                    if (!empty($_POST['student_id'])) {
+                        $stmt = $pdo->prepare("SELECT id FROM voters WHERE student_id = ?");
+                        $stmt->execute([$_POST['student_id']]);
+                        $voter = $stmt->fetch();
+                        $voter_id = $voter ? $voter['id'] : null;
+                    }
+                    
+                    $stmt = $pdo->prepare("UPDATE candidates SET election_id = ?, voter_id = ?, full_name = ?, student_id = ?, email = ?, program = ?, year = ?, faculty = ?, position = ?, manifesto = ?, profile_image = ?, updated_at = NOW() WHERE id = ?");
+                    $stmt->execute([
+                        $_POST['election_id'],
+                        $voter_id,
+                        $_POST['name'],
+                        $_POST['student_id'],
+                        $_POST['email'],
+                        $_POST['program'] ?? '',
+                        $_POST['year'] ?? '',
+                        $_POST['faculty'] ?? '',
+                        $_POST['position'],
+                        $_POST['platform'],
+                        $profile_image,
+                        $_POST['candidate_id']
+                    ]);
+                    
+                    // Log the action
+                    $audit_data = $_POST;
+                    $audit_data['profile_image'] = $profile_image;
+                    $stmt = $pdo->prepare("INSERT INTO audit_logs (user_type, user_id, action, entity_type, entity_id, new_values, ip_address, created_at) VALUES ('admin', ?, 'UPDATE', 'candidate', ?, ?, ?, NOW())");
+                    $stmt->execute([$admin_user['id'], $_POST['candidate_id'], json_encode($audit_data), $_SERVER['REMOTE_ADDR']]);
+                    
+                    header("Location: admin_candidates.php?success=updated");
+                    exit();
+                    break;
+            }
+        }
+    } catch(PDOException $e) {
+        $error_message = "Database error: " . $e->getMessage();
+    }
+}
+
+// Fetch real candidates data from database with election details and vote counts
+$candidates_query = "
+    SELECT 
+        c.*,
+        e.title as election_title,
+        e.election_type,
+        v.full_name as voter_name,
+        v.profile_image as voter_profile_image,
+        COALESCE(vote_counts.vote_count, 0) as vote_count
+    FROM candidates c
+    LEFT JOIN elections e ON c.election_id = e.id
+    LEFT JOIN voters v ON c.voter_id = v.id
+    LEFT JOIN (
+        SELECT candidate_id, COUNT(*) as vote_count 
+        FROM votes 
+        GROUP BY candidate_id
+    ) vote_counts ON c.id = vote_counts.candidate_id
+    ORDER BY c.created_at DESC
+";
+
+$stmt = $pdo->prepare($candidates_query);
+$stmt->execute();
+$candidates = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Get elections for filter dropdown
+$elections_stmt = $pdo->prepare("SELECT id, title, status FROM elections ORDER BY created_at DESC");
+$elections_stmt->execute();
+$elections = $elections_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Get all voters for candidate creation
+$voters_stmt = $pdo->prepare("SELECT id, student_id, full_name, email, program, year, faculty FROM voters WHERE status = 'active' ORDER BY full_name");
+$voters_stmt->execute();
+$voters = $voters_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Calculate real statistics from database
 $total_candidates = count($candidates);
-$approved_candidates = count(array_filter($candidates, function($c) { return $c['status'] === 'approved'; }));
+$approved_candidates = count(array_filter($candidates, function($c) { return $c['status'] === 'active'; }));
 $pending_candidates = count(array_filter($candidates, function($c) { return $c['status'] === 'pending'; }));
-$rejected_candidates = count(array_filter($candidates, function($c) { return $c['status'] === 'rejected'; }));
-$total_votes = array_sum(array_column($candidates, 'vote_count'));
+$rejected_candidates = count(array_filter($candidates, function($c) { return $c['status'] === 'inactive' || $c['status'] === 'disqualified'; }));
 
-// Get unique elections for filter
-$elections = array_unique(array_map(function($c) {
-    return ['id' => $c['election_id'], 'title' => $c['election_title']];
-}, $candidates), SORT_REGULAR);
+// Get total votes from database
+$total_votes_stmt = $pdo->prepare("SELECT COUNT(*) as total FROM votes");
+$total_votes_stmt->execute();
+$total_votes = $total_votes_stmt->fetch()['total'];
 
 // Get unique positions for filter
 $positions = array_unique(array_column($candidates, 'position'));
+sort($positions);
+
+// Generate default avatar for candidates without images
+function getDefaultAvatar($name) {
+    $initials = '';
+    $nameParts = explode(' ', trim($name));
+    foreach ($nameParts as $part) {
+        if (!empty($part)) {
+            $initials .= strtoupper($part[0]);
+            if (strlen($initials) >= 2) break;
+        }
+    }
+    return "https://ui-avatars.com/api/?name=" . urlencode($name) . "&background=6366f1&color=ffffff&size=400";
+}
+
+// Get dashboard statistics
+$stats_query = "
+    SELECT 
+        (SELECT COUNT(*) FROM voters WHERE status = 'active') as total_voters,
+        (SELECT COUNT(*) FROM elections WHERE status = 'active') as active_elections,
+        (SELECT COUNT(*) FROM candidates WHERE status = 'active') as active_candidates,
+        (SELECT COUNT(*) FROM votes) as total_votes_cast
+";
+$stats_stmt = $pdo->prepare($stats_query);
+$stats_stmt->execute();
+$dashboard_stats = $stats_stmt->fetch(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -173,34 +324,50 @@ $positions = array_unique(array_column($candidates, 'position'));
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Candidates Management - Admin Dashboard</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
+            /* Primary Colors */
             --primary: #6366f1;
-            --primary-dark: #4f46e5;
+            --primary-dark: #4338ca;
             --primary-light: #a5b4fc;
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            
+            /* Secondary Colors */
             --secondary: #8b5cf6;
-            --accent: #f43f5e;
-            --background: #f8fafc;
-            --surface: #ffffff;
-            --surface-hover: #f1f5f9;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --text-muted: #94a3b8;
-            --border: #e2e8f0;
-            --border-dark: #cbd5e1;
+            --accent: #f59e0b;
             --success: #10b981;
             --warning: #f59e0b;
             --error: #ef4444;
             --info: #3b82f6;
+            
+            /* Neutral Colors */
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --surface-alt: #f1f5f9;
+            --surface-hover: #e2e8f0;
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+            
+            /* Text Colors */
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --text-inverse: #ffffff;
+            
+            /* Shadows */
             --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            
+            /* Sizes */
             --radius-sm: 0.375rem;
             --radius-md: 0.5rem;
             --radius-lg: 0.75rem;
             --radius-xl: 1rem;
+            --sidebar-width: 280px;
         }
 
         * {
@@ -210,34 +377,38 @@ $positions = array_unique(array_column($candidates, 'position'));
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--background);
             color: var(--text-primary);
             line-height: 1.6;
+            overflow-x: hidden;
         }
 
-        .dashboard {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* Sidebar Styles */
+        /* Modern Sidebar Styles */
         .sidebar {
-            width: 280px;
-            background: var(--surface);
-            border-right: 1px solid var(--border);
             position: fixed;
+            top: 0;
+            left: 0;
             height: 100vh;
+            width: 280px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
             overflow-y: auto;
-            z-index: 100;
-            box-shadow: var(--shadow-sm);
         }
 
+        .sidebar.hidden {
+            transform: translateX(-100%);
+        }
+
+        /* Sidebar Header */
         .sidebar-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--border);
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
+            padding: 2rem 2rem 1.5rem 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 1rem;
         }
 
         .logo {
@@ -246,71 +417,185 @@ $positions = array_unique(array_column($candidates, 'position'));
             gap: 0.75rem;
             text-decoration: none;
             color: white;
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             font-weight: 700;
+            letter-spacing: -0.025em;
+            margin-bottom: 1rem;
         }
 
+        .logo i {
+            font-size: 1.75rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .admin-info {
+            text-align: left;
+        }
+
+        .admin-name {
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .admin-role {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Sidebar Navigation */
         .sidebar-nav {
-            padding: 1rem 0;
+            padding: 0 1rem 2rem 1rem;
         }
 
         .nav-section {
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
         }
 
         .nav-section-title {
-            padding: 0.5rem 1.5rem;
+            color: rgba(255, 255, 255, 0.6);
             font-size: 0.75rem;
             font-weight: 600;
-            color: var(--text-muted);
             text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 0 1rem 0.75rem 1rem;
         }
 
         .nav-item {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem 1.5rem;
-            color: var(--text-secondary);
+            padding: 0.875rem 1rem;
+            color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
-            transition: all 0.2s ease;
-            border-left: 3px solid transparent;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 0.25rem;
         }
 
         .nav-item:hover {
-            background: var(--surface-hover);
-            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            transform: translateX(4px);
         }
 
         .nav-item.active {
-            background: var(--primary-light);
-            color: var(--primary-dark);
-            border-left-color: var(--primary);
-            font-weight: 500;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
         }
 
         .nav-item i {
-            width: 1.25rem;
-            text-align: center;
+            width: 20px;
+            height: 20px;
+            margin-right: 0.75rem;
+            font-size: 1rem;
+        }
+
+        .nav-item span {
+            font-weight: 500;
+            letter-spacing: -0.01em;
+        }
+
+        /* Mobile Header */
+        .mobile-header {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            z-index: 1001;
+            padding: 0 1rem;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .mobile-logo {
+            color: white;
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .hamburger {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+
+        .hamburger:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .hamburger-icon {
+            width: 24px;
+            height: 24px;
+            fill: white;
+            transition: transform 0.3s ease;
+        }
+
+        .hamburger.active .hamburger-icon {
+            transform: rotate(90deg);
+        }
+
+        /* Overlay for mobile */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .overlay.active {
+            opacity: 1;
+        }
+
+        /* Dashboard Layout */
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
         }
 
         /* Main Content */
         .main-content {
-            flex: 1;
             margin-left: 280px;
+            padding: 2rem;
             min-height: 100vh;
+            transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            width: calc(100vw - 280px);
             display: flex;
             flex-direction: column;
         }
 
+        /* Top Bar */
         .top-bar {
             background: var(--surface);
             padding: 1.5rem 2rem;
-            border-bottom: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: var(--shadow-sm);
+            margin-bottom: 2rem;
         }
 
         .top-bar h1 {
@@ -327,7 +612,6 @@ $positions = array_unique(array_column($candidates, 'position'));
 
         .page-content {
             flex: 1;
-            padding: 2rem;
         }
 
         /* Statistics Cards */
@@ -480,6 +764,12 @@ $positions = array_unique(array_column($candidates, 'position'));
             border: 1px solid #bbf7d0;
         }
 
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
         .alert-success::before {
             content: "✓";
             display: inline-flex;
@@ -488,6 +778,20 @@ $positions = array_unique(array_column($candidates, 'position'));
             width: 1.25rem;
             height: 1.25rem;
             background: var(--success);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .alert-error::before {
+            content: "!";
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.25rem;
+            height: 1.25rem;
+            background: var(--error);
             color: white;
             border-radius: 50%;
             font-size: 0.75rem;
@@ -527,8 +831,9 @@ $positions = array_unique(array_column($candidates, 'position'));
         }
 
         .candidate-card.status-pending::before { background: var(--warning); }
-        .candidate-card.status-approved::before { background: var(--success); }
-        .candidate-card.status-rejected::before { background: var(--error); }
+        .candidate-card.status-active::before { background: var(--success); }
+        .candidate-card.status-inactive::before { background: var(--error); }
+        .candidate-card.status-disqualified::before { background: var(--error); }
 
         .candidate-header {
             padding: 1.5rem;
@@ -595,12 +900,17 @@ $positions = array_unique(array_column($candidates, 'position'));
             color: #92400e;
         }
 
-        .status-approved {
+        .status-active {
             background: #dcfce7;
             color: #166534;
         }
 
-        .status-rejected {
+        .status-inactive {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-disqualified {
             background: #fee2e2;
             color: #991b1b;
         }
@@ -617,7 +927,7 @@ $positions = array_unique(array_column($candidates, 'position'));
         }
 
         .candidate-qualifications {
-            background: var(--surface-hover);
+            background: var(--surface-alt);
             padding: 1rem;
             border-radius: var(--radius-md);
             margin-bottom: 1rem;
@@ -641,7 +951,7 @@ $positions = array_unique(array_column($candidates, 'position'));
             justify-content: space-between;
             margin-bottom: 1rem;
             padding: 0.75rem;
-            background: var(--surface-hover);
+            background: var(--surface-alt);
             border-radius: var(--radius-md);
         }
 
@@ -857,6 +1167,7 @@ $positions = array_unique(array_column($candidates, 'position'));
             text-align: center;
             padding: 4rem 2rem;
             color: var(--text-secondary);
+            grid-column: 1 / -1;
         }
 
         .empty-state i {
@@ -872,19 +1183,168 @@ $positions = array_unique(array_column($candidates, 'position'));
             color: var(--text-primary);
         }
 
-        /* Responsive Design */
+        /* Smooth scrollbar for webkit browsers */
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Image Upload Styles */
+        .image-upload-area {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius-md);
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .image-upload-area:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .image-upload-area.drag-over {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .upload-text {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .image-preview {
+            margin-top: 1rem;
+            padding: 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            background: var(--surface-alt);
+        }
+
+        .preview-image {
+            max-width: 150px;
+            max-height: 150px;
+            border-radius: 50%;
+            border: 3px solid var(--primary);
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+        }
+
+        .preview-image:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .image-info {
+            margin-top: 0.75rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .remove-image {
+            background: var(--error);
+            color: white;
+            border: none;
+            padding: 0.375rem 0.75rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .remove-image:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+        }
+
+        .drag-drop-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(99, 102, 241, 0.1);
+            border: 2px dashed var(--primary);
+            border-radius: var(--radius-md);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .drag-drop-overlay.active {
+            display: flex;
+        }
+
+        .candidate-avatar {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .candidate-avatar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 45%, rgba(99, 102, 241, 0.1) 50%, transparent 55%);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+            z-index: 1;
+        }
+
+        .candidate-card:hover .candidate-avatar::before {
+            transform: translateX(100%);
+        }
         @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
+            .mobile-header {
+                display: flex;
             }
 
-            .sidebar.open {
+            .sidebar {
+                top: 70px;
+                height: calc(100vh - 70px);
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
                 transform: translateX(0);
+            }
+
+            .overlay {
+                display: block;
+                top: 70px;
+                height: calc(100vh - 70px);
             }
 
             .main-content {
                 margin-left: 0;
+                margin-top: 70px;
+                padding: 1.5rem;
+                width: 100vw;
             }
 
             .top-bar {
@@ -892,10 +1352,6 @@ $positions = array_unique(array_column($candidates, 'position'));
                 flex-direction: column;
                 gap: 1rem;
                 align-items: stretch;
-            }
-
-            .page-content {
-                padding: 1rem;
             }
 
             .filter-bar {
@@ -922,20 +1378,59 @@ $positions = array_unique(array_column($candidates, 'position'));
         }
 
         @media (max-width: 480px) {
+            .main-content {
+                padding: 1rem;
+            }
+
             .stats-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .candidate-card {
+                margin-bottom: 1rem;
+            }
+
+            .top-bar {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .filter-bar {
+                padding: 1rem;
+                margin-bottom: 1rem;
             }
         }
     </style>
 </head>
 <body>
+    <!-- Mobile Header -->
+    <header class="mobile-header">
+        <div class="mobile-logo">
+            <i class="fas fa-shield-alt"></i>
+            VoteAdmin
+        </div>
+        <button class="hamburger" id="hamburgerBtn">
+            <svg class="hamburger-icon" viewBox="0 0 24 24">
+                <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+            </svg>
+        </button>
+    </header>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
     <div class="dashboard">
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <a href="admin_dashboard.php" class="logo">
                     <i class="fas fa-shield-alt"></i>
+                    <span>VoteAdmin</span>
                 </a>
+                <div class="admin-info">
+                    <div class="admin-name"><?php echo htmlspecialchars($admin_user['fullname'] ?? 'Admin User'); ?></div>
+                    <div class="admin-role"><?php echo htmlspecialchars(ucfirst($admin_user['role']) ?? 'Administrator'); ?></div>
+                </div>
             </div>
             
             <nav class="sidebar-nav">
@@ -981,9 +1476,9 @@ $positions = array_unique(array_column($candidates, 'position'));
                         <i class="fas fa-cog"></i>
                         <span>Settings</span>
                     </a>
-                    <a href="admin_users.php" class="nav-item">
-                        <i class="fas fa-user-shield"></i>
-                        <span>Admin Users</span>
+                    <a href="admin_audit.php" class="nav-item">
+                        <i class="fas fa-history"></i>
+                        <span>Audit Log</span>
                     </a>
                     <a href="logout.php" class="nav-item">
                         <i class="fas fa-sign-out-alt"></i>
@@ -992,7 +1487,7 @@ $positions = array_unique(array_column($candidates, 'position'));
                 </div>
             </nav>
         </aside>
-
+        
         <!-- Main Content -->
         <main class="main-content">
             <!-- Top Bar -->
@@ -1029,8 +1524,18 @@ $positions = array_unique(array_column($candidates, 'position'));
                             case 'deleted':
                                 echo 'Candidate deleted successfully!';
                                 break;
+                            case 'updated':
+                                echo 'Candidate updated successfully!';
+                                break;
                         }
                         ?>
+                    </div>
+                <?php endif; ?>
+
+                <!-- Error Messages -->
+                <?php if (isset($error_message)): ?>
+                    <div class="alert alert-error">
+                        <?php echo htmlspecialchars($error_message); ?>
                     </div>
                 <?php endif; ?>
 
@@ -1053,7 +1558,7 @@ $positions = array_unique(array_column($candidates, 'position'));
                             </div>
                         </div>
                         <div class="stat-value"><?php echo $approved_candidates; ?></div>
-                        <div class="stat-label">Approved</div>
+                        <div class="stat-label">Active</div>
                     </div>
 
                     <div class="stat-card warning">
@@ -1073,7 +1578,7 @@ $positions = array_unique(array_column($candidates, 'position'));
                             </div>
                         </div>
                         <div class="stat-value"><?php echo $rejected_candidates; ?></div>
-                        <div class="stat-label">Rejected</div>
+                        <div class="stat-label">Inactive</div>
                     </div>
 
                     <div class="stat-card info">
@@ -1094,8 +1599,9 @@ $positions = array_unique(array_column($candidates, 'position'));
                         <select class="filter-select" id="statusFilter">
                             <option value="">All Status</option>
                             <option value="pending">Pending</option>
-                            <option value="approved">Approved</option>
-                            <option value="rejected">Rejected</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="disqualified">Disqualified</option>
                         </select>
                     </div>
                     
@@ -1143,7 +1649,7 @@ $positions = array_unique(array_column($candidates, 'position'));
                                  data-status="<?php echo $candidate['status']; ?>" 
                                  data-election="<?php echo $candidate['election_id']; ?>" 
                                  data-position="<?php echo strtolower($candidate['position']); ?>"
-                                 data-name="<?php echo strtolower($candidate['name']); ?>">
+                                 data-name="<?php echo strtolower($candidate['full_name']); ?>">
                                 
                                 <div class="candidate-status status-<?php echo $candidate['status']; ?>">
                                     <?php echo ucfirst($candidate['status']); ?>
@@ -1151,30 +1657,60 @@ $positions = array_unique(array_column($candidates, 'position'));
                                 
                                 <div class="candidate-header">
                                     <div class="candidate-avatar">
-                                        <img src="<?php echo htmlspecialchars($candidate['image']); ?>" alt="<?php echo htmlspecialchars($candidate['name']); ?>">
+                                        <?php if ($candidate['profile_image'] && file_exists($candidate['profile_image'])): ?>
+                                            <img src="<?php echo htmlspecialchars($candidate['profile_image']); ?>" 
+                                                 alt="<?php echo htmlspecialchars($candidate['full_name']); ?>"
+                                                 onerror="this.src='<?php echo getDefaultAvatar($candidate['full_name']); ?>'">
+                                        <?php elseif ($candidate['voter_profile_image']): ?>
+                                            <img src="<?php echo htmlspecialchars($candidate['voter_profile_image']); ?>" 
+                                                 alt="<?php echo htmlspecialchars($candidate['full_name']); ?>"
+                                                 onerror="this.src='<?php echo getDefaultAvatar($candidate['full_name']); ?>'">
+                                        <?php else: ?>
+                                            <img src="<?php echo getDefaultAvatar($candidate['full_name']); ?>" 
+                                                 alt="<?php echo htmlspecialchars($candidate['full_name']); ?>">
+                                        <?php endif; ?>
                                     </div>
                                     <div class="candidate-info">
-                                        <h3 class="candidate-name"><?php echo htmlspecialchars($candidate['name']); ?></h3>
+                                        <h3 class="candidate-name"><?php echo htmlspecialchars($candidate['full_name']); ?></h3>
                                         <div class="candidate-position"><?php echo htmlspecialchars($candidate['position']); ?></div>
                                         <div class="candidate-meta">
+                                            <?php if ($candidate['student_id']): ?>
                                             <div><i class="fas fa-id-card"></i> <?php echo htmlspecialchars($candidate['student_id']); ?></div>
+                                            <?php endif; ?>
+                                            <?php if ($candidate['email']): ?>
                                             <div><i class="fas fa-envelope"></i> <?php echo htmlspecialchars($candidate['email']); ?></div>
-                                            <div><i class="fas fa-phone"></i> <?php echo htmlspecialchars($candidate['contact_phone']); ?></div>
+                                            <?php endif; ?>
+                                            <?php if ($candidate['program']): ?>
+                                            <div><i class="fas fa-graduation-cap"></i> <?php echo htmlspecialchars($candidate['program']); ?></div>
+                                            <?php endif; ?>
+                                            <?php if ($candidate['year']): ?>
+                                            <div><i class="fas fa-calendar"></i> <?php echo htmlspecialchars($candidate['year']); ?></div>
+                                            <?php endif; ?>
+                                            <?php if ($candidate['faculty']): ?>
+                                            <div><i class="fas fa-building"></i> <?php echo htmlspecialchars($candidate['faculty']); ?></div>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="candidate-body">
+                                    <?php if ($candidate['manifesto']): ?>
                                     <div class="candidate-platform">
-                                        <?php echo htmlspecialchars($candidate['platform']); ?>
+                                        <strong>Manifesto:</strong><br>
+                                        <?php echo nl2br(htmlspecialchars($candidate['manifesto'])); ?>
                                     </div>
+                                    <?php endif; ?>
 
+                                    <?php if ($candidate['election_title']): ?>
                                     <div class="candidate-qualifications">
-                                        <h4>Qualifications</h4>
-                                        <p><?php echo htmlspecialchars($candidate['qualifications']); ?></p>
+                                        <h4>Election Details</h4>
+                                        <p><strong>Election:</strong> <?php echo htmlspecialchars($candidate['election_title']); ?></p>
+                                        <p><strong>Type:</strong> <?php echo htmlspecialchars(ucfirst($candidate['election_type'])); ?></p>
+                                        <p><strong>Created:</strong> <?php echo date('M d, Y', strtotime($candidate['created_at'])); ?></p>
                                     </div>
+                                    <?php endif; ?>
 
-                                    <?php if ($candidate['status'] === 'approved'): ?>
+                                    <?php if ($candidate['status'] === 'active'): ?>
                                     <div class="candidate-stats">
                                         <div class="candidate-stat">
                                             <div class="candidate-stat-value"><?php echo $candidate['vote_count']; ?></div>
@@ -1185,30 +1721,23 @@ $positions = array_unique(array_column($candidates, 'position'));
                                             <div class="candidate-stat-label">Share</div>
                                         </div>
                                         <div class="candidate-stat">
-                                            <div class="candidate-stat-value"><?php echo date('M d', strtotime($candidate['approved_at'])); ?></div>
-                                            <div class="candidate-stat-label">Approved</div>
+                                            <div class="candidate-stat-value"><?php echo date('M d', strtotime($candidate['updated_at'])); ?></div>
+                                            <div class="candidate-stat-label">Updated</div>
                                         </div>
-                                    </div>
-                                    <?php endif; ?>
-
-                                    <?php if ($candidate['status'] === 'rejected' && isset($candidate['rejection_reason'])): ?>
-                                    <div style="background: #fee2e2; padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1rem;">
-                                        <h4 style="color: #991b1b; font-size: 0.875rem; margin-bottom: 0.5rem;">Rejection Reason</h4>
-                                        <p style="color: #991b1b; font-size: 0.8rem;"><?php echo htmlspecialchars($candidate['rejection_reason']); ?></p>
                                     </div>
                                     <?php endif; ?>
 
                                     <div class="candidate-actions">
                                         <button class="btn btn-secondary btn-sm" onclick="viewCandidate(<?php echo $candidate['id']; ?>)">
                                             <i class="fas fa-eye"></i>
-                                            View Details
+                                            View
                                         </button>
                                         
                                         <?php if ($candidate['status'] === 'pending'): ?>
                                             <form method="POST" style="display: inline;">
                                                 <input type="hidden" name="action" value="approve">
                                                 <input type="hidden" name="candidate_id" value="<?php echo $candidate['id']; ?>">
-                                                <button type="submit" class="btn btn-success btn-sm">
+                                                <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to approve this candidate?')">
                                                     <i class="fas fa-check"></i>
                                                     Approve
                                                 </button>
@@ -1246,7 +1775,7 @@ $positions = array_unique(array_column($candidates, 'position'));
                 <button class="modal-close" onclick="closeModal()">&times;</button>
             </div>
             
-            <form method="POST" class="form-grid">
+            <form method="POST" enctype="multipart/form-data" class="form-grid">
                 <input type="hidden" name="action" value="create">
                 
                 <div class="form-row">
@@ -1256,8 +1785,20 @@ $positions = array_unique(array_column($candidates, 'position'));
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label">Student ID *</label>
-                        <input type="text" name="student_id" class="form-control" placeholder="ST2024XXX" required>
+                        <label class="form-label">Student ID</label>
+                        <select name="student_id" class="form-control" onchange="populateVoterData(this.value)">
+                            <option value="">Select Student or Enter Manually</option>
+                            <?php foreach ($voters as $voter): ?>
+                            <option value="<?php echo htmlspecialchars($voter['student_id']); ?>" 
+                                    data-name="<?php echo htmlspecialchars($voter['full_name']); ?>"
+                                    data-email="<?php echo htmlspecialchars($voter['email']); ?>"
+                                    data-program="<?php echo htmlspecialchars($voter['program']); ?>"
+                                    data-year="<?php echo htmlspecialchars($voter['year']); ?>"
+                                    data-faculty="<?php echo htmlspecialchars($voter['faculty']); ?>">
+                                <?php echo htmlspecialchars($voter['student_id'] . ' - ' . $voter['full_name']); ?>
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                 </div>
                 
@@ -1268,8 +1809,35 @@ $positions = array_unique(array_column($candidates, 'position'));
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label">Phone Number</label>
-                        <input type="tel" name="phone" class="form-control" placeholder="+255 123 456 789">
+                        <label class="form-label">Program</label>
+                        <input type="text" name="program" class="form-control" placeholder="e.g., Computer Science">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Year</label>
+                        <select name="year" class="form-control">
+                            <option value="">Select Year</option>
+                            <option value="1st Year">1st Year</option>
+                            <option value="2nd Year">2nd Year</option>
+                            <option value="3rd Year">3rd Year</option>
+                            <option value="4th Year">4th Year</option>
+                            <option value="5th Year">5th Year</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Faculty</label>
+                        <select name="faculty" class="form-control">
+                            <option value="">Select Faculty</option>
+                            <option value="Science & Technology">Science & Technology</option>
+                            <option value="Business & Economics">Business & Economics</option>
+                            <option value="Engineering">Engineering</option>
+                            <option value="Health Sciences">Health Sciences</option>
+                            <option value="Arts & Humanities">Arts & Humanities</option>
+                            <option value="Law & Governance">Law & Governance</option>
+                        </select>
                     </div>
                 </div>
                 
@@ -1288,30 +1856,155 @@ $positions = array_unique(array_column($candidates, 'position'));
                         <label class="form-label">Position *</label>
                         <select name="position" class="form-control" required>
                             <option value="">Select Position</option>
-                            <option value="Student Body President">Student Body President</option>
+                            <option value="President">President</option>
                             <option value="Vice President">Vice President</option>
                             <option value="Secretary">Secretary</option>
                             <option value="Treasurer">Treasurer</option>
-                            <option value="Sports Representative">Sports Representative</option>
-                            <option value="Cultural Representative">Cultural Representative</option>
-                            <option value="Academic Representative">Academic Representative</option>
+                            <option value="Social Events Coordinator">Social Events Coordinator</option>
+                            <option value="Academic Affairs Representative">Academic Affairs Representative</option>
+                            <option value="Faculty Representative">Faculty Representative</option>
                         </select>
                     </div>
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label">Platform Statement *</label>
+                    <label class="form-label">Manifesto *</label>
                     <textarea name="platform" class="form-control" placeholder="Describe the candidate's platform and goals..." required></textarea>
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label">Qualifications</label>
-                    <textarea name="qualifications" class="form-control" placeholder="List relevant qualifications, experience, and achievements..."></textarea>
+                    <label class="form-label">Profile Image</label>
+                    <input type="file" name="profile_image" class="form-control" accept="image/*" onchange="previewImage(this, 'createPreview')">
+                    <small style="color: var(--text-muted); margin-top: 0.5rem; display: block;">Maximum file size: 5MB. Supported formats: JPEG, PNG, GIF</small>
+                    <div id="createPreview" style="margin-top: 1rem; display: none;">
+                        <img id="createPreviewImg" style="max-width: 100px; max-height: 100px; border-radius: 50%; border: 2px solid var(--border);">
+                    </div>
                 </div>
                 
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
                     <button type="submit" class="btn btn-primary">Add Candidate</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Candidate Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Edit Candidate</h2>
+                <button class="modal-close" onclick="closeEditModal()">&times;</button>
+            </div>
+            
+            <form method="POST" enctype="multipart/form-data" class="form-grid" id="editForm">
+                <input type="hidden" name="action" value="update">
+                <input type="hidden" name="candidate_id" id="editCandidateId">
+                <input type="hidden" name="existing_image" id="editExistingImage">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Full Name *</label>
+                        <input type="text" name="name" id="editName" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Student ID</label>
+                        <input type="text" name="student_id" id="editStudentId" class="form-control">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Email Address *</label>
+                        <input type="email" name="email" id="editEmail" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Program</label>
+                        <input type="text" name="program" id="editProgram" class="form-control">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Year</label>
+                        <select name="year" id="editYear" class="form-control">
+                            <option value="">Select Year</option>
+                            <option value="1st Year">1st Year</option>
+                            <option value="2nd Year">2nd Year</option>
+                            <option value="3rd Year">3rd Year</option>
+                            <option value="4th Year">4th Year</option>
+                            <option value="5th Year">5th Year</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Faculty</label>
+                        <select name="faculty" id="editFaculty" class="form-control">
+                            <option value="">Select Faculty</option>
+                            <option value="Science & Technology">Science & Technology</option>
+                            <option value="Business & Economics">Business & Economics</option>
+                            <option value="Engineering">Engineering</option>
+                            <option value="Health Sciences">Health Sciences</option>
+                            <option value="Arts & Humanities">Arts & Humanities</option>
+                            <option value="Law & Governance">Law & Governance</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Election *</label>
+                        <select name="election_id" id="editElectionId" class="form-control" required>
+                            <option value="">Select Election</option>
+                            <?php foreach ($elections as $election): ?>
+                            <option value="<?php echo $election['id']; ?>"><?php echo htmlspecialchars($election['title']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Position *</label>
+                        <select name="position" id="editPosition" class="form-control" required>
+                            <option value="">Select Position</option>
+                            <option value="President">President</option>
+                            <option value="Vice President">Vice President</option>
+                            <option value="Secretary">Secretary</option>
+                            <option value="Treasurer">Treasurer</option>
+                            <option value="Social Events Coordinator">Social Events Coordinator</option>
+                            <option value="Academic Affairs Representative">Academic Affairs Representative</option>
+                            <option value="Faculty Representative">Faculty Representative</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Manifesto *</label>
+                    <textarea name="platform" id="editPlatform" class="form-control" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Profile Image</label>
+                    <div id="editCurrentImage" style="margin-bottom: 1rem; display: none;">
+                        <label style="font-size: 0.875rem; color: var(--text-secondary);">Current Image:</label>
+                        <div style="margin-top: 0.5rem;">
+                            <img id="editCurrentImagePreview" style="max-width: 100px; max-height: 100px; border-radius: 50%; border: 2px solid var(--border);">
+                        </div>
+                    </div>
+                    <input type="file" name="profile_image" class="form-control" accept="image/*" onchange="previewImage(this, 'editPreview')">
+                    <small style="color: var(--text-muted); margin-top: 0.5rem; display: block;">Maximum file size: 5MB. Supported formats: JPEG, PNG, GIF. Leave empty to keep current image.</small>
+                    <div id="editPreview" style="margin-top: 1rem; display: none;">
+                        <label style="font-size: 0.875rem; color: var(--text-secondary);">New Image Preview:</label>
+                        <div style="margin-top: 0.5rem;">
+                            <img id="editPreviewImg" style="max-width: 100px; max-height: 100px; border-radius: 50%; border: 2px solid var(--border);">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Candidate</button>
                 </div>
             </form>
         </div>
@@ -1351,7 +2044,7 @@ $positions = array_unique(array_column($candidates, 'position'));
             </div>
             
             <div style="margin-bottom: 2rem;">
-                <p>Are you sure you want to delete this candidate? This action cannot be undone.</p>
+                <p>Are you sure you want to delete this candidate? This action cannot be undone and will also remove all associated votes.</p>
             </div>
             
             <div class="form-actions">
@@ -1366,10 +2059,41 @@ $positions = array_unique(array_column($candidates, 'position'));
     </div>
 
     <script>
+        // Store candidate data for editing from database
+        const candidatesData = <?php echo json_encode($candidates); ?>;
+        const votersData = <?php echo json_encode($voters); ?>;
+
+        // Mobile navigation functions
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+
+        // Toggle mobile menu
+        hamburgerBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+            hamburgerBtn.classList.toggle('active');
+        });
+
+        // Close menu when overlay is clicked
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+            hamburgerBtn.classList.remove('active');
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+                hamburgerBtn.classList.remove('active');
+            }
+        });
+
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
             initializeFilters();
-            initializeMobile();
         });
 
         function initializeFilters() {
@@ -1382,21 +2106,6 @@ $positions = array_unique(array_column($candidates, 'position'));
             electionFilter.addEventListener('change', filterCandidates);
             positionFilter.addEventListener('change', filterCandidates);
             searchInput.addEventListener('input', filterCandidates);
-        }
-
-        function initializeMobile() {
-            if (window.innerWidth <= 768) {
-                const sidebarToggle = document.createElement('button');
-                sidebarToggle.innerHTML = '<i class="fas fa-bars"></i>';
-                sidebarToggle.className = 'btn btn-secondary';
-                sidebarToggle.style.marginRight = '1rem';
-                
-                document.querySelector('.top-bar h1').parentNode.insertBefore(sidebarToggle, document.querySelector('.top-bar h1'));
-                
-                sidebarToggle.addEventListener('click', function() {
-                    document.getElementById('sidebar').classList.toggle('open');
-                });
-            }
         }
 
         function filterCandidates() {
@@ -1425,6 +2134,132 @@ $positions = array_unique(array_column($candidates, 'position'));
             });
         }
 
+        // Enhanced image preview with drag and drop
+        function previewImage(input, previewId) {
+            const preview = document.getElementById(previewId);
+            const previewImg = document.getElementById(previewId + 'Img');
+            
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                
+                // Validate file size (5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    showNotification('File size too large. Maximum 5MB allowed.', 'error');
+                    input.value = '';
+                    preview.style.display = 'none';
+                    return;
+                }
+                
+                // Validate file type
+                const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+                if (!allowedTypes.includes(file.type)) {
+                    showNotification('Invalid file type. Only JPEG, PNG, and GIF files are allowed.', 'error');
+                    input.value = '';
+                    preview.style.display = 'none';
+                    return;
+                }
+                
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    preview.style.display = 'block';
+                    
+                    // Add file info
+                    const fileInfo = preview.querySelector('.image-info') || document.createElement('div');
+                    fileInfo.className = 'image-info';
+                    fileInfo.innerHTML = `
+                        <strong>File:</strong> ${file.name}<br>
+                        <strong>Size:</strong> ${(file.size / 1024).toFixed(1)} KB<br>
+                        <strong>Type:</strong> ${file.type}
+                    `;
+                    if (!preview.querySelector('.image-info')) {
+                        preview.appendChild(fileInfo);
+                    }
+                }
+                
+                reader.readAsDataURL(file);
+            } else {
+                preview.style.display = 'none';
+            }
+        }
+
+        // Drag and drop functionality
+        function setupDragAndDrop() {
+            const fileInputs = document.querySelectorAll('input[type="file"]');
+            
+            fileInputs.forEach(input => {
+                const container = input.closest('.form-group');
+                
+                // Add drag and drop area
+                const dragArea = document.createElement('div');
+                dragArea.className = 'image-upload-area';
+                dragArea.innerHTML = `
+                    <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                    <div class="upload-text">
+                        <strong>Drop image here</strong> or click to browse<br>
+                        <small>Maximum 5MB • JPEG, PNG, GIF</small>
+                    </div>
+                    <div class="drag-drop-overlay">
+                        <div style="text-align: center; color: var(--primary); font-weight: 600;">
+                            <i class="fas fa-upload" style="font-size: 2rem; margin-bottom: 0.5rem;"></i><br>
+                            Drop image here
+                        </div>
+                    </div>
+                `;
+                
+                // Insert after input
+                input.style.display = 'none';
+                input.parentNode.insertBefore(dragArea, input.nextSibling);
+                
+                // Click to open file dialog
+                dragArea.addEventListener('click', () => input.click());
+                
+                // Drag and drop events
+                dragArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    dragArea.classList.add('drag-over');
+                    dragArea.querySelector('.drag-drop-overlay').classList.add('active');
+                });
+                
+                dragArea.addEventListener('dragleave', (e) => {
+                    e.preventDefault();
+                    if (!dragArea.contains(e.relatedTarget)) {
+                        dragArea.classList.remove('drag-over');
+                        dragArea.querySelector('.drag-drop-overlay').classList.remove('active');
+                    }
+                });
+                
+                dragArea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    dragArea.classList.remove('drag-over');
+                    dragArea.querySelector('.drag-drop-overlay').classList.remove('active');
+                    
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        input.files = files;
+                        input.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                });
+            });
+        }
+
+        // Initialize drag and drop when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            setupDragAndDrop();
+        });
+
+        function populateVoterData(studentId) {
+            const voter = votersData.find(v => v.student_id === studentId);
+            if (voter) {
+                document.querySelector('input[name="name"]').value = voter.full_name;
+                document.querySelector('input[name="email"]').value = voter.email;
+                document.querySelector('input[name="program"]').value = voter.program;
+                document.querySelector('select[name="year"]').value = voter.year;
+                document.querySelector('select[name="faculty"]').value = voter.faculty;
+            }
+        }
+
         function showCreateModal() {
             document.getElementById('createModal').classList.add('active');
         }
@@ -1443,11 +2278,69 @@ $positions = array_unique(array_column($candidates, 'position'));
         }
         
         function viewCandidate(id) {
-            window.location.href = `admin_candidate_details.php?id=${id}`;
+            const candidate = candidatesData.find(c => c.id == id);
+            if (candidate) {
+                const details = `
+Candidate Details:
+
+Name: ${candidate.full_name}
+Student ID: ${candidate.student_id || 'N/A'}
+Position: ${candidate.position}
+Election: ${candidate.election_title || 'N/A'}
+Status: ${candidate.status}
+Votes: ${candidate.vote_count}
+Program: ${candidate.program || 'N/A'}
+Year: ${candidate.year || 'N/A'}
+Faculty: ${candidate.faculty || 'N/A'}
+Email: ${candidate.email || 'N/A'}
+
+Manifesto: ${candidate.manifesto || 'No manifesto provided'}
+                `;
+                alert(details);
+            }
         }
 
         function editCandidate(id) {
-            window.location.href = `admin_edit_candidate.php?id=${id}`;
+            const candidate = candidatesData.find(c => c.id == id);
+            if (candidate) {
+                // Populate edit form with real database data
+                document.getElementById('editCandidateId').value = candidate.id;
+                document.getElementById('editName').value = candidate.full_name;
+                document.getElementById('editStudentId').value = candidate.student_id || '';
+                document.getElementById('editEmail').value = candidate.email || '';
+                document.getElementById('editProgram').value = candidate.program || '';
+                document.getElementById('editYear').value = candidate.year || '';
+                document.getElementById('editFaculty').value = candidate.faculty || '';
+                document.getElementById('editElectionId').value = candidate.election_id;
+                document.getElementById('editPosition').value = candidate.position;
+                document.getElementById('editPlatform').value = candidate.manifesto || '';
+                
+                // Handle existing image
+                const existingImage = candidate.profile_image || candidate.voter_profile_image;
+                document.getElementById('editExistingImage').value = existingImage || '';
+                
+                const currentImageDiv = document.getElementById('editCurrentImage');
+                const currentImagePreview = document.getElementById('editCurrentImagePreview');
+                
+                if (existingImage) {
+                    currentImagePreview.src = existingImage;
+                    currentImageDiv.style.display = 'block';
+                } else {
+                    currentImageDiv.style.display = 'none';
+                }
+                
+                // Reset file input and preview
+                const fileInput = document.querySelector('#editForm input[type="file"]');
+                fileInput.value = '';
+                document.getElementById('editPreview').style.display = 'none';
+                
+                // Show edit modal
+                document.getElementById('editModal').classList.add('active');
+            }
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
         }
 
         function deleteCandidate(id) {
@@ -1460,7 +2353,38 @@ $positions = array_unique(array_column($candidates, 'position'));
         }
 
         function exportCandidates() {
-            showNotification('Export feature coming soon!', 'info');
+            // Create CSV content from real database data
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Name,Student ID,Email,Program,Year,Faculty,Position,Election,Status,Manifesto,Vote Count,Created At\n";
+            
+            candidatesData.forEach(candidate => {
+                const row = [
+                    candidate.full_name,
+                    candidate.student_id || '',
+                    candidate.email || '',
+                    candidate.program || '',
+                    candidate.year || '',
+                    candidate.faculty || '',
+                    candidate.position,
+                    candidate.election_title || '',
+                    candidate.status,
+                    (candidate.manifesto || '').replace(/"/g, '""'),
+                    candidate.vote_count,
+                    candidate.created_at
+                ].map(field => `"${field}"`).join(",");
+                csvContent += row + "\n";
+            });
+
+            // Create download link
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `candidates_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification('Candidates exported successfully!', 'success');
         }
 
         function showNotification(message, type = 'info') {
@@ -1468,7 +2392,7 @@ $positions = array_unique(array_column($candidates, 'position'));
             notification.className = `notification notification-${type}`;
             notification.innerHTML = `
                 <div style="display: flex; align-items: center; gap: 0.75rem;">
-                    <i class="fas fa-${type === 'info' ? 'info-circle' : 'check-circle'}"></i>
+                    <i class="fas fa-${type === 'info' ? 'info-circle' : type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
                     <span>${message}</span>
                 </div>
             `;
@@ -1481,11 +2405,12 @@ $positions = array_unique(array_column($candidates, 'position'));
                 padding: 1rem 1.5rem;
                 border-radius: 0.5rem;
                 box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-                border-left: 4px solid var(--${type === 'info' ? 'info' : 'success'});
-                z-index: 1000;
+                border-left: 4px solid var(--${type === 'info' ? 'info' : type === 'success' ? 'success' : 'error'});
+                z-index: 1001;
                 opacity: 0;
                 transform: translateX(100%);
                 transition: all 0.3s ease;
+                max-width: 400px;
             `;
             
             document.body.appendChild(notification);
@@ -1522,6 +2447,11 @@ $positions = array_unique(array_column($candidates, 'position'));
                 document.querySelectorAll('.modal').forEach(modal => {
                     modal.classList.remove('active');
                 });
+                
+                // Also close mobile menu
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+                hamburgerBtn.classList.remove('active');
             }
         });
 
@@ -1535,6 +2465,82 @@ $positions = array_unique(array_column($candidates, 'position'));
                     setTimeout(() => alert.remove(), 300);
                 }, 5000);
             });
+        });
+
+        // Form validation
+        document.addEventListener('DOMContentLoaded', function() {
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    const requiredFields = form.querySelectorAll('[required]');
+                    let isValid = true;
+                    
+                    requiredFields.forEach(field => {
+                        if (!field.value.trim()) {
+                            isValid = false;
+                            field.style.borderColor = 'var(--error)';
+                            field.addEventListener('input', function() {
+                                field.style.borderColor = '';
+                            }, { once: true });
+                        }
+                    });
+                    
+                    if (!isValid) {
+                        e.preventDefault();
+                        showNotification('Please fill in all required fields.', 'error');
+                    }
+                });
+            });
+        });
+
+        // Real-time search with highlighting
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            if (searchTerm.length > 0) {
+                const cards = document.querySelectorAll('.candidate-card');
+                cards.forEach(card => {
+                    const nameElement = card.querySelector('.candidate-name');
+                    const originalName = nameElement.dataset.originalText || nameElement.textContent;
+                    nameElement.dataset.originalText = originalName;
+                    
+                    if (originalName.toLowerCase().includes(searchTerm)) {
+                        const highlightedName = originalName.replace(
+                            new RegExp(`(${searchTerm})`, 'gi'),
+                            '<mark style="background-color: #fef3c7; padding: 0 2px;">$1</mark>'
+                        );
+                        nameElement.innerHTML = highlightedName;
+                    } else {
+                        nameElement.textContent = originalName;
+                    }
+                });
+            } else {
+                // Remove highlights
+                const nameElements = document.querySelectorAll('.candidate-name');
+                nameElements.forEach(element => {
+                    if (element.dataset.originalText) {
+                        element.textContent = element.dataset.originalText;
+                    }
+                });
+            }
+        });
+
+        console.log('Database-integrated Candidates Management initialized');
+        console.log('Features available:', {
+            'realTimeDatabase': 'All operations sync with voting_system database',
+            'candidateManagement': 'Full CRUD operations with real data',
+            'statusFiltering': 'Filter by actual candidate status',
+            'searchFunctionality': 'Search through real candidate data',
+            'csvExport': 'Export real candidates to CSV',
+            'mobileResponsive': 'Optimized for all screen sizes',
+            'modalInteractions': 'Add, edit, approve, reject with database updates',
+            'formValidation': 'Client-side validation with server sync',
+            'auditLogging': 'All actions logged to audit_logs table'
+        });
+        console.log('Database Statistics:', {
+            'totalCandidates': <?php echo $total_candidates; ?>,
+            'activeCandidates': <?php echo $approved_candidates; ?>,
+            'pendingCandidates': <?php echo $pending_candidates; ?>,
+            'totalVotes': <?php echo $total_votes; ?>
         });
     </script>
 </body>

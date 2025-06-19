@@ -203,7 +203,7 @@ $notification_count = getNotificationCount();
             --radius-md: 0.5rem;
             --radius-lg: 0.75rem;
             --radius-xl: 1rem;
-            --sidebar-width: 260px;
+            --sidebar-width: 280px;
         }
 
         * {
@@ -218,74 +218,71 @@ $notification_count = getNotificationCount();
             color: var(--text-primary);
             line-height: 1.6;
             overflow-x: hidden;
-            width: 100vw;
-            max-width: 100%;
         }
 
-        /* Dashboard Layout */
-        .dashboard {
-            display: flex;
-            min-height: 100vh;
-            width: 100vw;
-            max-width: 100%;
-            overflow-x: hidden;
-        }
-
-        /* Sidebar */
+        /* Modern Sidebar Styles */
         .sidebar {
-            width: var(--sidebar-width);
-            min-width: var(--sidebar-width);
-            max-width: var(--sidebar-width);
-            background: var(--surface);
-            border-right: 1px solid var(--border);
             position: fixed;
+            top: 0;
+            left: 0;
             height: 100vh;
+            width: 280px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
             overflow-y: auto;
-            z-index: 100;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        .sidebar.hidden {
+            transform: translateX(-100%);
+        }
+
+        /* Sidebar Header */
         .sidebar-header {
-            padding: 2rem 1.5rem 1.5rem;
-            border-bottom: 1px solid var(--border-light);
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: var(--text-inverse);
+            padding: 2rem 2rem 1.5rem 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 1rem;
         }
 
         .logo {
             display: flex;
             align-items: center;
+            gap: 0.75rem;
             text-decoration: none;
-            color: var(--text-inverse);
+            color: white;
             font-size: 1.5rem;
-            font-weight: 800;
-            margin-bottom: 0.5rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            margin-bottom: 1rem;
         }
 
         .logo i {
-            font-size: 2rem;
-            margin-right: 0.75rem;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+            font-size: 1.75rem;
+            color: rgba(255, 255, 255, 0.9);
         }
 
         .admin-info {
-            font-size: 0.875rem;
-            opacity: 0.9;
+            text-align: left;
         }
 
-        .admin-info .admin-name {
+        .admin-name {
+            color: white;
             font-weight: 600;
-            margin-bottom: 0.25rem;
+            font-size: 0.875rem;
         }
 
-        .admin-info .admin-role {
-            opacity: 0.8;
+        .admin-role {
+            color: rgba(255, 255, 255, 0.7);
             font-size: 0.75rem;
+            margin-top: 0.25rem;
         }
 
-        /* Navigation */
+        /* Sidebar Navigation */
         .sidebar-nav {
-            padding: 1.5rem 0;
+            padding: 0 1rem 2rem 1rem;
         }
 
         .nav-section {
@@ -293,69 +290,146 @@ $notification_count = getNotificationCount();
         }
 
         .nav-section-title {
+            color: rgba(255, 255, 255, 0.6);
             font-size: 0.75rem;
             font-weight: 600;
-            color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            padding: 0 1.5rem 0.75rem;
+            margin: 0 1rem 0.75rem 1rem;
         }
 
         .nav-item {
             display: flex;
             align-items: center;
-            padding: 0.875rem 1.5rem;
-            color: var(--text-secondary);
+            padding: 0.875rem 1rem;
+            color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
-            transition: all 0.2s ease;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
-            font-weight: 500;
+            overflow: hidden;
+            margin-bottom: 0.25rem;
         }
 
         .nav-item:hover {
-            background: var(--surface-alt);
-            color: var(--primary);
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
             transform: translateX(4px);
         }
 
         .nav-item.active {
-            background: linear-gradient(90deg, rgba(99, 102, 241, 0.1) 0%, transparent 100%);
-            color: var(--primary);
-            border-right: 3px solid var(--primary);
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
         }
 
         .nav-item i {
             width: 20px;
+            height: 20px;
             margin-right: 0.75rem;
-            font-size: 1.1rem;
+            font-size: 1rem;
+        }
+
+        .nav-item span {
+            font-weight: 500;
+            letter-spacing: -0.01em;
+        }
+
+        /* Mobile Header */
+        .mobile-header {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            z-index: 1001;
+            padding: 0 1rem;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .mobile-logo {
+            color: white;
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .hamburger {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+
+        .hamburger:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .hamburger-icon {
+            width: 24px;
+            height: 24px;
+            fill: white;
+            transition: transform 0.3s ease;
+        }
+
+        .hamburger.active .hamburger-icon {
+            transform: rotate(90deg);
+        }
+
+        /* Overlay for mobile */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .overlay.active {
+            opacity: 1;
+        }
+
+        /* Dashboard Layout */
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
         }
 
         /* Main Content */
         .main-content {
-            flex: 1;
-            margin-left: var(--sidebar-width);
-            width: calc(100vw - var(--sidebar-width));
-            max-width: calc(100vw - var(--sidebar-width));
+            margin-left: 280px;
+            padding: 2rem;
             min-height: 100vh;
-            background: var(--background);
-            overflow-x: hidden;
+            transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            width: calc(100vw - 280px);
         }
 
         /* Top Navigation */
         .top-nav {
             background: var(--surface);
             padding: 1rem 2rem;
-            border-bottom: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            backdrop-filter: blur(10px);
-            width: 100%;
-            max-width: 100%;
-            box-sizing: border-box;
+            margin-bottom: 2rem;
         }
 
         .breadcrumb {
@@ -364,9 +438,6 @@ $notification_count = getNotificationCount();
             gap: 0.5rem;
             color: var(--text-muted);
             font-size: 0.875rem;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
         }
 
         .breadcrumb .current {
@@ -390,7 +461,6 @@ $notification_count = getNotificationCount();
             padding: 0.5rem;
             border-radius: var(--radius-md);
             transition: all 0.2s ease;
-            flex-shrink: 0;
         }
 
         .notification-btn:hover {
@@ -422,8 +492,6 @@ $notification_count = getNotificationCount();
             padding: 0.5rem;
             border-radius: var(--radius-md);
             transition: all 0.2s ease;
-            max-width: 200px;
-            overflow: hidden;
         }
 
         .user-menu:hover {
@@ -443,20 +511,9 @@ $notification_count = getNotificationCount();
             font-size: 0.875rem;
         }
 
-        .user-info h4 {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            max-width: 120px;
-        }
-
-        /* Dashboard Content Styles */
+        /* Dashboard Content */
         .dashboard-content {
-            padding: 1.5rem;
             max-width: 100%;
-            overflow-x: hidden;
-            width: 100%;
-            box-sizing: border-box;
         }
 
         /* Hero Section */
@@ -464,22 +521,15 @@ $notification_count = getNotificationCount();
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: var(--text-inverse);
             padding: 2rem 1.5rem;
-            margin: -1.5rem -1.5rem 1.5rem -1.5rem;
+            margin-bottom: 2rem;
             position: relative;
             overflow: hidden;
-            border-radius: 0 0 1.5rem 1.5rem;
-            width: 100%;
-            max-width: 100%;
-            box-sizing: border-box;
+            border-radius: var(--radius-xl);
         }
 
         .hero-content {
             position: relative;
             z-index: 2;
-            max-width: 1200px;
-            margin: 0 auto;
-            width: 100%;
-            box-sizing: border-box;
         }
 
         .hero-title {
@@ -506,8 +556,6 @@ $notification_count = getNotificationCount();
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 1.5rem;
             margin-top: 1.5rem;
-            width: 100%;
-            max-width: 100%;
         }
 
         .hero-stat {
@@ -541,10 +589,7 @@ $notification_count = getNotificationCount();
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 1.25rem;
-            margin-bottom: 1.5rem;
-            width: 100%;
-            max-width: 100%;
-            box-sizing: border-box;
+            margin-bottom: 2rem;
         }
 
         .stat-card {
@@ -555,9 +600,7 @@ $notification_count = getNotificationCount();
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
-            min-width: 0;
-            box-sizing: border-box;
-            max-width: 100%;
+            border: 1px solid var(--border);
         }
 
         .stat-card:hover {
@@ -605,9 +648,6 @@ $notification_count = getNotificationCount();
             color: var(--text-secondary);
             font-size: 0.875rem;
             font-weight: 500;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
         }
 
         .stat-change {
@@ -634,10 +674,8 @@ $notification_count = getNotificationCount();
             border-radius: var(--radius-xl);
             box-shadow: var(--shadow-md);
             text-align: center;
-            margin-bottom: 1.5rem;
-            width: 100%;
-            max-width: 100%;
-            box-sizing: border-box;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
         }
 
         .section-title {
@@ -671,16 +709,13 @@ $notification_count = getNotificationCount();
 
         /* Quick Actions */
         .quick-actions {
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
         }
 
         .actions-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 1.25rem;
-            width: 100%;
-            max-width: 100%;
-            box-sizing: border-box;
         }
 
         .action-card {
@@ -691,10 +726,7 @@ $notification_count = getNotificationCount();
             transition: all 0.3s ease;
             text-decoration: none;
             color: inherit;
-            min-width: 0;
-            box-sizing: border-box;
-            max-width: 100%;
-            overflow: hidden;
+            border: 1px solid var(--border);
         }
 
         .action-card:hover {
@@ -720,19 +752,12 @@ $notification_count = getNotificationCount();
             font-weight: 600;
             margin-bottom: 0.5rem;
             color: var(--text-primary);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
         }
 
         .action-description {
             color: var(--text-secondary);
             font-size: 0.8rem;
             line-height: 1.4;
-            overflow: hidden;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
         }
 
         /* Recent Activity */
@@ -741,9 +766,8 @@ $notification_count = getNotificationCount();
             padding: 1.5rem;
             border-radius: var(--radius-xl);
             box-shadow: var(--shadow-md);
-            margin-bottom: 1.5rem;
-            max-width: 100%;
-            overflow: hidden;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
         }
 
         .activity-item {
@@ -777,9 +801,6 @@ $notification_count = getNotificationCount();
             font-weight: 600;
             color: var(--text-primary);
             margin-bottom: 0.25rem;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
         }
 
         .activity-time {
@@ -791,19 +812,11 @@ $notification_count = getNotificationCount();
         .footer {
             background: var(--surface);
             padding: 1.5rem;
-            border-top: 1px solid var(--border);
+            border: 1px solid var(--border);
             text-align: center;
             color: var(--text-secondary);
-            margin-top: 1.5rem;
+            margin-top: 2rem;
             border-radius: var(--radius-xl);
-            width: 100%;
-            max-width: 100%;
-            box-sizing: border-box;
-        }
-
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
         }
 
         .footer-links {
@@ -812,8 +825,6 @@ $notification_count = getNotificationCount();
             gap: 2rem;
             margin-bottom: 1rem;
             flex-wrap: wrap;
-            max-width: 100%;
-            overflow: hidden;
         }
 
         .footer-links a {
@@ -876,128 +887,44 @@ $notification_count = getNotificationCount();
             to { transform: rotate(360deg); }
         }
 
-        /* Mobile Toggle Button */
-        .mobile-toggle {
-            position: fixed;
-            top: 1rem;
-            left: 1rem;
-            z-index: 200;
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 0.75rem;
-            border-radius: var(--radius-md);
-            cursor: pointer;
-            display: none;
-            box-shadow: var(--shadow-md);
-            transition: all 0.2s ease;
-        }
-
-        .mobile-toggle:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-        }
-
         /* Responsive Design */
-        @media (max-width: 1366px) {
-            :root {
-                --sidebar-width: 240px;
-            }
-            
-            .main-content {
-                margin-left: var(--sidebar-width);
-                width: calc(100vw - var(--sidebar-width));
-            }
-            
-            .dashboard-content {
-                padding: 1.25rem;
-            }
-            
-            .hero-section {
-                padding: 1.75rem 1.25rem;
-                margin: -1.25rem -1.25rem 1.25rem -1.25rem;
-            }
-            
-            .stats-grid {
-                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-                gap: 1rem;
-            }
-            
-            .actions-grid {
-                grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-                gap: 1rem;
-            }
-        }
-
-        @media (max-width: 1024px) {
-            :root {
-                --sidebar-width: 220px;
-            }
-            
-            .main-content {
-                margin-left: var(--sidebar-width);
-                width: calc(100vw - var(--sidebar-width));
-            }
-            
-            .hero-title {
-                font-size: 1.75rem;
-            }
-            
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 1rem;
-            }
-
-            .actions-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 1rem;
-            }
-            
-            .hero-stats {
-                grid-template-columns: repeat(4, 1fr);
-                gap: 1rem;
-            }
-        }
-
         @media (max-width: 768px) {
-            .mobile-toggle {
-                display: block;
+            .mobile-header {
+                display: flex;
             }
-            
+
             .sidebar {
+                top: 70px;
+                height: calc(100vh - 70px);
                 transform: translateX(-100%);
-                position: fixed;
-                z-index: 1000;
             }
-            
-            .sidebar.open {
+
+            .sidebar.active {
                 transform: translateX(0);
             }
-            
+
+            .overlay {
+                display: block;
+                top: 70px;
+                height: calc(100vh - 70px);
+            }
+
             .main-content {
                 margin-left: 0;
+                margin-top: 70px;
+                padding: 1.5rem;
                 width: 100vw;
-                max-width: 100%;
             }
-            
-            .dashboard-content {
-                padding: 1rem;
-            }
-            
-            .hero-section {
-                padding: 1.5rem 1rem;
-                margin: -1rem -1rem 1rem -1rem;
-            }
-            
+
             .hero-title {
                 font-size: 1.5rem;
             }
-            
+
             .stats-grid {
                 grid-template-columns: 1fr;
                 gap: 1rem;
             }
-            
+
             .actions-grid {
                 grid-template-columns: 1fr;
                 gap: 1rem;
@@ -1015,28 +942,53 @@ $notification_count = getNotificationCount();
 
             .top-nav {
                 padding: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .hero-section {
+                padding: 1.5rem 1rem;
+                margin-bottom: 1.5rem;
             }
         }
 
-        @media (min-width: 1920px) {
-            .dashboard-content {
-                max-width: 1600px;
-                margin: 0 auto;
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 1rem;
             }
-        }
 
-        /* Animation performance improvements */
-        @media (prefers-reduced-motion: reduce) {
-            .stat-card,
+            .hero-section {
+                padding: 1rem;
+            }
+
+            .stat-card {
+                padding: 1rem;
+            }
+
             .action-card {
-                transition: none;
+                padding: 1rem;
             }
-            
-            .animate-fade-in {
-                animation: none;
-                opacity: 1;
-                transform: none;
+
+            .recent-activity {
+                padding: 1rem;
             }
+        }
+
+        /* Smooth scrollbar for webkit browsers */
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
         }
 
         /* Utility Classes */
@@ -1053,10 +1005,21 @@ $notification_count = getNotificationCount();
     </style>
 </head>
 <body>
-    <!-- Mobile Toggle Button -->
-    <button class="mobile-toggle" onclick="toggleSidebar()">
-        <i class="fas fa-bars"></i>
-    </button>
+    <!-- Mobile Header -->
+    <header class="mobile-header">
+        <div class="mobile-logo">
+            <i class="fas fa-shield-alt"></i>
+            VoteAdmin
+        </div>
+        <button class="hamburger" id="hamburgerBtn">
+            <svg class="hamburger-icon" viewBox="0 0 24 24">
+                <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+            </svg>
+        </button>
+    </header>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
 
     <div class="dashboard">
         <!-- Sidebar -->
@@ -1375,11 +1338,33 @@ $notification_count = getNotificationCount();
 
     <!-- JavaScript for Interactivity -->
     <script>
-        // Toggle sidebar on mobile
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('open');
-        }
+        // Mobile navigation functions
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+
+        // Toggle mobile menu
+        hamburgerBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+            hamburgerBtn.classList.toggle('active');
+        });
+
+        // Close menu when overlay is clicked
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+            hamburgerBtn.classList.remove('active');
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+                hamburgerBtn.classList.remove('active');
+            }
+        });
 
         // User dropdown toggle
         function toggleUserDropdown() {
@@ -1391,12 +1376,14 @@ $notification_count = getNotificationCount();
         // Close sidebar when clicking outside on mobile
         document.addEventListener('click', function(event) {
             const sidebar = document.getElementById('sidebar');
-            const toggleButton = document.querySelector('.mobile-toggle');
+            const toggleButton = document.querySelector('.hamburger');
             
             if (window.innerWidth <= 768 && 
                 !sidebar.contains(event.target) && 
                 !toggleButton.contains(event.target)) {
-                sidebar.classList.remove('open');
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+                hamburgerBtn.classList.remove('active');
             }
         });
 
@@ -1452,11 +1439,13 @@ $notification_count = getNotificationCount();
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                     const sidebar = document.getElementById('sidebar');
-                    sidebar.classList.remove('open');
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                    hamburgerBtn.classList.remove('active');
                 }
             });
 
-            console.log('Dashboard initialized successfully');
+            console.log('Dashboard with Modern Sidebar initialized successfully');
         });
 
         // Session timeout handling
@@ -1471,6 +1460,14 @@ $notification_count = getNotificationCount();
             }
         }, sessionTimeout - 300000);
         <?php endif; ?>
+
+        console.log('Admin Dashboard with Modern Sidebar initialized');
+        console.log('Navigation features:', {
+            'mobileToggle': 'Hamburger menu for mobile devices',
+            'responsiveDesign': 'Adaptive layout for all screen sizes',
+            'keyboardSupport': 'ESC key closes mobile menu',
+            'animations': 'Smooth transitions and number animations'
+        });
     </script>
 </body>
 </html>

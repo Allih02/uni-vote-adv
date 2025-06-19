@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Need Help - University Voting System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background-color: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .help-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            padding: 2rem;
+        }
+
+        .help-card h1 {
+            color: #1f2937;
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .faq-section {
+            margin-bottom: 2rem;
+        }
+
+        .faq-item {
+            margin-bottom: 1.5rem;
+        }
+
+        .faq-question {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .faq-answer {
+            color: #4b5563;
+            line-height: 1.5;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: #3b82f6;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .back-button:hover {
+            background-color: #2563eb;
+        }
+
+        @media (max-width: 480px) {
+            .help-card {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="help-card">
+        <h1>Need Help?</h1>
+        
+        <div class="faq-section">
+            <div class="faq-item">
+                <div class="faq-question">How do I log in to the voting system?</div>
+                <div class="faq-answer">Use your university student ID and password to log in through the Student Login portal. If you're an administrator, use your admin credentials through the Administrator Login.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">I forgot my password. What should I do?</div>
+                <div class="faq-answer">Click on the "Forgot Password" link on the login page. You'll receive password reset instructions on your university email address.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">How do I cast my vote?</div>
+                <div class="faq-answer">After logging in, you'll see available elections. Click on an election, select your candidate, and confirm your vote. You'll receive a confirmation message once your vote is recorded.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Is my vote confidential?</div>
+                <div class="faq-answer">Yes, all votes are encrypted and anonymous. While the system verifies your eligibility to vote, it does not store any connection between your identity and your voting choice.</div>
+            </div>
+        </div>
+
+        <div style="text-align: center;">
+            <a href="home.html" class="back-button">Back to Home</a>
+        </div>
+    </div>
+</body>
+</html>
