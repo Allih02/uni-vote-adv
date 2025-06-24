@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security - University Voting System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            scroll-behavior: smooth;
+        }
+        
+        .hero-gradient {
+            background-image: linear-gradient(135deg, #6366F1 0%, #3B82F6 50%, #2563EB 100%);
+        }
+        
+        .section-heading:after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 3px;
+            background-color: #3B82F6;
+            margin: 15px auto 0;
+        }
+        
+        .security-card {
+            transition: all 0.3s ease;
+        }
+        
+        .security-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .security-layer {
+            position: relative;
+        }
+        
+        .security-layer:after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: -20px;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 20px;
+            background-color: #3B82F6;
+        }
+        
+        .security-layer:last-child:after {
+            display: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-indigo-900 via-blue-800 to-blue-700 text-white">
+    <!-- Navigation Bar -->
+    <nav class="bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg fixed w-full z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <a href="home.html">
+                            <i class="fas fa-vote-yea text-2xl text-white"></i>
+                        </a>
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-4">
+                            <a href="home.html" class="px-3 py-2 rounded-md text-sm font-medium text-gray-200 hover:text-white hover:bg-blue-600">Home</a>
+                            <a href="learn-more.html" class="px-3 py-2 rounded-md text-sm font-medium text-gray-200 hover:text-white hover:bg-blue-600">Learn More</a>
+                            <a href="mission.html" class="px-3 py-2 rounded-md text-sm font-medium text-gray-200 hover:text-white hover:bg-blue-600">Our Mission</a>
+                            <a href="security.html" class="px-3 py-2 rounded-md text-sm font-medium text-white bg-blue-600">Security</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-4 flex items-center md:ml-6">
+                        <a href="student/register.php" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-blue-600 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Log In / Register
+                        </a>
+                    </div>
+                </div>
+                <div class="-mr-2 flex md:hidden">
+                    <button type="button" class="bg-blue-800 inline-flex items-center justify-center p-2 rounded-md text-gray-200 hover:text-white hover:bg-blue-700 focus:outline-none">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="pt-24 pb-16 hero-gradient">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-4 animate__animated animate__fadeInDown">
+                Our Security <span class="text-blue-200">Architecture</span>
+            </h1>
+            <p class="mt-3 text-xl text-blue-100 sm:mt-5 max-w-3xl mx-auto animate__animated animate__fadeIn" style="animation-delay: 0.2s">
+                Industry-leading protections ensuring election integrity and voter privacy
+            </p>
+        </div>
+    </div>
+
+    <!-- Security Approach Section -->
+    <section class="py-20 bg-gradient-to-b from-indigo-900 to-blue-900">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl mb-4 section-heading">
+                    Our Security <span class="text-blue-400">Approach</span>
+                </h2>
+                <p class="mt-4 max-w-3xl mx-auto text-lg text-blue-100">
+                    We've built our platform with security as the foundational principle, not an afterthought
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <div class="security-card bg-white bg-opacity-10 rounded-xl p-8 backdrop-filter backdrop-blur-sm">
+                    <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mb-6 mx-auto">
+                        <i class="fas fa-shield-alt text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4 text-center">Defense in Depth</h3>
+                    <p class="text-blue-100 text-center">
+                        We implement multiple layers of security controls, so that if one layer is compromised, others remain intact to protect your data and election integrity.
+                    </p>
+                </div>
+                
+                <div class="security-card bg-white bg-opacity-10 rounded-xl p-8 backdrop-filter backdrop-blur-sm">
+                    <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mb-6 mx-auto">
+                        <i class="fas fa-eye-slash text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4 text-center">Privacy by Design</h3>
+                    <p class="text-blue-100 text-center">
+                        We build privacy protections into every aspect of our system, ensuring that voter anonymity is preserved while maintaining verifiability.
+                    </p>
+                </div>
+                
+                <div class="security-card bg-white bg-opacity-10 rounded-xl p-8 backdrop-filter backdrop-blur-sm">
+                    <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mb-6 mx-auto">
+                        <i class="fas fa-search text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4 text-center">Transparency & Auditability</h3>
+                    <p class="text-blue-100 text-center">
+                        Our systems are designed to be transparent and auditable by independent parties, without compromising security or voter privacy.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="mt-20 bg-white bg-opacity-5 rounded-xl p-8 backdrop-filter backdrop-blur-sm">
+                <h3 class="text-2xl font-bold mb-6 text-center">Security Certifications & Compliance</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                    <div>
+                        <div class="bg-white bg-opacity-10 rounded-full p-4 w-20 h-20 flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-lock text-blue-300 text-3xl"></i>
+                        </div>
+                        <p class="font-medium">ISO 27001</p>
+                        <p class="text-sm text-blue-300">Information Security</p>
+                    </div>
+                    
+                    <div>
+                        <div class="bg-white bg-opacity-10 rounded-full p-4 w-20 h-20 flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-cloud text-blue-300 text-3xl"></i>
+                        </div>
+                        <p class="font-medium">SOC 2 Type II</p>
+                        <p class="text-sm text-blue-300">Security & Privacy</p>
+                    </div>
+                    
+                    <div>
+                        <div class="bg-white bg-opacity-10 rounded-full p-4 w-20 h-20 flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-fingerprint text-blue-300 text-3xl"></i>
+                        </div>
+                        <p class="font-medium">GDPR</p>
+                        <p class="text-sm text-blue-300">Compliant</p>
+                    </div>
+                    
+                    <div>
+                        <div class="bg-white bg-opacity-10 rounded-full p-4 w-20 h-20 flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-user-shield text-blue-300 text-3xl"></i>
+                        </div>
+                        <p class="font-medium">FERPA</p>
+                        <p class="text-sm text-blue-300">Compliant</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Security Architecture Section -->
+    <section class="py-20 bg-gradient-to-b from-blue-900 to-indigo-900">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl mb-4 section-heading">
+                    Multi-Layered <span class="text-blue-400">Protection</span>
+                </h2>
+                <p class="mt-4 max-w-3xl mx-auto text-lg text-blue-100">
+                    How our defense-in-depth strategy protects every aspect of the electoral process
+                </p>
+            </div>
+            
+            <div class="relative">
+                <!-- Layer 1 -->
+                <div class="security-layer flex flex-col items-center mb-14">
+                    <div class="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-users text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">User Authentication</h3>
+                    <div class="bg-white bg-opacity-10 rounded-xl p-6 backdrop-filter backdrop-blur-sm max-w-4xl">
+                        <p class="text-blue-100 mb-4">
+                            Our multi-factor authentication system ensures that only eligible voters can access the platform:
+                        </p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="bg-white bg-opacity-5 p-4 rounded-lg">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-envelope text-blue-400 mr-2"></i>
+                                    <span class="font-medium">Institutional Email</span>
+                                </div>
+                                <p class="text-sm text-blue-200">
+                                    Verification through university-issued email domains ensures users are affiliated with the institution.
+                                </p>
+                            </div>
+                            
+                            <div class="bg-white bg-opacity-5 p-4 rounded-lg">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-key text-blue-400 mr-2"></i>
+                                    <span class="font-medium">Unique Token</span>
+                                </div>
+                                <p class="text-sm text-blue-200">
+                                    One-time tokens verified against university records provide a second layer of identity confirmation.
+                                </p>
+                            </div>
+                            
+                            <div class="bg-white bg-opacity-5 p-4 rounded-lg">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-mobile-alt text-blue-400 mr-2"></i>
+                                    <span class="font-medium">Device Verification</span>
+                                </div>
+                                <p class="text-sm text-blue-200">
+                                    Optional second-factor authentication through mobile devices adds an additional security layer.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Layer 2 -->
+                <div class="security-layer flex flex-col items-center mb-14">
+                    <div class="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-exchange-alt text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Data Transmission</h3>
+                    <div class="bg-white bg-opacity-10 rounded-xl p-6 backdrop-filter backdrop-blur-sm max-w-4xl">
+                        <p class="text-blue-100 mb-4">
+                            All data moving between users and our servers is protected with industry-leading encryption:
+                        </p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="bg-white bg-opacity-5 p-4 rounded-lg">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-lock text-blue-400 mr-2"></i>
+                                    <span class="font-medium">TLS 1.3 Encryption</span>
+                                </div>
+                                <p class="text-sm text-blue-200">
+                                    The latest Transport Layer Security protocols ensure all connections are secure and encrypted.
+                                </p>
+                            </div>
+                            
+                            <div class="bg-white bg-opacity-5 p-4 rounded-lg">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-certificate text-blue-400 mr-2"></i>
+                                    <span class="font-medium">Certificate Pinning</span>
+                                </div>
+                                <p class="text-sm text-blue-200">
+                                    Protects against man-in-the-middle attacks by validating server certificates against known good certificates.
+                                </p>
+                            </div>
+                            
+                            <div class="bg-white bg-opacity-5 p-4 rounded-lg">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-arrow-alt-circle-right text-blue-400 mr-2"></i>
+                                    <span class="font-medium">Forward Secrecy</span>
+                                </div>
+                                <p class="text-sm text-blue-200">
+                                    Ensures that session keys cannot be compromised even if the server's private key is compromised.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Layer 3 -->
+                <div class="security-layer flex flex-col items-center mb-14">
+                    <div class="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-database text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Data Storage</h3>
+                    <div class="bg-white bg-opacity-10 rounded-xl p-6 backdrop-filter backdrop-blur-sm max-w-4xl">
+                        <p class="text-blue-100 mb-4">
+                            All stored data is protected through multiple security mechanisms:
+                        </p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="bg-white bg-opacity-5 p-4 rounded-lg">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-file-alt text-blue-400 mr-2"></i>
+                                    <span class="font-medium">Encryption at Rest</span>
+                                </div>
+                                <p class="text-sm text-blue-200">
+                                    AES-256 encryption protects all data stored in our databases, with keys managed through a secure key management system.
+                                </p>
+                            </div>
+                            
+                            <div class="bg-white bg-opacity-5 p-4 rounded-lg">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-random text-blue-400 mr-2"></i>
+                                    <span class="font-medium">Data Segregation</span>
+                                </div>
+                                <p class="text-sm text-blue-200">
+                                    Voter identities and ballot choices are stored in separate databases with different encryption keys to ensure anonymity.
+                                </p>
+                            </div>
+                            
+                            <div class="bg-white bg-opacity-5 p-4 rounded-lg">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-server text-blue-400 mr-2"></i>
+                                    <span class="font-medium">Secure Infrastructure</span>
+                                </div>
+                                <p class="text-sm text-blue-200">
+                                    Hosted in SOC 2 compliant data centers with physical security, redundant systems, and continuous monitoring.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Layer 4 -->
+                <div class="security-layer flex flex-col items-center mb-14">
+                    <div class="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-link text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Blockchain Verification</h3>
+                    <div class="bg-white bg-opacity-10 rounded-xl p-6 backdrop-filter backdrop-blur-sm max-w-4xl">
+                        <p class="text-blue-100 mb-4">
+                            Our proprietary blockchain system ensures vote integrity without compromising anonymity:
+                        </p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="bg-white bg-opacity-5 p-4 rounded-lg">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-fingerprint text-blue-400 mr-2"></i>
+                                    <span class="font-medium">Immutable Record</span>
+                                </div>
+                                <p class="text-sm text-blue-200">
+                                    Each vote is cryptographically sealed in the blockchain, creating a tamper-proof record that can be verified but not altered.
+                                </p>
+                            </div>
+                            
+                            <div class="bg-white bg-opacity-5 p-4 rounded-lg">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-mask text-blue-400 mr-2"></i>
+                                    <span class="font-medium">Zero-Knowledge Proofs</span>
+                                </div>
+                                <p class="text-sm text-blue-200">
+                                    Cryptographic techniques allow verification that a vote was counted correctly without revealing the voter's identity.
+                                </p>
+                            </div>
+                            
+                            <div class="bg-white bg-opacity-5 p-4 rounded-lg">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-eye text-blue-400 mr-2"></i>
+                                    <span class="font-medium">Public Verifiability</span>
+                                </div>
+                                <p class="text-sm text-blue-200">
+                                    Each voter receives a receipt code that allows them to verify their vote was included in the final tally without revealing their choices.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Layer 5 -->
+                <div class="security-layer flex flex-col items-center">
+                    <div class="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-shield-virus text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Threat Protection</h3>
+                    <div class="bg-white bg-opacity-10 rounded-xl p-6 backdrop-filter backdrop-blur-sm max-w-4xl">
+                        <p class="text-blue-100 mb-4">
+                            Active defenses against various attack vectors protect the platform from external threats:
+                        </p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="bg-white bg-opacity-5 p-4 rounded-lg">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-filter text-blue-400 mr-2"></i>
+                                    <span class="font-medium">DDoS Protection</span>
+                                </div>
+                                <p class="text-sm text-blue-200">
+                                    Advanced traffic filtering and rate limiting prevent denial-of-service attacks during critical election periods.
+                                </p>
+                            </div>
+                            
+                            <div class="bg-white bg-opacity-5 p-4 rounded-lg">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-bug text-blue-400 mr-2"></i>
+                                    <span class="font-medium">Intrusion Detection</span>
+                                </div>
+                                <p class="text-sm text-blue-200">
+                                    Real-time monitoring systems detect and block suspicious activities and potential intrusion attempts.
+                                </p>
+                            </div>
+                            
+                            <div class="bg-white bg-opacity-5 p-4 rounded-lg">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-code text-blue-400 mr-2"></i>
+                                    <span class="font-medium">Secure Development</span>
+                                </div>
+                                <p class="text-sm text-blue-200">
+                                    Rigorous code reviews, static analysis, and penetration testing identify and remediate vulnerabilities before deployment.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Security Testing Section -->
+    <section class="py-20 bg-gradient-to-b from-indigo-900 to-blue-900">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl mb-4 section-heading">
+                    Rigorous <span class="text-blue-400">Testing</span>
+                </h2>
+                <p class="mt-4 max-w-3xl mx-auto text-lg text-blue-100">
+                    How we continually validate and improve our security measures
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <div class="security-card bg-white bg-opacity-10 rounded-xl p-8 backdrop-filter backdrop-blur-sm">
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-users-cog text-blue-400 mr-3"></i>
+                        Independent Security Audits
+                    </h3>
+                    <p class="text-blue-100 mb-4">
+                        Our platform undergoes regular security audits by independent third-party firms:
+                    </p>
+                    <ul class="list-disc pl-5 text-blue-100 space-y-2">
+                        <li>Comprehensive security assessments before each major election cycle</li>
+                        <li>Code reviews by experienced security professionals</li>
+                        <li>Architecture reviews to identify potential design weaknesses</li>
+                        <li>Compliance audits to ensure adherence to industry standards</li>
+                        <li>Full reports provided to client institutions upon request</li>
+                    </ul>
+                </div>
+                
+                <div class="security-card bg-white bg-opacity-10 rounded-xl p-8 backdrop-filter backdrop-blur-sm">
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-user-ninja text-blue-400 mr-3"></i>
+                        Penetration Testing
+                    </h3>
+                    <p class="text-blue-100 mb-4">
+                        We conduct regular penetration tests to identify and address potential vulnerabilities:
+                    </p>
+                    <ul class="list-disc pl-5 text-blue-100 space-y-2">
+                        <li>Red team exercises simulating sophisticated attack scenarios</li>
+                        <li>Web application penetration testing to identify vulnerabilities</li>
+                        <li>API security testing to ensure proper controls</li>
+                        <li>Network security testing to verify infrastructure protections</li>
+                        <li>Social engineering simulations to test human security factors</li>
+                    </ul>
+                </div>
+                
+                <div class="security-card bg-white bg-opacity-10 rounded-xl p-8 backdrop-filter backdrop-blur-sm">
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-trophy text-blue-400 mr-3"></i>
+                        Bug Bounty Program
+                    </h3>
+                    <p class="text-blue-100 mb-4">
+                        We maintain an active bug bounty program to engage the global security community:
+                    </p>
+                    <ul class="list-disc pl-5 text-blue-100 space-y-2">
+                        <li>Financial rewards for responsible disclosure of security vulnerabilities</li>
+                        <li>Collaboration with ethical hackers worldwide</li>
+                        <li>Public recognition for significant security contributions</li>
+                        <li>Rapid response team to address identified issues</li>
+                        <li>Transparency in disclosure of resolved vulnerabilities</li>
+                    </ul>
+                </div>
+                
+                <div class="security-card bg-white bg-opacity-10 rounded-xl p-8 backdrop-filter backdrop-blur-sm">
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-sitemap text-blue-400 mr-3"></i>
+                        Mock Elections
+                    </h3>
+                    <p class="text-blue-100 mb-4">
+                        We conduct simulated elections to test both security and performance:
+                    </p>
+                    <ul class="list-disc pl-5 text-blue-100 space-y-2">
+                        <li>Full-scale simulations with thousands of concurrent voters</li>
+                        <li>Load testing to ensure performance under peak conditions</li>
+                        <li>Adversarial scenarios with simulated attack attempts</li>
+                        <li>End-to-end verification of the electoral process</li>
+                        <li>Disaster recovery testing to ensure resilience</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Security Research Section -->
+    <section class="py-20 bg-gradient-to-b from-blue-900 to-indigo-900">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl mb-4 section-heading">
+                    Security <span class="text-blue-400">Research</span>
+                </h2>
+                <p class="mt-4 max-w-3xl mx-auto text-lg text-blue-100">
+                    Our ongoing commitment to advancing electoral security technology
+                </p>
+            </div>
+            
+            <div class="bg-white bg-opacity-10 rounded-xl p-8 backdrop-filter backdrop-blur-sm mb-10">
+                <div class="md:flex items-start">
+                    <div class="md:w-1/4 mb-6 md:mb-0 md:pr-8">
+                        <div class="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mb-4 mx-auto md:mx-0">
+                            <i class="fas fa-flask text-3xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 text-center md:text-left">Research Initiatives</h3>
+                    </div>
+                    <div class="md:w-3/4">
+                        <p class="text-blue-100 mb-6">
+                            Our security team actively contributes to the field of election security through ongoing research in several key areas:
+                        </p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-white bg-opacity-5 p-5 rounded-lg">
+                                <h4 class="font-bold mb-2 flex items-center">
+                                    <i class="fas fa-lock text-blue-400 mr-2"></i>
+                                    Post-Quantum Cryptography
+                                </h4>
+                                <p class="text-sm text-blue-200">
+                                    Developing and implementing cryptographic methods that will remain secure even with the advent of quantum computing technologies, ensuring long-term protection of electoral data.
+                                </p>
+                            </div>
+                            
+                            <div class="bg-white bg-opacity-5 p-5 rounded-lg">
+                                <h4 class="font-bold mb-2 flex items-center">
+                                    <i class="fas fa-user-secret text-blue-400 mr-2"></i>
+                                    Privacy-Preserving Authentication
+                                </h4>
+                                <p class="text-sm text-blue-200">
+                                    Creating advanced authentication methods that verify voter eligibility without collecting or storing unnecessary personal information, enhancing both security and privacy.
+                                </p>
+                            </div>
+                            
+                            <div class="bg-white bg-opacity-5 p-5 rounded-lg">
+                                <h4 class="font-bold mb-2 flex items-center">
+                                    <i class="fas fa-brain text-blue-400 mr-2"></i>
+                                    AI-Powered Threat Detection
+                                </h4>
+                                <p class="text-sm text-blue-200">
+                                    Leveraging machine learning to identify potential security threats in real-time, allowing for proactive defense against evolving attack vectors during critical election periods.
+                                </p>
+                            </div>
+                            
+                            <div class="bg-white bg-opacity-5 p-5 rounded-lg">
+                                <h4 class="font-bold mb-2 flex items-center">
+                                    <i class="fas fa-universal-access text-blue-400 mr-2"></i>
+                                    Accessible Security
+                                </h4>
+                                <p class="text-sm text-blue-200">
+                                    Researching methods to maintain robust security while ensuring the platform remains accessible to all voters, including those with disabilities or limited technological literacy.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white bg-opacity-10 rounded-xl p-8 backdrop-filter backdrop-blur-sm mb-10">
+                <div class="md:flex items-start">
+                    <div class="md:w-1/4 mb-6 md:mb-0 md:pr-8">
+                        <div class="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mb-4 mx-auto md:mx-0">
+                            <i class="fas fa-book-open text-3xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 text-center md:text-left">Publications</h3>
+                    </div>
+                    <div class="md:w-3/4">
+                        <p class="text-blue-100 mb-6">
+                            Our team regularly publishes research findings in peer-reviewed journals and conferences:
+                        </p>
+                        <div class="space-y-4">
+                            <div class="bg-white bg-opacity-5 p-5 rounded-lg">
+                                <h4 class="font-bold mb-1">"Ensuring Voter Privacy in University Elections: A Zero-Knowledge Approach"</h4>
+                                <p class="text-sm text-blue-300 mb-2">International Conference on Electronic Voting, 2024</p>
+                                <p class="text-sm text-blue-200">
+                                    This paper presents our novel implementation of zero-knowledge proofs that allow voters to verify their votes while maintaining complete anonymity.
+                                </p>
+                            </div>
+                            
+                            <div class="bg-white bg-opacity-5 p-5 rounded-lg">
+                                <h4 class="font-bold mb-1">"Blockchain-Based Verification for Student Government Elections"</h4>
+                                <p class="text-sm text-blue-300 mb-2">Journal of Cybersecurity Education, 2023</p>
+                                <p class="text-sm text-blue-200">
+                                    A comprehensive examination of our blockchain implementation for verifiable university elections, including performance metrics and security analysis.
+                                </p>
+                            </div>
+                            
+                            <div class="bg-white bg-opacity-5 p-5 rounded-lg">
+                                <h4 class="font-bold mb-1">"Defense in Depth: A Multi-Layered Approach to University Election Security"</h4>
+                                <p class="text-sm text-blue-300 mb-2">Applied Cybersecurity Conference, 2023</p>
+                                <p class="text-sm text-blue-200">
+                                    This paper details our comprehensive security architecture and how multiple layers of protection ensure election integrity against various threat models.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white bg-opacity-10 rounded-xl p-8 backdrop-filter backdrop-blur-sm">
+                <div class="md:flex items-start">
+                    <div class="md:w-1/4 mb-6 md:mb-0 md:pr-8">
+                        <div class="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mb-4 mx-auto md:mx-0">
+                            <i class="fas fa-users text-3xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 text-center md:text-left">Collaborations</h3>
+                    </div>
+                    <div class="md:w-3/4">
+                        <p class="text-blue-100 mb-6">
+                            We actively collaborate with academic and industry partners to advance election security:
+                        </p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-white bg-opacity-5 p-5 rounded-lg">
+                                <h4 class="font-bold mb-2 flex items-center">
+                                    <i class="fas fa-university text-blue-400 mr-2"></i>
+                                    Academic Partnerships
+                                </h4>
+                                <p class="text-sm text-blue-200">
+                                    We partner with cybersecurity departments at leading universities to research advanced electoral security methods and train the next generation of security professionals.
+                                </p>
+                            </div>
+                            
+                            <div class="bg-white bg-opacity-5 p-5 rounded-lg">
+                                <h4 class="font-bold mb-2 flex items-center">
+                                    <i class="fas fa-hands-helping text-blue-400 mr-2"></i>
+                                    Industry Consortiums
+                                </h4>
+                                <p class="text-sm text-blue-200">
+                                    We are active members of industry groups focused on election security and standard development, sharing knowledge while maintaining competitive security.
+                                </p>
+                            </div>
+                            
+                            <div class="bg-white bg-opacity-5 p-5 rounded-lg">
+                                <h4 class="font-bold mb-2 flex items-center">
+                                    <i class="fas fa-globe text-blue-400 mr-2"></i>
+                                    Open Source Contributions
+                                </h4>
+                                <p class="text-sm text-blue-200">
+                                    We contribute to and maintain several open-source security tools, allowing broader adoption of secure electoral practices around the world.
+                                </p>
+                            </div>
+                            
+                            <div class="bg-white bg-opacity-5 p-5 rounded-lg">
+                                <h4 class="font-bold mb-2 flex items-center">
+                                    <i class="fas fa-balance-scale text-blue-400 mr-2"></i>
+                                    Standards Development
+                                </h4>
+                                <p class="text-sm text-blue-200">
+                                    Our security team participates in the development of industry standards for electronic voting systems, ensuring best practices are codified and adopted.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Security Team Section -->
+    <section class="py-20 bg-gradient-to-b from-indigo-900 to-blue-900">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl mb-4 section-heading">
+                    Our Security <span class="text-blue-400">Team</span>
+                </h2>
+                <p class="mt-4 max-w-3xl mx-auto text-lg text-blue-100">
+                    Meet the experts who design, implement, and maintain our security systems
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <div class="security-card bg-white bg-opacity-10 rounded-xl p-8 backdrop-filter backdrop-blur-sm text-center">
+                    <div class="w-24 h-24 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full flex items-center justify-center mb-6 mx-auto">
+                        <span class="text-2xl font-bold">JL</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-1">Dr. Jennifer Lee</h3>
+                    <p class="text-blue-300 mb-4">Chief Security Officer</p>
+                    <p class="text-blue-100 mb-6">
+                        Former DARPA researcher with over 15 years of experience in cryptography and secure systems design. Ph.D. in Computer Science from MIT.
+                    </p>
+                    <div class="flex justify-center space-x-4">
+                        <a href="#" class="text-blue-300 hover:text-white"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" class="text-blue-300 hover:text-white"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+                
+                <div class="security-card bg-white bg-opacity-10 rounded-xl p-8 backdrop-filter backdrop-blur-sm text-center">
+                    <div class="w-24 h-24 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full flex items-center justify-center mb-6 mx-auto">
+                        <span class="text-2xl font-bold">MR</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-1">Marcus Rivera</h3>
+                    <p class="text-blue-300 mb-4">Director of Threat Intelligence</p>
+                    <p class="text-blue-100 mb-6">
+                        Former cybersecurity lead at a major tech company with expertise in threat modeling and adversarial thinking. CISSP and OSCP certified.
+                    </p>
+                    <div class="flex justify-center space-x-4">
+                        <a href="#" class="text-blue-300 hover:text-white"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" class="text-blue-300 hover:text-white"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+                
+                <div class="security-card bg-white bg-opacity-10 rounded-xl p-8 backdrop-filter backdrop-blur-sm text-center">
+                    <div class="w-24 h-24 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full flex items-center justify-center mb-6 mx-auto">
+                        <span class="text-2xl font-bold">SK</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-1">Dr. Sarah Kim</h3>
+                    <p class="text-blue-300 mb-4">Lead Cryptography Researcher</p>
+                    <p class="text-blue-100 mb-6">
+                        Blockchain and zero-knowledge proof specialist with multiple published papers on electronic voting security. Ph.D. in Applied Cryptography.
+                    </p>
+                    <div class="flex justify-center space-x-4">
+                        <a href="#" class="text-blue-300 hover:text-white"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" class="text-blue-300 hover:text-white"><i class="fas fa-book"></i></a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-16 text-center">
+                <a href="careers.html" class="inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-blue-700 bg-white hover:bg-blue-50 transition">
+                    Join Our Security Team
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Security FAQ Section -->
+    <section class="py-20 bg-gradient-to-b from-blue-900 to-indigo-900">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-extrabold tracking-tight sm:text-4xl mb-4 section-heading">
+                    Security <span class="text-blue-400">FAQ</span>
+                </h2>
+                <p class="mt-4 max-w-3xl mx-auto text-lg text-blue-100">
+                    Common questions about our security approach
+                </p>
+            </div>
+            
+            <div class="space-y-6">
+                <div class="bg-white bg-opacity-10 rounded-xl p-6 backdrop-filter backdrop-blur-sm">
+                    <h3 class="text-xl font-bold mb-3">How do you ensure votes remain anonymous?</h3>
+                    <p class="text-blue-100">
+                        We use a cryptographic technique called "blind signatures" to separate voter identity from their ballot choices. When a voter is authenticated, they receive a digitally signed token that allows them to cast a vote without revealing their identity. This process is similar to receiving a sealed envelope that has been stamped as valid—the stamp proves the envelope came from an authorized source, but doesn't reveal who's inside the envelope.
+                    </p>
+                </div>
+                
+                <div class="bg-white bg-opacity-10 rounded-xl p-6 backdrop-filter backdrop-blur-sm">
+                    <h3 class="text-xl font-bold mb-3">Can voters verify their votes were counted correctly?</h3>
+                    <p class="text-blue-100">
+                        Yes. Each voter receives a unique verification code after casting their ballot. This code allows them to verify that their vote was recorded correctly in the final tally without revealing their specific choices to anyone else. This provides transparency while maintaining the secrecy of the ballot.
+                    </p>
+                </div>
+                
+                <div class="bg-white bg-opacity-10 rounded-xl p-6 backdrop-filter backdrop-blur-sm">
+                    <h3 class="text-xl font-bold mb-3">What happens if there's a system failure during an election?</h3>
+                    <p class="text-blue-100">
+                        Our system is designed with multiple redundancies. All votes are immediately written to multiple distributed databases, so no vote is ever lost, even in the event of hardware failure. We also have automatic failover systems that can switch to backup servers in milliseconds if primary systems experience issues. For critical elections, we deploy additional standby systems that can be activated if needed.
+                    </p>
+                </div>
+                
+                <div class="bg-white bg-opacity-10 rounded-xl p-6 backdrop-filter backdrop-blur-sm">
+                    <h3 class="text-xl font-bold mb-3">How do you prevent someone from voting multiple times?</h3>
+                    <p class="text-blue-100">
+                        Our system maintains a secure registry of eligible voters that is updated in real-time as votes are cast. Once a voter has cast their ballot, their status is immediately updated to prevent additional votes. This registry is separate from the actual votes cast, preserving anonymity while preventing duplicate voting.
+                    </p>
+                </div>
+                
+                <div class="bg-white bg-opacity-10 rounded-xl p-6 backdrop-filter backdrop-blur-sm">
+                    <h3 class="text-xl font-bold mb-3">Have your systems ever been breached?</h3>
+                    <p class="text-blue-100">
+                        No. While we regularly conduct penetration testing and security exercises that simulate attacks, our production systems have never experienced a successful security breach. We attribute this to our defense-in-depth approach and continuous security monitoring. However, we never become complacent—we constantly evolve our security measures to address emerging threats.
+                    </p>
+                </div>
+                
+                <div class="bg-white bg-opacity-10 rounded-xl p-6 backdrop-filter backdrop-blur-sm">
+                    <h3 class="text-xl font-bold mb-3">What security standards do you comply with?</h3>
+                    <p class="text-blue-100">
+                        Our platform complies with ISO 27001 for information security management, SOC 2 Type II for security and privacy controls, GDPR for data protection, and FERPA for educational records privacy. We also follow NIST cybersecurity framework guidelines and election-specific security best practices published by the Center for Democracy & Technology.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Security Contact Section -->
+    <section class="py-20 bg-gradient-to-r from-blue-600 to-indigo-700">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-2xl font-bold mb-6">Security Concerns or Questions?</h2>
+            <p class="text-blue-100 mb-8 max-w-2xl mx-auto">
+                If you have specific security questions or want to report a potential vulnerability, our security team is ready to assist
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+                <a href="mailto:security@universityvoter.com" class="bg-white bg-opacity-10 rounded-xl p-6 flex flex-col items-center hover:bg-opacity-20 transition">
+                    <i class="fas fa-envelope text-3xl mb-4"></i>
+                    <h3 class="font-bold mb-2">Email Our Security Team</h3>
+                    <p class="text-blue-200">security@universityvoter.com</p>
+                </a>
+                
+                <a href="security-report.html" class="bg-white bg-opacity-10 rounded-xl p-6 flex flex-col items-center hover:bg-opacity-20 transition">
+                    <i class="fas fa-bug text-3xl mb-4"></i>
+                    <h3 class="font-bold mb-2">Report a Vulnerability</h3>
+                    <p class="text-blue-200">Submit through our secure portal</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-indigo-900 pt-12 pb-6">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">About</h3>
+                    <ul class="space-y-2">
+                        <li><a href="mission.html" class="text-blue-200 hover:text-white">Our Mission</a></li>
+                        <li><a href="security.html" class="text-white hover:text-white">Security</a></li>
+                        <li><a href="privacy.html" class="text-blue-200 hover:text-white">Privacy Policy</a></li>
+                        <li><a href="terms.html" class="text-blue-200 hover:text-white">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Resources</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-blue-200 hover:text-white">Help Center</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">User Guide</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">API Documentation</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">Developer Resources</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Features</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-blue-200 hover:text-white">Candidate Profiles</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">Real-time Results</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">Voter Statistics</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">Election Archives</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Connect</h3>
+                    <div class="flex space-x-4 mb-4">
+                        <a href="#" class="text-blue-200 hover:text-white"><i class="fab fa-twitter text-xl"></i></a>
+                        <a href="#" class="text-blue-200 hover:text-white"><i class="fab fa-facebook text-xl"></i></a>
+                        <a href="#" class="text-blue-200 hover:text-white"><i class="fab fa-instagram text-xl"></i></a>
+                        <a href="#" class="text-blue-200 hover:text-white"><i class="fab fa-linkedin text-xl"></i></a>
+                    </div>
+                    <p class="text-blue-200">Email us: <a href="mailto:contact@universityvoter.com" class="hover:text-white">contact@universityvoter.com</a></p>
+                </div>
+            </div>
+            <div class="border-t border-blue-800 pt-6 text-center text-sm text-blue-300">
+                <p>© 2025 University Voting System. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Animation on Scroll -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js"></script>
+    <script>
+        // Initialize animations
+        new WOW().init();
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

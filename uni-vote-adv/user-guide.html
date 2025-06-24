@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Guide - University Voting System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            scroll-behavior: smooth;
+        }
+        
+        .hero-gradient {
+            background-image: linear-gradient(135deg, #6366F1 0%, #3B82F6 50%, #2563EB 100%);
+        }
+        
+        .section-heading:after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 3px;
+            background-color: #3B82F6;
+            margin: 15px 0 0;
+        }
+        
+        .guide-card {
+            transition: all 0.3s ease;
+        }
+        
+        .guide-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .toc-link {
+            transition: all 0.3s ease;
+        }
+        
+        .toc-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+        
+        /* Table of Contents sticky positioning */
+        .sticky-toc {
+            position: sticky;
+            top: 100px;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-indigo-900 via-blue-800 to-blue-700 text-white">
+    <!-- Navigation Bar -->
+    <nav class="bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg fixed w-full z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <a href="home.html">
+                            <i class="fas fa-vote-yea text-2xl text-white"></i>
+                        </a>
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-4">
+                            <a href="home.html" class="px-3 py-2 rounded-md text-sm font-medium text-gray-200 hover:text-white hover:bg-blue-600">Home</a>
+                            <a href="learn-more.html" class="px-3 py-2 rounded-md text-sm font-medium text-gray-200 hover:text-white hover:bg-blue-600">Learn More</a>
+                            <a href="mission.html" class="px-3 py-2 rounded-md text-sm font-medium text-gray-200 hover:text-white hover:bg-blue-600">Our Mission</a>
+                            <a href="security.html" class="px-3 py-2 rounded-md text-sm font-medium text-gray-200 hover:text-white hover:bg-blue-600">Security</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-4 flex items-center md:ml-6">
+                        <a href="student/register.php" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-blue-600 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Log In / Register
+                        </a>
+                    </div>
+                </div>
+                <div class="-mr-2 flex md:hidden">
+                    <button type="button" class="bg-blue-800 inline-flex items-center justify-center p-2 rounded-md text-gray-200 hover:text-white hover:bg-blue-700 focus:outline-none">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="pt-24 pb-16 hero-gradient">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-4 animate__animated animate__fadeInDown">
+                User <span class="text-blue-200">Guide</span>
+            </h1>
+            <p class="mt-3 text-xl text-blue-100 sm:mt-5 max-w-3xl mx-auto animate__animated animate__fadeIn" style="animation-delay: 0.2s">
+                A comprehensive guide to using the University Voting System
+            </p>
+            
+            <div class="flex justify-center mt-8 space-x-4">
+                <a href="#" onclick="window.print(); return false;" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-blue-600 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <i class="fas fa-print mr-2"></i> Print Guide
+                </a>
+                <a href="#" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <i class="fas fa-download mr-2"></i> Download PDF
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Guide Content Section -->
+    <section class="py-16 bg-gradient-to-b from-indigo-900 to-blue-900">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row">
+                <!-- Table of Contents -->
+                <div class="md:w-1/4 md:pr-8 mb-8 md:mb-0">
+                    <div class="sticky-toc bg-white bg-opacity-5 rounded-xl p-6">
+                        <h2 class="text-xl font-bold mb-4">Contents</h2>
+                        <ul class="space-y-3">
+                            <li>
+                                <a href="#introduction" class="toc-link flex items-center px-3 py-2 rounded-md hover:text-white">
+                                    <i class="fas fa-info-circle text-blue-300 mr-2"></i>
+                                    <span>1. Introduction</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#getting-started" class="toc-link flex items-center px-3 py-2 rounded-md hover:text-white">
+                                    <i class="fas fa-rocket text-blue-300 mr-2"></i>
+                                    <span>2. Getting Started</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#account-management" class="toc-link flex items-center px-3 py-2 rounded-md hover:text-white">
+                                    <i class="fas fa-user-cog text-blue-300 mr-2"></i>
+                                    <span>3. Account Management</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#voting-process" class="toc-link flex items-center px-3 py-2 rounded-md hover:text-white">
+                                    <i class="fas fa-vote-yea text-blue-300 mr-2"></i>
+                                    <span>4. Voting Process</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#candidate-info" class="toc-link flex items-center px-3 py-2 rounded-md hover:text-white">
+                                    <i class="fas fa-user-tie text-blue-300 mr-2"></i>
+                                    <span>5. Candidate Information</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#results-verification" class="toc-link flex items-center px-3 py-2 rounded-md hover:text-white">
+                                    <i class="fas fa-chart-bar text-blue-300 mr-2"></i>
+                                    <span>6. Results & Verification</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#security-features" class="toc-link flex items-center px-3 py-2 rounded-md hover:text-white">
+                                    <i class="fas fa-shield-alt text-blue-300 mr-2"></i>
+                                    <span>7. Security Features</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#troubleshooting" class="toc-link flex items-center px-3 py-2 rounded-md hover:text-white">
+                                    <i class="fas fa-tools text-blue-300 mr-2"></i>
+                                    <span>8. Troubleshooting</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#glossary" class="toc-link flex items-center px-3 py-2 rounded-md hover:text-white">
+                                    <i class="fas fa-book text-blue-300 mr-2"></i>
+                                    <span>9. Glossary</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Main Content -->
+                <div class="md:w-3/4">
+                    <!-- Introduction Section -->
+                    <div id="introduction" class="mb-16 bg-white bg-opacity-5 rounded-xl p-8">
+                        <h2 class="text-3xl font-bold mb-6 section-heading">1. Introduction</h2>
+                        
+                        <div class="mb-8">
+                            <h3 class="text-xl font-semibold mb-4">1.1 About the University Voting System</h3>
+                            <p class="text-blue-100 mb-4">
+                                The University Voting System is a secure, electronic platform designed specifically for university elections. Our system enables students, faculty, and staff to participate in campus democratic processes conveniently while maintaining the highest standards of security and integrity.
+                            </p>
+                            <p class="text-blue-100">
+                                Whether you're voting in student government elections, department leadership contests, or university-wide referendums, this guide will help you understand how to use the platform effectively.
+                            </p>
+                        </div>
+                        
+                        <div class="mb-8">
+                            <h3 class="text-xl font-semibold mb-4">1.2 Key Features</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-white bg-opacity-10 p-4 rounded-lg">
+                                    <h4 class="font-medium mb-2 flex items-center">
+                                        <i class="fas fa-shield-alt text-blue-300 mr-2"></i>
+                                        Secure Voting
+                                    </h4>
+                                    <p class="text-sm text-blue-200">
+                                        End-to-end encryption and blockchain verification ensure the integrity of every vote.
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-white bg-opacity-10 p-4 rounded-lg">
+                                    <h4 class="font-medium mb-2 flex items-center">
+                                        <i class="fas fa-user-secret text-blue-300 mr-2"></i>
+                                        Anonymous Ballots
+                                    </h4>
+                                    <p class="text-sm text-blue-200">
+                                        Sophisticated cryptographic protocols separate your identity from your voting choices.
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-white bg-opacity-10 p-4 rounded-lg">
+                                    <h4 class="font-medium mb-2 flex items-center">
+                                        <i class="fas fa-laptop text-blue-300 mr-2"></i>
+                                        Accessible Platform
+                                    </h4>
+                                    <p class="text-sm text-blue-200">
+                                        Vote from any device with internet access—desktop, tablet, or mobile.
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-white bg-opacity-10 p-4 rounded-lg">
+                                    <h4 class="font-medium mb-2 flex items-center">
+                                        <i class="fas fa-clipboard-check text-blue-300 mr-2"></i>
+                                        Verifiable Results
+                                    </h4>
+                                    <p class="text-sm text-blue-200">
+                                        Confirm your vote was counted correctly using your unique receipt code.
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-white bg-opacity-10 p-4 rounded-lg">
+                                    <h4 class="font-medium mb-2 flex items-center">
+                                        <i class="fas fa-users text-blue-300 mr-2"></i>
+                                        Candidate Profiles
+                                    </h4>
+                                    <p class="text-sm text-blue-200">
+                                        Learn about candidates with detailed profiles and platform information.
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-white bg-opacity-10 p-4 rounded-lg">
+                                    <h4 class="font-medium mb-2 flex items-center">
+                                        <i class="fas fa-chart-pie text-blue-300 mr-2"></i>
+                                        Real-time Results
+                                    </h4>
+                                    <p class="text-sm text-blue-200">
+                                        View election outcomes as soon as they're verified and published.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-xl font-semibold mb-4">1.3 How to Use This Guide</h3>
+                            <p class="text-blue-100 mb-4">
+                                This user guide is organized into sections that follow the typical user journey. You can read it from start to finish or jump to specific sections using the table of contents.
+                            </p>
+                            <p class="text-blue-100">
+                                Look for these special callouts throughout the guide:
+                            </p>
+                            
+                            <div class="space-y-4 mt-4">
+                                <div class="bg-blue-800 bg-opacity-50 border-l-4 border-blue-400 p-4 rounded-r-md">
+                                    <div class="flex">
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-info-circle text-blue-300 text-xl"></i>
+                                        </div>
+                                        <div class="ml-4">
+                                            <p class="text-sm text-blue-100">
+                                                <span class="font-bold">Note:</span> Additional information that may be helpful.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-yellow-800 bg-opacity-50 border-l-4 border-yellow-400 p-4 rounded-r-md">
+                                    <div class="flex">
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-exclamation-triangle text-yellow-300 text-xl"></i>
+                                        </div>
+                                        <div class="ml-4">
+                                            <p class="text-sm text-blue-100">
+                                                <span class="font-bold">Important:</span> Critical information you should pay special attention to.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-green-800 bg-opacity-50 border-l-4 border-green-400 p-4 rounded-r-md">
+                                    <div class="flex">
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-lightbulb text-green-300 text-xl"></i>
+                                        </div>
+                                        <div class="ml-4">
+                                            <p class="text-sm text-blue-100">
+                                                <span class="font-bold">Tip:</span> Helpful suggestions to improve your experience.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Getting Started Section -->
+                    <div id="getting-started" class="mb-16 bg-white bg-opacity-5 rounded-xl p-8">
+                        <h2 class="text-3xl font-bold mb-6 section-heading">2. Getting Started</h2>
+                        
+                        <div class="mb-8">
+                            <h3 class="text-xl font-semibold mb-4">2.1 System Requirements</h3>
+                            <p class="text-blue-100 mb-4">
+                                The University Voting System is a web-based platform that works on most modern devices and browsers. Here are the minimum requirements:
+                            </p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                                <div>
+                                    <h4 class="font-medium mb-2">Supported Browsers:</h4>
+                                    <ul class="list-disc pl-5 text-blue-100 space-y-1">
+                                        <li>Google Chrome (version 90+)</li>
+                                        <li>Mozilla Firefox (version 88+)</li>
+                                        <li>Apple Safari (version 14+)</li>
+                                        <li>Microsoft Edge (version 90+)</li>
+                                    </ul>
+                                </div>
+                                
+                                <div>
+                                    <h4 class="font-medium mb-2">Supported Devices:</h4>
+                                    <ul class="list-disc pl-5 text-blue-100 space-y-1">
+                                        <li>Desktop/Laptop computers (Windows, macOS, Linux)</li>
+                                        <li>Tablets (iOS 13+, Android 9+)</li>
+                                        <li>Smartphones (iOS 13+, Android 9+)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-yellow-800 bg-opacity-50 border-l-4 border-yellow-400 p-4 rounded-r-md">
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-exclamation-triangle text-yellow-300 text-xl"></i>
+                                    </div>
+                                    <div class="ml-4">
+                                        <p class="text-sm text-blue-100">
+                                            <span class="font-bold">Important:</span> JavaScript must be enabled in your browser for the platform to function correctly.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-8">
+                            <h3 class="text-xl font-semibold mb-4">2.2 Creating Your Account</h3>
+                            
+                            <div class="space-y-6">
+                                <div class="flex">
+                                    <div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center mr-4">
+                                        <span class="font-bold">1</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium mb-2">Navigate to the Registration Page</h4>
+                                        <p class="text-blue-100">
+                                            Visit the <a href="student/register.php" class="text-blue-300 hover:text-white">registration page</a> by clicking "Log In / Register" in the top navigation bar and then selecting "Create Account."
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex">
+                                    <div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center mr-4">
+                                        <span class="font-bold">2</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium mb-2">Enter Your University Email</h4>
+                                        <p class="text-blue-100">
+                                            You must use your official university email address ending with your institution's domain (e.g., @university.edu).
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex">
+                                    <div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center mr-4">
+                                        <span class="font-bold">3</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium mb-2">Verify Your Email</h4>
+                                        <p class="text-blue-100">
+                                            Check your university email inbox for a verification link. Click the link to confirm your email address. The verification link expires after 24 hours.
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex">
+                                    <div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center mr-4">
+                                        <span class="font-bold">4</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium mb-2">Complete Your Profile</h4>
+                                        <p class="text-blue-100 mb-3">
+                                            After verifying your email, you'll be prompted to:
+                                        </p>
+                                        <ul class="list-disc pl-5 text-blue-100 space-y-1 mb-3">
+                                            <li>Create a secure password (at least 12 characters with a mix of letters, numbers, and symbols)</li>
+                                            <li>Enter your full name as it appears in university records</li>
+                                            <li>Provide your student/faculty ID number</li>
+                                            <li>Select your department or school</li>
+                                            <li>Indicate your class year or status (for students)</li>
+                                        </ul>
+                                        <div class="bg-green-800 bg-opacity-50 border-l-4 border-green-400 p-4 rounded-r-md">
+                                            <div class="flex">
+                                                <div class="flex-shrink-0">
+                                                    <i class="fas fa-lightbulb text-green-300 text-xl"></i>
+                                                </div>
+                                                <div class="ml-4">
+                                                    <p class="text-sm text-blue-100">
+                                                        <span class="font-bold">Tip:</span> Make sure your information matches exactly what's in your university's official records to ensure verification goes smoothly.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex">
+                                    <div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center mr-4">
+                                        <span class="font-bold">5</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium mb-2">Wait for Verification</h4>
+                                        <p class="text-blue-100">
+                                            Your account information will be automatically verified against your university's records. This process typically takes minutes but can take up to 24 hours in some cases. You'll receive an email notification once your account is fully verified and ready to use.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-xl font-semibold mb-4">2.3 Logging In</h3>
+                            
+                            <div class="space-y-4">
+                                <p class="text-blue-100">
+                                    Once your account is verified, you can log in to the platform:
+                                </p>
+                                
+                                <ol class="list-decimal pl-5 text-blue-100 space-y-2">
+                                    <li>Visit the <a href="student/login.php" class="text-blue-300 hover:text-white">login page</a></li>
+                                    <li>Enter your university email address</li>
+                                    <li>Enter your password</li>
+                                    <li>Click "Log In"</li>
+                                </ol>
+                                
+                                <div class="bg-blue-800 bg-opacity-50 border-l-4 border-blue-400 p-4 rounded-r-md mt-4">
+                                    <div class="flex">
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-info-circle text-blue-300 text-xl"></i>
+                                        </div>
+                                        <div class="ml-4">
+                                            <p class="text-sm text-blue-100">
+                                                <span class="font-bold">Note:</span> For security reasons, you'll be automatically logged out after 30 minutes of inactivity. If you're voting in an election, make sure to complete your ballot within this timeframe or save your progress.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-indigo-900 pt-12 pb-6">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">About</h3>
+                    <ul class="space-y-2">
+                        <li><a href="mission.html" class="text-blue-200 hover:text-white">Our Mission</a></li>
+                        <li><a href="security.html" class="text-blue-200 hover:text-white">Security</a></li>
+                        <li><a href="privacy.html" class="text-blue-200 hover:text-white">Privacy Policy</a></li>
+                        <li><a href="terms.html" class="text-blue-200 hover:text-white">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Resources</h3>
+                    <ul class="space-y-2">
+                        <li><a href="help-center.html" class="text-blue-200 hover:text-white">Help Center</a></li>
+                        <li><a href="user-guide.html" class="text-blue-200 hover:text-white">User Guide</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">API Documentation</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">Developer Resources</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Features</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-blue-200 hover:text-white">Candidate Profiles</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">Real-time Results</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">Voter Statistics</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">Election Archives</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Connect</h3>
+                    <div class="flex space-x-4 mb-4">
+                        <a href="#" class="text-blue-200 hover:text-white"><i class="fab fa-twitter text-xl"></i></a>
+                        <a href="#" class="text-blue-200 hover:text-white"><i class="fab fa-facebook text-xl"></i></a>
+                        <a href="#" class="text-blue-200 hover:text-white"><i class="fab fa-instagram text-xl"></i></a>
+                        <a href="#" class="text-blue-200 hover:text-white"><i class="fab fa-linkedin text-xl"></i></a>
+                    </div>
+                    <p class="text-blue-200">Email us: <a href="mailto:contact@universityvoter.com" class="hover:text-white">contact@universityvoter.com</a></p>
+                </div>
+            </div>
+            <div class="border-t border-blue-800 pt-6 text-center text-sm text-blue-300">
+                <p>© 2025 University Voting System. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Animation on Scroll -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js"></script>
+    <script>
+        // Initialize animations
+        new WOW().init();
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

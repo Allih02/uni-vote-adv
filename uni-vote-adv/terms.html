@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service - University Voting System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            scroll-behavior: smooth;
+        }
+        
+        .hero-gradient {
+            background-image: linear-gradient(135deg, #6366F1 0%, #3B82F6 50%, #2563EB 100%);
+        }
+        
+        .section-heading:after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 3px;
+            background-color: #3B82F6;
+            margin: 15px 0 0;
+        }
+        
+        .terms-card {
+            transition: all 0.3s ease;
+        }
+        
+        .terms-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-indigo-900 via-blue-800 to-blue-700 text-white">
+    <!-- Navigation Bar -->
+    <nav class="bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg fixed w-full z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <a href="home.html">
+                            <i class="fas fa-vote-yea text-2xl text-white"></i>
+                        </a>
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-4">
+                            <a href="home.html" class="px-3 py-2 rounded-md text-sm font-medium text-gray-200 hover:text-white hover:bg-blue-600">Home</a>
+                            <a href="learn-more.html" class="px-3 py-2 rounded-md text-sm font-medium text-gray-200 hover:text-white hover:bg-blue-600">Learn More</a>
+                            <a href="mission.html" class="px-3 py-2 rounded-md text-sm font-medium text-gray-200 hover:text-white hover:bg-blue-600">Our Mission</a>
+                            <a href="security.html" class="px-3 py-2 rounded-md text-sm font-medium text-gray-200 hover:text-white hover:bg-blue-600">Security</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-4 flex items-center md:ml-6">
+                        <a href="student/register.php" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-blue-600 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Log In / Register
+                        </a>
+                    </div>
+                </div>
+                <div class="-mr-2 flex md:hidden">
+                    <button type="button" class="bg-blue-800 inline-flex items-center justify-center p-2 rounded-md text-gray-200 hover:text-white hover:bg-blue-700 focus:outline-none">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="pt-24 pb-16 hero-gradient">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-4 animate__animated animate__fadeInDown">
+                Terms of <span class="text-blue-200">Service</span>
+            </h1>
+            <p class="mt-3 text-xl text-blue-100 sm:mt-5 max-w-3xl mx-auto animate__animated animate__fadeIn" style="animation-delay: 0.2s">
+                The legal agreement governing your use of the University Voting System
+            </p>
+            <p class="mt-4 text-blue-200">Last Updated: May 1, 2025</p>
+        </div>
+    </div>
+
+    <!-- Terms Overview Section -->
+    <section class="py-16 bg-gradient-to-b from-indigo-900 to-blue-900">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="mb-12">
+                <h2 class="text-3xl font-bold mb-6 section-heading">Overview</h2>
+                <p class="text-blue-100 mb-4 text-lg">
+                    These Terms of Service ("Terms") govern your access to and use of the University Voting System platform, including any associated web or mobile applications (collectively, the "Service"). Please read these Terms carefully before using the Service.
+                </p>
+                <p class="text-blue-100 mb-4">
+                    By accessing or using the Service, you agree to be bound by these Terms and our Privacy Policy. If you disagree with any part of the Terms, then you may not access the Service.
+                </p>
+                <p class="text-blue-100">
+                    These Terms constitute a legal agreement between you and University Voting System. If you are using the Service on behalf of an organization or entity, you represent and warrant that you have authority to bind that organization or entity to these Terms. In that case, "you" and "your" refers to both you and that organization or entity.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+                <div class="terms-card bg-white bg-opacity-10 rounded-xl p-6 backdrop-filter backdrop-blur-sm">
+                    <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mb-6 mx-auto">
+                        <i class="fas fa-university text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4 text-center">Institutional Use</h3>
+                    <p class="text-blue-100 text-center">
+                        Our platform is designed specifically for official elections at universities and educational institutions.
+                    </p>
+                </div>
+                
+                <div class="terms-card bg-white bg-opacity-10 rounded-xl p-6 backdrop-filter backdrop-blur-sm">
+                    <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mb-6 mx-auto">
+                        <i class="fas fa-user-graduate text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4 text-center">Authorized Users</h3>
+                    <p class="text-blue-100 text-center">
+                        Access is restricted to verified members of participating educational institutions with valid credentials.
+                    </p>
+                </div>
+                
+                <div class="terms-card bg-white bg-opacity-10 rounded-xl p-6 backdrop-filter backdrop-blur-sm">
+                    <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mb-6 mx-auto">
+                        <i class="fas fa-balance-scale text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4 text-center">Legal Compliance</h3>
+                    <p class="text-blue-100 text-center">
+                        Users must comply with all applicable laws and university policies when using our platform.
+                    </p>
+                </div>
+            </div>
+
+            <div class="mb-12">
+                <h2 class="text-3xl font-bold mb-6 section-heading">Quick Summary</h2>
+                <div class="bg-white bg-opacity-10 rounded-xl p-6 backdrop-filter backdrop-blur-sm">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h3 class="text-xl font-semibold mb-4 flex items-center">
+                                <i class="fas fa-check-circle text-blue-400 mr-3"></i>
+                                What You Can Do
+                            </h3>
+                            <ul class="list-disc pl-5 text-blue-100 space-y-2">
+                                <li>Participate in legitimate elections at your institution</li>
+                                <li>Create and maintain one account linked to your institutional identity</li>
+                                <li>View candidate information and election results</li>
+                                <li>Submit feedback and report issues</li>
+                                <li>Access and use the Service as intended for institutional voting</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-xl font-semibold mb-4 flex items-center">
+                                <i class="fas fa-times-circle text-blue-400 mr-3"></i>
+                                What You Cannot Do
+                            </h3>
+                            <ul class="list-disc pl-5 text-blue-100 space-y-2">
+                                <li>Create multiple accounts or share access credentials</li>
+                                <li>Attempt to manipulate voting results or interfere with elections</li>
+                                <li>Use the system for unauthorized purposes</li>
+                                <li>Violate the integrity, security, or functionality of the Service</li>
+                                <li>Access the Service through automated means</li>
+                                <li>Reverse engineer or modify the Service</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-xl font-semibold mb-4 flex items-center">
+                                <i class="fas fa-shield-alt text-blue-400 mr-3"></i>
+                                Our Responsibilities
+                            </h3>
+                            <ul class="list-disc pl-5 text-blue-100 space-y-2">
+                                <li>Provide a secure and reliable voting platform</li>
+                                <li>Maintain integrity and anonymity of the electoral process</li>
+                                <li>Protect user privacy according to our Privacy Policy</li>
+                                <li>Provide technical support for the Service</li>
+                                <li>Continuously improve the Service based on user feedback</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-xl font-semibold mb-4 flex items-center">
+                                <i class="fas fa-exclamation-triangle text-blue-400 mr-3"></i>
+                                Important Notes
+                            </h3>
+                            <ul class="list-disc pl-5 text-blue-100 space-y-2">
+                                <li>We may modify these Terms at any time with notice</li>
+                                <li>We may suspend or terminate access for violations</li>
+                                <li>We are not responsible for third-party content</li>
+                                <li>University administrators have oversight of the Service</li>
+                                <li>These Terms may be superseded by your institution's policies</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Detailed Terms Section -->
+    <section class="py-16 bg-gradient-to-b from-blue-900 to-indigo-900">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="mb-16">
+                <h2 class="text-3xl font-bold mb-6 section-heading">Detailed Terms of Service</h2>
+                
+                <!-- Service Access and Eligibility -->
+                <div class="mb-12 bg-white bg-opacity-5 rounded-xl p-8">
+                    <h3 id="access-eligibility" class="text-2xl font-bold mb-6">1. Service Access and Eligibility</h3>
+                    
+                    <div class="mb-8">
+                        <h4 class="text-xl font-semibold mb-4">1.1 Institutional Affiliation</h4>
+                        <p class="text-blue-100 mb-4">
+                            The Service is exclusively available to current students, faculty, and staff of educational institutions that have contracted with University Voting System. Your eligibility to access and use the Service is contingent upon your affiliation with a participating institution.
+                        </p>
+                        <p class="text-blue-100">
+                            We reserve the right to verify your institutional affiliation at any time. If we cannot confirm your eligibility or if your affiliation with the institution ends, we may suspend or terminate your access to the Service.
+                        </p>
+                    </div>
+                    
+                    <div class="mb-8">
+                        <h4 class="text-xl font-semibold mb-4">1.2 Account Registration</h4>
+                        <p class="text-blue-100 mb-4">
+                            To access the Service, you must register for an account using your institutional email address and create a secure password. You agree to provide accurate, current, and complete information during the registration process and to update such information to keep it accurate, current, and complete.
+                        </p>
+                        <p class="text-blue-100 mb-4">
+                            You are responsible for safeguarding your account credentials and for all activities that occur under your account. You agree to notify us immediately of any unauthorized use of your account or any other breach of security.
+                        </p>
+                        <p class="text-blue-100">
+                            You may not create multiple accounts or share your account credentials with others. Each eligible user must register individually using their own institutional credentials.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-xl font-semibold mb-4">1.3 Age Requirement</h4>
+                        <p class="text-blue-100">
+                            You must be at least 16 years of age to use the Service. By using the Service, you represent and warrant that you meet this age requirement. If you are under the age of 18 but at least 16 years old, you may only use the Service with the consent and supervision of a parent or legal guardian who agrees to be bound by these Terms.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Acceptable Use -->
+                <div class="mb-12 bg-white bg-opacity-5 rounded-xl p-8">
+                    <h3 id="acceptable-use" class="text-2xl font-bold mb-6">2. Acceptable Use</h3>
+                    
+                    <div class="mb-8">
+                        <h4 class="text-xl font-semibold mb-4">2.1 Permitted Use</h4>
+                        <p class="text-blue-100 mb-4">
+                            You may use the Service solely for participating in legitimate elections and voting activities as authorized by your educational institution. This includes:
+                        </p>
+                        <ul class="list-disc pl-8 text-blue-100 space-y-2 mb-4">
+                            <li>Registering for and maintaining a single user account</li>
+                            <li>Casting votes in elections for which you are eligible</li>
+                            <li>Viewing election information, candidate profiles, and results</li>
+                            <li>Submitting feedback and reporting technical issues</li>
+                            <li>Accessing other features and functionality that we make available through the Service</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-xl font-semibold mb-4">2.2 Prohibited Activities</h4>
+                        <p class="text-blue-100 mb-4">
+                            You agree not to engage in any of the following prohibited activities:
+                        </p>
+                        <ul class="list-disc pl-8 text-blue-100 space-y-2">
+                            <li>Creating multiple accounts or sharing your account credentials with others</li>
+                            <li>Attempting to manipulate voting results or interfere with the electoral process</li>
+                            <li>Using the Service to conduct unauthorized polls or elections</li>
+                            <li>Using the Service for any illegal purpose or in violation of any local, state, national, or international law</li>
+                            <li>Attempting to gain unauthorized access to the Service or other users' accounts</li>
+                            <li>Interfering with or disrupting the integrity or performance of the Service</li>
+                            <li>Attempting to reverse engineer, modify, or create derivative works based on the Service</li>
+                            <li>Circumventing any technological measures implemented to protect the Service</li>
+                            <li>Using the Service to transmit any viruses, malware, or other harmful code</li>
+                            <li>Collecting or harvesting any information from the Service, including user data</li>
+                            <li>Using the Service to send unauthorized advertising or promotional materials</li>
+                            <li>Impersonating another person or entity or misrepresenting your affiliation with a person or entity</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Intellectual Property Rights -->
+                <div class="mb-12 bg-white bg-opacity-5 rounded-xl p-8">
+                    <h3 id="intellectual-property" class="text-2xl font-bold mb-6">3. Intellectual Property Rights</h3>
+                    
+                    <div class="mb-8">
+                        <h4 class="text-xl font-semibold mb-4">3.1 Our Intellectual Property</h4>
+                        <p class="text-blue-100 mb-4">
+                            The Service and its original content, features, and functionality are owned by University Voting System and are protected by international copyright, trademark, patent, trade secret, and other intellectual property or proprietary rights laws.
+                        </p>
+                        <p class="text-blue-100">
+                            These Terms do not grant you any rights to use our trademarks, logos, domain names, or other distinctive brand features without our prior written consent.
+                        </p>
+                    </div>
+                    
+                    <div class="mb-8">
+                        <h4 class="text-xl font-semibold mb-4">3.2 Limited License</h4>
+                        <p class="text-blue-100 mb-4">
+                            Subject to these Terms, we grant you a limited, non-exclusive, non-transferable, non-sublicensable license to access and use the Service for its intended purpose in accordance with these Terms and as permitted by the features of the Service.
+                        </p>
+                        <p class="text-blue-100">
+                            This license is solely for your personal, non-commercial use and is subject to your compliance with these Terms. This license will terminate automatically if you violate any of these Terms or upon termination of your account.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-xl font-semibold mb-4">3.3 User Content</h4>
+                        <p class="text-blue-100 mb-4">
+                            You may be permitted to submit certain content to the Service, such as profile information, feedback, or reports ("User Content"). You retain all rights in and to your User Content, and you grant us a non-exclusive, royalty-free, worldwide, perpetual, and irrevocable license to use, reproduce, modify, adapt, publish, translate, create derivative works from, distribute, and display such User Content in connection with providing and improving the Service.
+                        </p>
+                        <p class="text-blue-100">
+                            You represent and warrant that you have all rights necessary to grant us this license and that your User Content does not violate these Terms or infringe upon any third-party rights.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Privacy and Data Protection -->
+                <div class="mb-12 bg-white bg-opacity-5 rounded-xl p-8">
+                    <h3 id="privacy" class="text-2xl font-bold mb-6">4. Privacy and Data Protection</h3>
+                    
+                    <div class="mb-8">
+                        <h4 class="text-xl font-semibold mb-4">4.1 Privacy Policy</h4>
+                        <p class="text-blue-100 mb-4">
+                            Our <a href="privacy.html" class="text-blue-300 hover:text-white">Privacy Policy</a> describes how we collect, use, and share your personal information when you use the Service. By using the Service, you acknowledge that you have read and understand our Privacy Policy and agree to our collection, storage, use, and disclosure of your personal information as described in the Privacy Policy.
+                        </p>
+                    </div>
+                    
+                    <div class="mb-8">
+                        <h4 class="text-xl font-semibold mb-4">4.2 Voting Privacy</h4>
+                        <p class="text-blue-100 mb-4">
+                            We are committed to maintaining the anonymity of your votes. While we record that you have participated in a particular election (to prevent duplicate voting), your specific voting choices are not linked to your identity and cannot be traced back to you.
+                        </p>
+                        <p class="text-blue-100">
+                            However, you acknowledge that no system can guarantee absolute anonymity, and in certain limited circumstances (such as a court order), we may be required to provide information about user activities on the Service.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-xl font-semibold mb-4">4.3 Communication</h4>
+                        <p class="text-blue-100 mb-4">
+                            By using the Service, you consent to receive communications from us, including emails about upcoming elections, confirmation of your actions on the Service, and updates to these Terms or our Privacy Policy.
+                        </p>
+                        <p class="text-blue-100">
+                            You may opt out of receiving certain non-essential communications by following the unsubscribe instructions provided in the email or by adjusting your account settings. However, you cannot opt out of receiving service-related communications that are essential to your use of the Service.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Service Availability and Modification -->
+                <div class="mb-12 bg-white bg-opacity-5 rounded-xl p-8">
+                    <h3 id="service-availability" class="text-2xl font-bold mb-6">5. Service Availability and Modification</h3>
+                    
+                    <div class="mb-8">
+                        <h4 class="text-xl font-semibold mb-4">5.1 Service Availability</h4>
+                        <p class="text-blue-100 mb-4">
+                            We strive to ensure that the Service is available at all times, particularly during active election periods. However, we do not guarantee uninterrupted access to the Service. The Service may be temporarily unavailable due to maintenance, updates, or factors beyond our control.
+                        </p>
+                        <p class="text-blue-100">
+                            We are not liable for any interruptions in the availability of the Service, regardless of the cause. We will make reasonable efforts to notify users of scheduled maintenance or anticipated downtime.
+                        </p>
+                    </div>
+                    
+                    <div class="mb-8">
+                        <h4 class="text-xl font-semibold mb-4">5.2 Modifications to the Service</h4>
+                        <p class="text-blue-100 mb-4">
+                            We reserve the right to modify, suspend, or discontinue the Service, temporarily or permanently, at any time, with or without notice. We may also add, remove, or modify features or functionality of the Service at our discretion.
+                        </p>
+                        <p class="text-blue-100">
+                            You agree that we will not be liable to you or any third party for any modification, suspension, or discontinuation of the Service or any part thereof.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-xl font-semibold mb-4">5.3 Updates to These Terms</h4>
+                        <p class="text-blue-100 mb-4">
+                            We may update these Terms from time to time at our discretion. If we make material changes to these Terms, we will notify you by email or through a notice on the Service before the changes take effect.
+                        </p>
+                        <p class="text-blue-100 mb-4">
+                            Your continued use of the Service after the effective date of the revised Terms constitutes your acceptance of the changes. If you do not agree to the revised Terms, you must stop using the Service.
+                        </p>
+                        <p class="text-blue-100">
+                            You are encouraged to review these Terms periodically to stay informed of any updates.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Termination -->
+                <div class="mb-12 bg-white bg-opacity-5 rounded-xl p-8">
+                    <h3 id="termination" class="text-2xl font-bold mb-6">6. Termination</h3>
+                    
+                    <div class="mb-8">
+                        <h4 class="text-xl font-semibold mb-4">6.1 Termination by You</h4>
+                        <p class="text-blue-100 mb-4">
+                            You may terminate your account at any time by following the instructions on the Service or by contacting us. Upon termination, you will no longer have access to your account or any features of the Service that require an account.
+                        </p>
+                        <p class="text-blue-100">
+                            Note that terminating your account does not remove your voting history or other data that we are required to retain for legal, administrative, or security purposes.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-xl font-semibold mb-4">6.2 Termination by Us</h4>
+                        <p class="text-blue-100 mb-4">
+                            We may suspend or terminate your access to the Service, including your account, at any time for any reason without notice or liability. Reasons for termination may include, but are not limited to:
+                        </p>
+                        <ul class="list-disc pl-8 text-blue-100 space-y-2 mb-4">
+                            <li>Violation of these Terms</li>
+                            <li>Engagement in prohibited activities</li>
+                            <li>Failure to maintain eligibility criteria (e.g., ending your affiliation with the educational institution)</li>
+                            <li>Upon request from your educational institution</li>
+                            <li>As required by law or government order</li>
+                            <li>If we discontinue the Service</li>
+                        </ul>
+                        <p class="text-blue-100">
+                            Upon termination, your right to use the Service will immediately cease. All provisions of these Terms that by their nature should survive termination shall survive, including intellectual property provisions, warranty disclaimers, indemnity, and limitations of liability.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Disclaimers and Limitations of Liability -->
+                <div class="mb-12 bg-white bg-opacity-5 rounded-xl p-8">
+                    <h3 id="disclaimers" class="text-2xl font-bold mb-6">7. Disclaimers and Limitations of Liability</h3>
+                    
+                    <div class="mb-8">
+                        <h4 class="text-xl font-semibold mb-4">7.1 Disclaimer of Warranties</h4>
+                        <p class="text-blue-100 mb-4">
+                            THE SERVICE IS PROVIDED ON AN "AS IS" AND "AS AVAILABLE" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED. TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, WE DISCLAIM ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+                        </p>
+                        <p class="text-blue-100 mb-4">
+                            WE DO NOT WARRANT THAT THE SERVICE WILL BE UNINTERRUPTED, ERROR-FREE, OR SECURE; THAT DEFECTS WILL BE CORRECTED; OR THAT THE SERVICE IS FREE OF VIRUSES OR OTHER HARMFUL COMPONENTS. YOU ASSUME THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SERVICE.
+                        </p>
+                        <p class="text-blue-100">
+                            WE DO NOT WARRANT OR MAKE ANY REPRESENTATIONS REGARDING THE USE OR THE RESULTS OF THE USE OF THE SERVICE IN TERMS OF CORRECTNESS, ACCURACY, RELIABILITY, OR OTHERWISE.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-xl font-semibold mb-4">7.2 Limitation of Liability</h4>
+                        <p class="text-blue-100 mb-4">
+                            TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT WILL WE, OUR AFFILIATES, OR THEIR LICENSORS, SERVICE PROVIDERS, EMPLOYEES, AGENTS, OFFICERS, OR DIRECTORS BE LIABLE FOR ANY INDIRECT, SPECIAL, INCIDENTAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING BUT NOT LIMITED TO, PERSONAL INJURY, PAIN AND SUFFERING, EMOTIONAL DISTRESS, LOSS OF REVENUE, LOSS OF PROFITS, LOSS OF BUSINESS OR ANTICIPATED SAVINGS, LOSS OF USE, LOSS OF GOODWILL, LOSS OF DATA, OR OTHER INTANGIBLE LOSSES, ARISING OUT OF OR RELATING TO:
+                        </p>
+                        <ul class="list-disc pl-8 text-blue-100 space-y-2 mb-4">
+                            <li>YOUR USE OF OR INABILITY TO USE THE SERVICE;</li>
+                            <li>ANY ACTION TAKEN IN CONNECTION WITH AN INVESTIGATION BY US OR LAW ENFORCEMENT AUTHORITIES REGARDING YOUR USE OF THE SERVICE;</li>
+                            <li>ANY ACTION TAKEN IN CONNECTION WITH COPYRIGHT OR OTHER INTELLECTUAL PROPERTY OWNERS;</li>
+                            <li>ANY ERRORS OR OMISSIONS IN THE OPERATION OF THE SERVICE;</li>
+                            <li>ANY UNAUTHORIZED ACCESS TO OR USE OF OUR SERVERS AND/OR ANY PERSONAL INFORMATION STORED THEREIN;</li>
+                            <li>ANY INTERRUPTION OR CESSATION OF TRANSMISSION TO OR FROM THE SERVICE;</li>
+                            <li>ANY BUGS, VIRUSES, TROJAN HORSES, OR THE LIKE THAT MAY BE TRANSMITTED TO OR THROUGH THE SERVICE BY ANY THIRD PARTY;</li>
+                            <li>ANY LOSS OR DAMAGE OF ANY KIND INCURRED AS A RESULT OF YOUR USE OF ANY CONTENT POSTED, EMAILED, TRANSMITTED, OR OTHERWISE MADE AVAILABLE VIA THE SERVICE.</li>
+                        </ul>
+                        <p class="text-blue-100 mb-4">
+                            NOTWITHSTANDING ANYTHING TO THE CONTRARY CONTAINED HEREIN, OUR LIABILITY TO YOU FOR ANY CAUSE WHATSOEVER AND REGARDLESS OF THE FORM OF THE ACTION, WILL AT ALL TIMES BE LIMITED TO THE GREATER OF (A) THE AMOUNT PAID, IF ANY, BY YOU TO US FOR THE SERVICE DURING THE PERIOD OF 12 MONTHS PRIOR TO ANY CAUSE OF ACTION ARISING, OR (B) $100.
+                        </p>
+                        <p class="text-blue-100">
+                            CERTAIN STATE LAWS DO NOT ALLOW LIMITATIONS ON IMPLIED WARRANTIES OR THE EXCLUSION OR LIMITATION OF CERTAIN DAMAGES. IF THESE LAWS APPLY TO YOU, SOME OR ALL OF THE ABOVE DISCLAIMERS, EXCLUSIONS, OR LIMITATIONS MAY NOT APPLY TO YOU, AND YOU MAY HAVE ADDITIONAL RIGHTS.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Indemnification -->
+                <div class="mb-12 bg-white bg-opacity-5 rounded-xl p-8">
+                    <h3 id="indemnification" class="text-2xl font-bold mb-6">8. Indemnification</h3>
+                    
+                    <p class="text-blue-100 mb-4">
+                        You agree to defend, indemnify, and hold harmless University Voting System, its affiliates, licensors, and service providers, and its and their respective officers, directors, employees, contractors, agents, licensors, suppliers, successors, and assigns from and against any claims, liabilities, damages, judgments, awards, losses, costs, expenses, or fees (including reasonable attorneys' fees) arising out of or relating to:
+                    </p>
+                    <ul class="list-disc pl-8 text-blue-100 space-y-2 mb-4">
+                        <li>Your violation of these Terms;</li>
+                        <li>Your use of the Service, including any User Content;</li>
+                        <li>Your violation of any rights of another person or entity; or</li>
+                        <li>Your violation of any laws, rules, or regulations.</li>
+                    </ul>
+                    <p class="text-blue-100">
+                        We reserve the right, at your expense, to assume the exclusive defense and control of any matter for which you are required to indemnify us, and you agree to cooperate with our defense of these claims. You agree not to settle any matter without our prior written consent. We will use reasonable efforts to notify you of any such claim, action, or proceeding upon becoming aware of it.
+                    </p>
+                </div>
+                
+                <!-- Governing Law and Dispute Resolution -->
+                <div class="mb-12 bg-white bg-opacity-5 rounded-xl p-8">
+                    <h3 id="governing-law" class="text-2xl font-bold mb-6">9. Governing Law and Dispute Resolution</h3>
+                    
+                    <div class="mb-8">
+                        <h4 class="text-xl font-semibold mb-4">9.1 Governing Law</h4>
+                        <p class="text-blue-100">
+                            These Terms and your use of the Service shall be governed by and construed in accordance with the laws of the Commonwealth of Massachusetts, without giving effect to any choice or conflict of law provision or rule. The application of the United Nations Convention on Contracts for the International Sale of Goods is expressly excluded.
+                        </p>
+                    </div>
+                    
+                    <div class="mb-8">
+                        <h4 class="text-xl font-semibold mb-4">9.2 Dispute Resolution</h4>
+                        <p class="text-blue-100 mb-4">
+                            Any dispute, controversy, or claim arising out of or relating to these Terms or the Service shall be settled by binding arbitration in accordance with the commercial arbitration rules of the American Arbitration Association. The arbitration shall be conducted in Boston, Massachusetts, and judgment on the arbitration award may be entered into any court having jurisdiction thereof.
+                        </p>
+                        <p class="text-blue-100 mb-4">
+                            Any such arbitration shall be conducted by an arbitrator experienced in online services and technology and shall include a written record of the arbitration hearing. The parties shall each bear an equal share of the arbitrator's fees and administrative costs of arbitration.
+                        </p>
+                        <p class="text-blue-100">
+                            Notwithstanding the foregoing, we may seek injunctive or other equitable relief to protect our intellectual property rights or to prevent unauthorized use of the Service in any court of competent jurisdiction.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-xl font-semibold mb-4">9.3 Class Action Waiver</h4>
+                        <p class="text-blue-100 mb-4">
+                            ANY ARBITRATION OR LEGAL ACTION SHALL PROCEED SOLELY ON AN INDIVIDUAL BASIS; CLASS ACTIONS AND CLASS ARBITRATIONS ARE NOT PERMITTED. YOU AGREE THAT YOU MAY BRING CLAIMS AGAINST US ONLY IN YOUR INDIVIDUAL CAPACITY, AND NOT AS A PLAINTIFF OR CLASS MEMBER IN ANY PURPORTED CLASS OR REPRESENTATIVE PROCEEDING.
+                        </p>
+                        <p class="text-blue-100">
+                            IF THIS SPECIFIC PROVISION IS FOUND TO BE UNENFORCEABLE, THEN THE ENTIRETY OF THIS "GOVERNING LAW AND DISPUTE RESOLUTION" SECTION SHALL BE NULL AND VOID, AND NEITHER YOU NOR WE SHALL BE ENTITLED TO ARBITRATE OUR DISPUTE.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Miscellaneous -->
+                <div class="bg-white bg-opacity-5 rounded-xl p-8">
+                    <h3 id="miscellaneous" class="text-2xl font-bold mb-6">10. Miscellaneous</h3>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <h4 class="text-xl font-semibold mb-3">10.1 Entire Agreement</h4>
+                            <p class="text-blue-100">
+                                These Terms, together with our Privacy Policy, constitute the entire agreement between you and University Voting System regarding your use of the Service and supersede all prior and contemporaneous written or oral agreements, understandings, or communications on the subject matter covered by these Terms.
+                            </p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-xl font-semibold mb-3">10.2 Waiver</h4>
+                            <p class="text-blue-100">
+                                Our failure to exercise or enforce any right or provision of these Terms shall not operate as a waiver of such right or provision. No waiver by us shall be effective unless it is in writing and signed by an authorized representative of University Voting System.
+                            </p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-xl font-semibold mb-3">10.3 Severability</h4>
+                            <p class="text-blue-100">
+                                If any provision of these Terms is found to be invalid, illegal, or unenforceable, the remaining provisions shall remain in full force and effect. The invalid, illegal, or unenforceable provision shall be deemed modified so that it is valid, legal, and enforceable while preserving its intent, or if this is not possible, it shall be severed from these Terms without affecting the validity and enforceability of the remaining provisions.
+                            </p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-xl font-semibold mb-3">10.4 Assignment</h4>
+                            <p class="text-blue-100">
+                                You may not assign or transfer these Terms, by operation of law or otherwise, without our prior written consent. Any attempt by you to assign or transfer these Terms without our consent shall be null and void. We may freely assign or transfer these Terms without restriction, and without notice to you. Subject to the foregoing, these Terms will bind and inure to the benefit of the parties, their successors, and permitted assigns.
+                            </p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-xl font-semibold mb-3">10.5 Relationship of the Parties</h4>
+                            <p class="text-blue-100">
+                                Nothing in these Terms is intended to or shall operate to create a partnership, joint venture, agency, or employment relationship between the parties. Neither party is authorized to act as agent for the other or to bind the other to any obligation.
+                            </p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-xl font-semibold mb-3">10.6 Survival</h4>
+                            <p class="text-blue-100">
+                                The provisions of these Terms that by their nature should survive termination shall survive, including, but not limited to, intellectual property provisions, warranty disclaimers, indemnity, and limitations of liability.
+                            </p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-xl font-semibold mb-3">10.7 Contact Information</h4>
+                            <p class="text-blue-100 mb-4">
+                                If you have any questions about these Terms, please contact us at:
+                            </p>
+                            <div class="bg-white bg-opacity-10 rounded-lg p-6 max-w-md">
+                                <p class="text-blue-100 mb-2">
+                                    <span class="font-semibold">Email:</span> <a href="mailto:legal@universityvoter.com" class="text-blue-300 hover:text-white">legal@universityvoter.com</a>
+                                </p>
+                                <p class="text-blue-100 mb-2">
+                                    <span class="font-semibold">Postal Address:</span>
+                                </p>
+                                <address class="text-blue-100 not-italic mb-2">
+                                    University Voting System<br>
+                                    Attn: Legal Department<br>
+                                    123 Tech Avenue, Suite 400<br>
+                                    Boston, MA 02110<br>
+                                    United States
+                                </address>
+                                <p class="text-blue-100">
+                                    <span class="font-semibold">Phone:</span> +1 (800) 555-0123
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Terms Navigation Section -->
+    <section class="py-16 bg-gradient-to-b from-indigo-900 to-blue-900">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-6 section-heading mx-auto">
+                    Quick <span class="text-blue-400">Navigation</span>
+                </h2>
+                <p class="mt-4 max-w-3xl mx-auto text-lg text-blue-100">
+                    Jump to specific sections of our Terms of Service
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <a href="#access-eligibility" class="terms-card bg-white bg-opacity-10 rounded-xl p-6 backdrop-filter backdrop-blur-sm hover:bg-opacity-20 transition">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mr-4">
+                            <i class="fas fa-user-check text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold">Service Access and Eligibility</h3>
+                            <p class="text-blue-200 text-sm">Institutional affiliation, account registration, age requirements</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="#acceptable-use" class="terms-card bg-white bg-opacity-10 rounded-xl p-6 backdrop-filter backdrop-blur-sm hover:bg-opacity-20 transition">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mr-4">
+                            <i class="fas fa-clipboard-check text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold">Acceptable Use</h3>
+                            <p class="text-blue-200 text-sm">Permitted uses, prohibited activities</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="#intellectual-property" class="terms-card bg-white bg-opacity-10 rounded-xl p-6 backdrop-filter backdrop-blur-sm hover:bg-opacity-20 transition">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mr-4">
+                            <i class="fas fa-copyright text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold">Intellectual Property Rights</h3>
+                            <p class="text-blue-200 text-sm">Our IP, limited license, user content</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="#privacy" class="terms-card bg-white bg-opacity-10 rounded-xl p-6 backdrop-filter backdrop-blur-sm hover:bg-opacity-20 transition">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mr-4">
+                            <i class="fas fa-shield-alt text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold">Privacy and Data Protection</h3>
+                            <p class="text-blue-200 text-sm">Privacy policy, voting privacy, communications</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="#disclaimers" class="terms-card bg-white bg-opacity-10 rounded-xl p-6 backdrop-filter backdrop-blur-sm hover:bg-opacity-20 transition">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mr-4">
+                            <i class="fas fa-exclamation-circle text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold">Disclaimers and Limitations</h3>
+                            <p class="text-blue-200 text-sm">Warranty disclaimers, limitation of liability</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="#governing-law" class="terms-card bg-white bg-opacity-10 rounded-xl p-6 backdrop-filter backdrop-blur-sm hover:bg-opacity-20 transition">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mr-4">
+                            <i class="fas fa-gavel text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold">Governing Law and Disputes</h3>
+                            <p class="text-blue-200 text-sm">Applicable law, dispute resolution, class action waiver</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="mt-12 text-center">
+                <a href="#" onclick="window.print(); return false;" class="inline-flex items-center px-5 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-blue-600 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <i class="fas fa-print mr-2"></i> Print Terms of Service
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-indigo-900 pt-12 pb-6">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">About</h3>
+                    <ul class="space-y-2">
+                        <li><a href="mission.html" class="text-blue-200 hover:text-white">Our Mission</a></li>
+                        <li><a href="security.html" class="text-blue-200 hover:text-white">Security</a></li>
+                        <li><a href="privacy.html" class="text-blue-200 hover:text-white">Privacy Policy</a></li>
+                        <li><a href="terms.html" class="text-white hover:text-white">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Resources</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-blue-200 hover:text-white">Help Center</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">User Guide</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">API Documentation</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">Developer Resources</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Features</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-blue-200 hover:text-white">Candidate Profiles</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">Real-time Results</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">Voter Statistics</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">Election Archives</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Connect</h3>
+                    <div class="flex space-x-4 mb-4">
+                        <a href="#" class="text-blue-200 hover:text-white"><i class="fab fa-twitter text-xl"></i></a>
+                        <a href="#" class="text-blue-200 hover:text-white"><i class="fab fa-facebook text-xl"></i></a>
+                        <a href="#" class="text-blue-200 hover:text-white"><i class="fab fa-instagram text-xl"></i></a>
+                        <a href="#" class="text-blue-200 hover:text-white"><i class="fab fa-linkedin text-xl"></i></a>
+                    </div>
+                    <p class="text-blue-200">Email us: <a href="mailto:contact@universityvoter.com" class="hover:text-white">contact@universityvoter.com</a></p>
+                </div>
+            </div>
+            <div class="border-t border-blue-800 pt-6 text-center text-sm text-blue-300">
+                <p>© 2025 University Voting System. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Animation on Scroll -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js"></script>
+    <script>
+        // Initialize animations
+        new WOW().init();
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

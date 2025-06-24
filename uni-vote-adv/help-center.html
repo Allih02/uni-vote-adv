@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help Center - University Voting System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            scroll-behavior: smooth;
+        }
+        
+        .hero-gradient {
+            background-image: linear-gradient(135deg, #6366F1 0%, #3B82F6 50%, #2563EB 100%);
+        }
+        
+        .section-heading:after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 3px;
+            background-color: #3B82F6;
+            margin: 15px 0 0;
+        }
+        
+        .faq-card {
+            transition: all 0.3s ease;
+        }
+        
+        .faq-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .accordion-header {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .accordion-header:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .accordion-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .accordion-body.active {
+            max-height: 500px;
+        }
+        
+        .rotate-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        .rotate-icon.active {
+            transform: rotate(180deg);
+        }
+        
+        .search-card {
+            background-image: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(59, 130, 246, 0.1) 50%, rgba(37, 99, 235, 0.1) 100%);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-indigo-900 via-blue-800 to-blue-700 text-white">
+    <!-- Navigation Bar -->
+    <nav class="bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg fixed w-full z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <a href="home.html">
+                            <i class="fas fa-vote-yea text-2xl text-white"></i>
+                        </a>
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-4">
+                            <a href="home.html" class="px-3 py-2 rounded-md text-sm font-medium text-gray-200 hover:text-white hover:bg-blue-600">Home</a>
+                            <a href="learn-more.html" class="px-3 py-2 rounded-md text-sm font-medium text-gray-200 hover:text-white hover:bg-blue-600">Learn More</a>
+                            <a href="mission.html" class="px-3 py-2 rounded-md text-sm font-medium text-gray-200 hover:text-white hover:bg-blue-600">Our Mission</a>
+                            <a href="security.html" class="px-3 py-2 rounded-md text-sm font-medium text-gray-200 hover:text-white hover:bg-blue-600">Security</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-4 flex items-center md:ml-6">
+                        <a href="student/register.php" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-blue-600 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Log In
+                        </a>
+                    </div>
+                </div>
+                <div class="-mr-2 flex md:hidden">
+                    <button type="button" class="bg-blue-800 inline-flex items-center justify-center p-2 rounded-md text-gray-200 hover:text-white hover:bg-blue-700 focus:outline-none">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="pt-24 pb-16 hero-gradient">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-4 animate__animated animate__fadeInDown">
+                Help <span class="text-blue-200">Center</span>
+            </h1>
+            <p class="mt-3 text-xl text-blue-100 sm:mt-5 max-w-3xl mx-auto animate__animated animate__fadeIn" style="animation-delay: 0.2s">
+                Find answers to your questions and get the support you need
+            </p>
+            
+            <!-- Search Bar -->
+            <div class="max-w-3xl mx-auto mt-8 mb-4 search-card p-4 rounded-xl backdrop-filter backdrop-blur-sm animate__animated animate__fadeInUp" style="animation-delay: 0.4s">
+                <div class="relative">
+                    <input type="text" placeholder="Search for help topics..." class="w-full py-3 px-4 pr-12 rounded-lg bg-white bg-opacity-10 border border-white border-opacity-20 text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:bg-opacity-20">
+                    <button class="absolute right-3 top-3">
+                        <i class="fas fa-search text-blue-200"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Quick Links -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 animate__animated animate__fadeInUp" style="animation-delay: 0.6s">
+                <a href="#account-setup" class="p-4 bg-white bg-opacity-10 rounded-xl backdrop-filter backdrop-blur-sm hover:bg-opacity-20 transition">
+                    <i class="fas fa-user-circle text-2xl mb-2 text-blue-300"></i>
+                    <p class="font-medium">Account Setup</p>
+                </a>
+                <a href="#voting-help" class="p-4 bg-white bg-opacity-10 rounded-xl backdrop-filter backdrop-blur-sm hover:bg-opacity-20 transition">
+                    <i class="fas fa-vote-yea text-2xl mb-2 text-blue-300"></i>
+                    <p class="font-medium">Voting Help</p>
+                </a>
+                <a href="#security-privacy" class="p-4 bg-white bg-opacity-10 rounded-xl backdrop-filter backdrop-blur-sm hover:bg-opacity-20 transition">
+                    <i class="fas fa-shield-alt text-2xl mb-2 text-blue-300"></i>
+                    <p class="font-medium">Security & Privacy</p>
+                </a>
+                <a href="#troubleshooting" class="p-4 bg-white bg-opacity-10 rounded-xl backdrop-filter backdrop-blur-sm hover:bg-opacity-20 transition">
+                    <i class="fas fa-tools text-2xl mb-2 text-blue-300"></i>
+                    <p class="font-medium">Troubleshooting</p>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Sections -->
+    <section class="py-16 bg-gradient-to-b from-indigo-900 to-blue-900">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Account Setup Section -->
+            <div id="account-setup" class="mb-16">
+                <h2 class="text-3xl font-bold mb-8 section-heading">Account Setup</h2>
+                
+                <div class="space-y-6">
+                    <div class="faq-card bg-white bg-opacity-10 rounded-xl overflow-hidden">
+                        <div class="accordion-header flex justify-between items-center p-6">
+                            <h3 class="text-xl font-semibold">How do I create an account?</h3>
+                            <i class="fas fa-chevron-down rotate-icon text-blue-300"></i>
+                        </div>
+                        <div class="accordion-body px-6 pb-6">
+                            <p class="text-blue-100 mb-4">
+                                To create an account on the University Voting System:
+                            </p>
+                            <ol class="list-decimal pl-5 text-blue-100 space-y-2">
+                                <li>Click the "Log In" button in the top right corner of the homepage</li>
+                                <li>Select "Create Account" on the login page</li>
+                                <li>Enter your university email address (must end with your institution's domain)</li>
+                                <li>Check your email for a verification link and click it</li>
+                                <li>Complete your profile with your personal information</li>
+                                <li>Create a secure password</li>
+                                <li>Your account will be verified against university records</li>
+                                <li>Once verified, you can log in and participate in elections</li>
+                            </ol>
+                            <p class="text-blue-200 mt-4">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                Note: Only current students, faculty, and staff with valid university credentials can create accounts.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-card bg-white bg-opacity-10 rounded-xl overflow-hidden">
+                        <div class="accordion-header flex justify-between items-center p-6">
+                            <h3 class="text-xl font-semibold">I didn't receive a verification email. What should I do?</h3>
+                            <i class="fas fa-chevron-down rotate-icon text-blue-300"></i>
+                        </div>
+                        <div class="accordion-body px-6 pb-6">
+                            <p class="text-blue-100 mb-4">
+                                If you haven't received your verification email:
+                            </p>
+                            <ol class="list-decimal pl-5 text-blue-100 space-y-2">
+                                <li>Check your spam/junk folder</li>
+                                <li>Verify you entered your email address correctly</li>
+                                <li>Wait 15 minutes as emails may sometimes be delayed</li>
+                                <li>Click "Resend Verification Email" on the registration page</li>
+                            </ol>
+                            <p class="text-blue-100 mt-4">
+                                If you still don't receive the email after trying these steps, please contact support at <a href="mailto:support@universityvoter.com" class="text-blue-300 hover:text-white">support@universityvoter.com</a> with your full name and university ID.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-card bg-white bg-opacity-10 rounded-xl overflow-hidden">
+                        <div class="accordion-header flex justify-between items-center p-6">
+                            <h3 class="text-xl font-semibold">How do I reset my password?</h3>
+                            <i class="fas fa-chevron-down rotate-icon text-blue-300"></i>
+                        </div>
+                        <div class="accordion-body px-6 pb-6">
+                            <p class="text-blue-100 mb-4">
+                                To reset your password:
+                            </p>
+                            <ol class="list-decimal pl-5 text-blue-100 space-y-2">
+                                <li>Go to the login page</li>
+                                <li>Click "Forgot Password?"</li>
+                                <li>Enter your university email address</li>
+                                <li>Check your email for a password reset link</li>
+                                <li>Create a new password that meets our security requirements</li>
+                            </ol>
+                            <p class="text-blue-200 mt-4">
+                                <i class="fas fa-exclamation-triangle mr-2"></i>
+                                Important: Password reset links expire after 24 hours for security reasons.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Voting Help Section -->
+            <div id="voting-help" class="mb-16">
+                <h2 class="text-3xl font-bold mb-8 section-heading">Voting Help</h2>
+                
+                <div class="space-y-6">
+                    <div class="faq-card bg-white bg-opacity-10 rounded-xl overflow-hidden">
+                        <div class="accordion-header flex justify-between items-center p-6">
+                            <h3 class="text-xl font-semibold">How do I cast my vote?</h3>
+                            <i class="fas fa-chevron-down rotate-icon text-blue-300"></i>
+                        </div>
+                        <div class="accordion-body px-6 pb-6">
+                            <p class="text-blue-100 mb-4">
+                                Casting your vote is simple:
+                            </p>
+                            <ol class="list-decimal pl-5 text-blue-100 space-y-2">
+                                <li>Log in to your account</li>
+                                <li>On your dashboard, you'll see all active elections you're eligible to vote in</li>
+                                <li>Click "Vote Now" for the election you want to participate in</li>
+                                <li>Review the candidates and their profiles</li>
+                                <li>Select your preferred candidate(s) according to the voting method</li>
+                                <li>Review your choices on the confirmation screen</li>
+                                <li>Submit your ballot</li>
+                                <li>You'll receive a confirmation receipt with a unique code</li>
+                            </ol>
+                            <p class="text-blue-200 mt-4">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                Note: Different elections may use different voting methods (single choice, ranked choice, etc.). Instructions will be provided on the voting page.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-card bg-white bg-opacity-10 rounded-xl overflow-hidden">
+                        <div class="accordion-header flex justify-between items-center p-6">
+                            <h3 class="text-xl font-semibold">Can I change my vote after submitting?</h3>
+                            <i class="fas fa-chevron-down rotate-icon text-blue-300"></i>
+                        </div>
+                        <div class="accordion-body px-6 pb-6">
+                            <p class="text-blue-100">
+                                No, once you submit your ballot, your vote is final and cannot be changed. This is to maintain the integrity of the election process.
+                            </p>
+                            <p class="text-blue-100 mt-4">
+                                However, if you haven't clicked the final "Submit Ballot" button, you can navigate back through the voting process to modify your choices.
+                            </p>
+                            <p class="text-blue-200 mt-4">
+                                <i class="fas fa-lightbulb mr-2"></i>
+                                Tip: Take your time to research candidates and consider your choices carefully before submitting your vote.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-card bg-white bg-opacity-10 rounded-xl overflow-hidden">
+                        <div class="accordion-header flex justify-between items-center p-6">
+                            <h3 class="text-xl font-semibold">What is ranked-choice voting and how does it work?</h3>
+                            <i class="fas fa-chevron-down rotate-icon text-blue-300"></i>
+                        </div>
+                        <div class="accordion-body px-6 pb-6">
+                            <p class="text-blue-100 mb-4">
+                                Ranked-choice voting (RCV) is a voting method used in some elections that allows you to rank candidates in order of preference (1st, 2nd, 3rd, etc.) rather than selecting just one candidate.
+                            </p>
+                            <p class="text-blue-100 mb-4">
+                                Here's how it works:
+                            </p>
+                            <ol class="list-decimal pl-5 text-blue-100 space-y-2">
+                                <li>All first-choice votes are counted</li>
+                                <li>If a candidate receives more than 50% of first-choice votes, they win</li>
+                                <li>If no candidate has a majority, the candidate with the fewest votes is eliminated</li>
+                                <li>Voters who selected the eliminated candidate have their vote transferred to their next choice</li>
+                                <li>This process continues until a candidate has a majority</li>
+                            </ol>
+                            <div class="mt-4 p-4 bg-blue-800 bg-opacity-30 rounded-lg">
+                                <h4 class="font-semibold mb-2">Example:</h4>
+                                <p class="text-blue-100 text-sm">
+                                    In an election with candidates A, B, and C, you might rank them: 1) B, 2) C, 3) A. If B is eliminated, your vote would transfer to your second choice, C.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Security & Privacy Section -->
+            <div id="security-privacy" class="mb-16">
+                <h2 class="text-3xl font-bold mb-8 section-heading">Security & Privacy</h2>
+                
+                <div class="space-y-6">
+                    <div class="faq-card bg-white bg-opacity-10 rounded-xl overflow-hidden">
+                        <div class="accordion-header flex justify-between items-center p-6">
+                            <h3 class="text-xl font-semibold">How is my vote kept anonymous?</h3>
+                            <i class="fas fa-chevron-down rotate-icon text-blue-300"></i>
+                        </div>
+                        <div class="accordion-body px-6 pb-6">
+                            <p class="text-blue-100 mb-4">
+                                We use a sophisticated cryptographic process to ensure your vote remains anonymous while still being verifiable:
+                            </p>
+                            <ul class="list-disc pl-5 text-blue-100 space-y-2">
+                                <li>When you submit your ballot, the system separates your identity from your vote choices using a technique called "blind signatures"</li>
+                                <li>Your vote is encrypted and stored without any connection to your personal information</li>
+                                <li>The system verifies that you are eligible to vote without tracking which specific candidates you selected</li>
+                                <li>Your vote receipt allows you to verify your vote was counted correctly without revealing your choices to others</li>
+                            </ul>
+                            <p class="text-blue-100 mt-4">
+                                This approach ensures that no one—not even system administrators—can connect your identity to your specific vote choices, while still maintaining the integrity of the election.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-card bg-white bg-opacity-10 rounded-xl overflow-hidden">
+                        <div class="accordion-header flex justify-between items-center p-6">
+                            <h3 class="text-xl font-semibold">What security measures protect the voting system?</h3>
+                            <i class="fas fa-chevron-down rotate-icon text-blue-300"></i>
+                        </div>
+                        <div class="accordion-body px-6 pb-6">
+                            <p class="text-blue-100 mb-4">
+                                The University Voting System employs multiple layers of security:
+                            </p>
+                            <ul class="list-disc pl-5 text-blue-100 space-y-3">
+                                <li>
+                                    <span class="font-medium">End-to-end encryption:</span>
+                                    <p class="mt-1">All data is encrypted during transmission and storage</p>
+                                </li>
+                                <li>
+                                    <span class="font-medium">Blockchain verification:</span>
+                                    <p class="mt-1">Votes are recorded in a tamper-evident ledger that can be independently verified</p>
+                                </li>
+                                <li>
+                                    <span class="font-medium">Multi-factor authentication:</span>
+                                    <p class="mt-1">Sensitive administrative functions require additional verification</p>
+                                </li>
+                                <li>
+                                    <span class="font-medium">Continuous monitoring:</span>
+                                    <p class="mt-1">Automated systems detect and block suspicious activity</p>
+                                </li>
+                                <li>
+                                    <span class="font-medium">Regular security audits:</span>
+                                    <p class="mt-1">Independent security experts regularly review our systems</p>
+                                </li>
+                                <li>
+                                    <span class="font-medium">Open-source components:</span>
+                                    <p class="mt-1">Key security algorithms can be reviewed by the public</p>
+                                </li>
+                            </ul>
+                            <p class="text-blue-200 mt-4">
+                                <i class="fas fa-shield-alt mr-2"></i>
+                                For more detailed information on our security measures, please visit our <a href="security.html" class="text-blue-300 hover:text-white">Security</a> page.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-card bg-white bg-opacity-10 rounded-xl overflow-hidden">
+                        <div class="accordion-header flex justify-between items-center p-6">
+                            <h3 class="text-xl font-semibold">How can I verify my vote was counted correctly?</h3>
+                            <i class="fas fa-chevron-down rotate-icon text-blue-300"></i>
+                        </div>
+                        <div class="accordion-body px-6 pb-6">
+                            <p class="text-blue-100 mb-4">
+                                After submitting your ballot, you'll receive a unique receipt code. This code allows you to verify your vote was included in the final tally:
+                            </p>
+                            <ol class="list-decimal pl-5 text-blue-100 space-y-2">
+                                <li>Log in to your account after the election results are published</li>
+                                <li>Go to "My Voting History"</li>
+                                <li>Select the election you participated in</li>
+                                <li>Click "Verify My Vote"</li>
+                                <li>The system will confirm your vote was included in the count without revealing your specific choices</li>
+                            </ol>
+                            <p class="text-blue-100 mt-4">
+                                Additionally, you can use our public verification tool to check that the overall election results are accurate, without compromising anyone's vote privacy.
+                            /=>
+                            <p class="text-blue-200 mt-4">
+                                <i class="fas fa-exclamation-triangle mr-2"></i>
+                                Important: Keep your receipt code private. While it can't be used to determine your choices, it's an important security measure.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Troubleshooting Section -->
+            <div id="troubleshooting" class="mb-16">
+                <h2 class="text-3xl font-bold mb-8 section-heading">Troubleshooting</h2>
+                
+                <div class="space-y-6">
+                    <div class="faq-card bg-white bg-opacity-10 rounded-xl overflow-hidden">
+                        <div class="accordion-header flex justify-between items-center p-6">
+                            <h3 class="text-xl font-semibold">I'm having trouble logging in. What should I do?</h3>
+                            <i class="fas fa-chevron-down rotate-icon text-blue-300"></i>
+                        </div>
+                        <div class="accordion-body px-6 pb-6">
+                            <p class="text-blue-100 mb-4">
+                                If you're experiencing login issues, try these steps:
+                            </p>
+                            <ol class="list-decimal pl-5 text-blue-100 space-y-2">
+                                <li>Verify you're using the correct email address (your university email)</li>
+                                <li>Make sure you're entering your password correctly (check caps lock)</li>
+                                <li>Clear your browser cache and cookies</li>
+                                <li>Try using a different browser</li>
+                                <li>Use the "Forgot Password" link to reset your password</li>
+                            </ol>
+                            <p class="text-blue-100 mt-4">
+                                If you're still having trouble after trying these steps, contact our support team at <a href="mailto:support@universityvoter.com" class="text-blue-300 hover:text-white">support@universityvoter.com</a> with details about the issue you're experiencing.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-card bg-white bg-opacity-10 rounded-xl overflow-hidden">
+                        <div class="accordion-header flex justify-between items-center p-6">
+                            <h3 class="text-xl font-semibold">The system says I'm not eligible to vote in an election. Why?</h3>
+                            <i class="fas fa-chevron-down rotate-icon text-blue-300"></i>
+                        </div>
+                        <div class="accordion-body px-6 pb-6">
+                            <p class="text-blue-100 mb-4">
+                                Eligibility for elections is determined by several factors:
+                            </p>
+                            <ul class="list-disc pl-5 text-blue-100 space-y-2">
+                                <li>Your academic department or school (for department-specific elections)</li>
+                                <li>Your class year or status (undergraduate, graduate, faculty, etc.)</li>
+                                <li>Your registration date (some elections require you to be registered before a certain date)</li>
+                                <li>Previous participation (some positions have term limits)</li>
+                            </ul>
+                            <p class="text-blue-100 mt-4">
+                                If you believe you should be eligible for an election but the system indicates otherwise, check that your profile information is complete and accurate. If everything is correct and you still think there's an error, contact your university's election administrator at <a href="mailto:elections@university.edu" class="text-blue-300 hover:text-white">elections@university.edu</a>.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-card bg-white bg-opacity-10 rounded-xl overflow-hidden">
+                        <div class="accordion-header flex justify-between items-center p-6">
+                            <h3 class="text-xl font-semibold">The page isn't loading or displays errors. How can I fix this?</h3>
+                            <i class="fas fa-chevron-down rotate-icon text-blue-300"></i>
+                        </div>
+                        <div class="accordion-body px-6 pb-6">
+                            <p class="text-blue-100 mb-4">
+                                If you're experiencing technical issues with the website:
+                            </p>
+                            <ol class="list-decimal pl-5 text-blue-100 space-y-2">
+                                <li>Refresh the page (press F5 or Ctrl+R)</li>
+                                <li>Clear your browser cache and cookies</li>
+                                <li>Check your internet connection</li>
+                                <li>Try using a different browser (Chrome, Firefox, Safari, or Edge)</li>
+                                <li>Disable browser extensions that might be interfering</li>
+                                <li>Try accessing the site from a different device</li>
+                            </ol>
+                            <p class="text-blue-100 mt-4">
+                                If the problem persists, please report the issue to our technical support team:
+                            </p>
+                            <ol class="list-decimal pl-5 text-blue-100 space-y-2">
+                                <li>Take a screenshot of any error messages</li>
+                                <li>Note the device and browser you're using</li>
+                                <li>Describe the steps that led to the error</li>
+                                <li>Email this information to <a href="mailto:tech@universityvoter.com" class="text-blue-300 hover:text-white">tech@universityvoter.com</a></li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contact Support Section -->
+            <div class="bg-white bg-opacity-5 rounded-xl p-8 backdrop-filter backdrop-blur-sm">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                    <div>
+                        <h2 class="text-2xl font-bold mb-6">Still Need Help?</h2>
+                        <p class="text-blue-100 mb-6">
+                            If you couldn't find what you're looking for in our Help Center, our support team is ready to assist you.
+                        </p>
+                        <div class="space-y-4">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center mr-4">
+                                    <i class="fas fa-envelope text-white"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-medium mb-1">Email Support</h3>
+                                    <p class="text-blue-200 text-sm mb-1">Response within 24 hours</p>
+                                    <a href="mailto:support@universityvoter.com" class="text-blue-300 hover:text-white">support@universityvoter.com</a>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center mr-4">
+                                    <i class="fas fa-phone-alt text-white"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-medium mb-1">Phone Support</h3>
+                                    <p class="text-blue-200 text-sm mb-1">Available Mon-Fri, 9am-5pm</p>
+                                    <a href="tel:+18005550123" class="text-blue-300 hover:text-white">+1 (800) 555-0123</a>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center mr-4">
+                                    <i class="fas fa-comments text-white"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-medium mb-1">Live Chat</h3>
+                                    <p class="text-blue-200 text-sm mb-1">Available during election periods</p>
+                                    <button class="text-blue-300 hover:text-white mt-1">Start Chat <i class="fas fa-arrow-right ml-1"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h2 class="text-2xl font-bold mb-6">Additional Resources</h2>
+                        <div class="space-y-4">
+                            <a href="user-guide.html" class="flex items-center p-4 bg-white bg-opacity-10 rounded-lg hover:bg-opacity-20 transition">
+                                <div class="flex-shrink-0 w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center mr-4">
+                                    <i class="fas fa-book text-white"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-medium">User Guide</h3>
+                                    <p class="text-sm text-blue-200">Comprehensive documentation on using the platform</p>
+                                </div>
+                                <i class="fas fa-chevron-right ml-auto text-blue-300"></i>
+                            </a>
+                            
+                            <a href="#" class="flex items-center p-4 bg-white bg-opacity-10 rounded-lg hover:bg-opacity-20 transition">
+                                <div class="flex-shrink-0 w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center mr-4">
+                                    <i class="fas fa-video text-white"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-medium">Video Tutorials</h3>
+                                    <p class="text-sm text-blue-200">Step-by-step visual guides to using the system</p>
+                                </div>
+                                <i class="fas fa-chevron-right ml-auto text-blue-300"></i>
+                            </a>
+                            
+                            <a href="#" class="flex items-center p-4 bg-white bg-opacity-10 rounded-lg hover:bg-opacity-20 transition">
+                                <div class="flex-shrink-0 w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center mr-4">
+                                    <i class="fas fa-graduation-cap text-white"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-medium">University IT Support</h3>
+                                    <p class="text-sm text-blue-200">Connect with your institution's tech team</p>
+                                </div>
+                                <i class="fas fa-chevron-right ml-auto text-blue-300"></i>
+                            </a>
+                            
+                            <a href="#" class="flex items-center p-4 bg-white bg-opacity-10 rounded-lg hover:bg-opacity-20 transition">
+                                <div class="flex-shrink-0 w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center mr-4">
+                                    <i class="fas fa-file-alt text-white"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-medium">Election Rules</h3>
+                                    <p class="text-sm text-blue-200">Official policies and procedures</p>
+                                </div>
+                                <i class="fas fa-chevron-right ml-auto text-blue-300"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-indigo-900 pt-12 pb-6">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">About</h3>
+                    <ul class="space-y-2">
+                        <li><a href="mission.html" class="text-blue-200 hover:text-white">Our Mission</a></li>
+                        <li><a href="security.html" class="text-blue-200 hover:text-white">Security</a></li>
+                        <li><a href="privacy.html" class="text-blue-200 hover:text-white">Privacy Policy</a></li>
+                        <li><a href="terms.html" class="text-blue-200 hover:text-white">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Resources</h3>
+                    <ul class="space-y-2">
+                        <li><a href="help-center.html" class="text-blue-200 hover:text-white">Help Center</a></li>
+                        <li><a href="user-guide.html" class="text-blue-200 hover:text-white">User Guide</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">API Documentation</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">Developer Resources</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Features</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-blue-200 hover:text-white">Candidate Profiles</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">Real-time Results</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">Voter Statistics</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white">Election Archives</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Connect</h3>
+                    <div class="flex space-x-4 mb-4">
+                        <a href="#" class="text-blue-200 hover:text-white"><i class="fab fa-twitter text-xl"></i></a>
+                        <a href="#" class="text-blue-200 hover:text-white"><i class="fab fa-facebook text-xl"></i></a>
+                        <a href="#" class="text-blue-200 hover:text-white"><i class="fab fa-instagram text-xl"></i></a>
+                        <a href="#" class="text-blue-200 hover:text-white"><i class="fab fa-linkedin text-xl"></i></a>
+                    </div>
+                    <p class="text-blue-200">Email us: <a href="mailto:contact@universityvoter.com" class="hover:text-white">contact@universityvoter.com</a></p>
+                </div>
+            </div>
+            <div class="border-t border-blue-800 pt-6 text-center text-sm text-blue-300">
+                <p>© 2025 University Voting System. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Accordion functionality
+        document.querySelectorAll('.accordion-header').forEach(button => {
+            button.addEventListener('click', () => {
+                const body = button.nextElementSibling;
+                const icon = button.querySelector('.rotate-icon');
+                
+                // Toggle the accordion
+                body.classList.toggle('active');
+                icon.classList.toggle('active');
+                
+                // Close other accordions (optional)
+                /*
+                document.querySelectorAll('.accordion-body').forEach(otherBody => {
+                    if (otherBody !== body) {
+                        otherBody.classList.remove('active');
+                    }
+                });
+                
+                document.querySelectorAll('.rotate-icon').forEach(otherIcon => {
+                    if (otherIcon !== icon) {
+                        otherIcon.classList.remove('active');
+                    }
+                });
+                */
+            });
+        });
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80, // Adjust for fixed navbar
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
